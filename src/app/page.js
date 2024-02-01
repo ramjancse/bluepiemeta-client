@@ -10,12 +10,12 @@ export default function Home() {
     <>
       <Header />
 
-      <main class="flex">
-        <div class="h-full w-1/6">
+      <main className="flex">
+        <div className="h-full w-1/6">
           <Sidebar />
         </div>
 
-        <div class="w-5/6 border-l-[1px] border-divideColor">
+        <div className="w-5/6 border-l-[1px] border-divideColor">
           <Intro />
 
           <Songs />

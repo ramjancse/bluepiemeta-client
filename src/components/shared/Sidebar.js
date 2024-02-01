@@ -43,16 +43,16 @@ const Sidebar = () => {
   ];
 
   return (
-    <nav class="flex justify-center pt-5">
-      <ul class="flex flex-col">
+    <nav className="flex justify-center pt-5">
+      <ul className="flex flex-col">
         {menus.map((menu) => (
           <li key={menu.id}>
             <Link
               href={menu.link}
-              class="flex items-center p-2 hover:font-medium hover:text-fill"
+              className="flex items-center p-2 hover:font-medium hover:text-fill"
             >
-              <div class="circle relative mr-3 h-3 w-3 rounded-full border-2 border-blue-400">
-                <div class="fill absolute left-[2px] h-3 w-3 rounded-full bg-fill"></div>
+              <div className="circle relative mr-3 h-3 w-3 rounded-full border-2 border-blue-400">
+                <div className="fill absolute left-[2px] h-3 w-3 rounded-full bg-fill"></div>
               </div>
               {menu.name}
             </Link>

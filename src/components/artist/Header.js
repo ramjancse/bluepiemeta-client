@@ -1,0 +1,85 @@
+import React from "react";
+import { FaBars, FaMagnifyingGlass } from "react-icons/fa6";
+
+const Header = () => {
+  return (
+    <header>
+      <div className="flex items-center overflow-hidden py-3">
+        <div className="flex w-1/6 flex-col items-center">
+          <a
+            href="/"
+            className="flex flex-col items-center hover:font-medium hover:text-fill"
+          >
+            <img className="w-20" src="/images/logo.png" alt="Logo Image" />
+          </a>
+        </div>
+
+        <div className="flex w-5/6">
+          <nav className="w-full">
+            <ul className="font-ralewayMedium flex text-lg text-primary">
+              <li className="ml-3 text-center">
+                <a href="/" className="px-3 hover:font-medium hover:text-fill">
+                  Songs
+                </a>
+              </li>
+
+              <li className="text-center">
+                <a href="/" className="px-3 hover:font-medium hover:text-fill">
+                  Projects
+                </a>
+              </li>
+            </ul>
+          </nav>
+
+          <nav className="w-full overflow-hidden">
+            <ul className="flex items-center justify-end">
+              <li className="relative hidden sm:block">
+                <FaMagnifyingGlass className="absolute left-3 top-[9px] z-20 text-primary" />
+
+                <input
+                  className="relative z-10 w-full rounded-full bg-gray-200 px-8 py-1 font-ralewayRegular focus:outline-none"
+                  type="text"
+                  name="search"
+                  id="search"
+                  placeholder="Search Song"
+                />
+              </li>
+
+              <li className="ml-4">
+                <a href="/dist/index.html">
+                  <img
+                    src="/images/main_banner.jpg"
+                    className="w-[28px] rounded-full"
+                    alt="Profile Image"
+                  />
+                </a>
+              </li>
+
+              <li className="ml-2 mr-1">
+                <a href="/dist/index.html">
+                  <FaBars className="text-2xl text-primary" />
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {/* this search input show only for small screen less than 640px */}
+      <div className="search mb-3 border-y-[1px] border-divideColor px-5 py-2 sm:hidden">
+        <div className="relative w-full">
+          <FaMagnifyingGlass className="absolute left-3 top-[9px] z-20 text-primary" />
+          <input
+            className="relative z-10 w-full rounded-full bg-gray-200 px-8 py-1 font-ralewayRegular focus:outline-none"
+            type="text"
+            name="search"
+            id="search"
+            placeholder="Search Song"
+          />
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;

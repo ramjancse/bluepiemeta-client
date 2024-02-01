@@ -5,64 +5,69 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 
 const Header = () => {
   return (
-    <header class="border-b-[1px] border-divideColor">
-      <div class="flex items-center overflow-hidden">
-        <div class="flex w-1/6 flex-col items-center">
+    <header className="border-b-[1px] border-divideColor">
+      <div className="flex items-center overflow-hidden">
+        <div className="flex w-1/6 flex-col items-center">
           <a
             href="/"
-            class="flex flex-col items-center hover:font-medium hover:text-fill"
+            className="flex flex-col items-center hover:font-medium hover:text-fill"
           >
             <Image
-              class="-mb-2 w-20"
+              className="-mb-2 w-20"
               src="/images/logo.png"
               alt="Logo Image"
               width={200}
               height={100}
             />
-            <span class="font-ralewayMedium text-[10px]">Blue Pie Meta</span>
+            <span className="font-ralewayMedium text-[10px]">
+              Blue Pie Meta
+            </span>
           </a>
         </div>
 
-        <div class="flex h-[87px] w-5/6 items-center border-l-[1px] border-divideColor">
-          <nav class="w-3/5">
-            <ul class="font-ralewayMedium flex text-lg text-primary">
-              <li class="ml-3 text-center">
+        <div className="flex h-[87px] w-5/6 items-center border-l-[1px] border-divideColor">
+          <nav className="w-3/5">
+            <ul className="font-ralewayMedium flex text-lg text-primary">
+              <li className="ml-3 text-center">
                 <Link
                   href="/songs"
-                  class="px-3 hover:font-medium hover:text-fill"
+                  className="px-3 hover:font-medium hover:text-fill"
                 >
                   Songs
                 </Link>
               </li>
 
-              <li class="text-center">
+              <li className="text-center">
                 <a
                   href="/projects"
-                  class="px-3 hover:font-medium hover:text-fill"
+                  className="px-3 hover:font-medium hover:text-fill"
                 >
                   Projects
                 </a>
               </li>
 
-              <li class="text-center">
+              <li className="text-center">
                 <a
-                  href="/artists/1"
-                  class="px-3 hover:font-medium hover:text-fill"
+                  href="/artist"
+                  className="px-3 hover:font-medium hover:text-fill"
                 >
                   Artist
                 </a>
               </li>
 
-              <li class="text-center">
-                <a href="/login" class="px-3 hover:font-medium hover:text-fill">
+              <li className="text-center">
+                <a
+                  href="/login"
+                  className="px-3 hover:font-medium hover:text-fill"
+                >
                   Login
                 </a>
               </li>
 
-              <li class="text-center">
+              <li className="text-center">
                 <a
                   href="/register"
-                  class="px-3 hover:font-medium hover:text-fill"
+                  className="px-3 hover:font-medium hover:text-fill"
                 >
                   Register
                 </a>
@@ -70,13 +75,13 @@ const Header = () => {
             </ul>
           </nav>
 
-          <nav class="w-2/5">
-            <ul class="flex justify-end">
-              <li class="relative">
-                <FaMagnifyingGlass class="absolute left-3 top-[9px] z-20 text-primary" />
+          <nav className="w-2/5">
+            <ul className="flex justify-end">
+              <li className="relative">
+                <FaMagnifyingGlass className="absolute left-3 top-[9px] z-20 text-primary" />
 
                 <input
-                  class="relative z-10 rounded-full bg-gray-200 px-8 py-1 font-ralewayRegular"
+                  className="relative z-10 rounded-full bg-gray-200 px-8 py-1 font-ralewayRegular"
                   type="text"
                   name="search"
                   id="search"
@@ -84,19 +89,19 @@ const Header = () => {
                 />
               </li>
 
-              <li class="ml-4">
+              <li className="ml-4">
                 <a href="/dist/index.html">
                   <img
                     src="/images/main_banner.jpg"
-                    class="w-7 rounded-full"
+                    className="w-7 rounded-full"
                     alt="Profile Image"
                   />
                 </a>
               </li>
 
-              <li class="ml-2 mr-4">
+              <li className="ml-2 mr-4">
                 <a href="/dist/index.html">
-                  <FaBars class="text-2xl text-primary" />
+                  <FaBars className="text-2xl text-primary" />
                 </a>
               </li>
             </ul>
