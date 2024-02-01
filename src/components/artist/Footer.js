@@ -145,63 +145,63 @@ const Footer = () => {
               <li>
                 <a
                   href="/"
-                  className="!lg:pl-0 mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-3 text-center hover:bg-fill"
+                  className="!lg:pl-0 mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-2 text-center hover:bg-fill"
                 >
-                  <FaFacebookF className="text-white" />
+                  <FaFacebookF className="text-white text-lg" />
                 </a>
               </li>
 
               <li>
                 <a
                   href="/"
-                  className="mx-2 flex h-10 w-10 items-center justify-center rounded-full bg-gray-700 px-3 text-center hover:bg-fill"
+                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-2 text-center hover:bg-fill"
                 >
-                  <FaTwitter className="text-white" />
+                  <FaTwitter className="text-white text-lg" />
                 </a>
               </li>
 
               <li>
                 <a
                   href="/"
-                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-3 text-center hover:bg-fill"
+                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 text-center hover:bg-fill px-2"
                 >
-                  <FaSquareInstagram className="text-white" />
+                  <FaSquareInstagram className="text-white text-lg" />
                 </a>
               </li>
 
               <li>
                 <a
                   href="/"
-                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-3 text-center hover:bg-fill"
+                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-2 text-center hover:bg-fill"
                 >
-                  <FaYoutube className="text-white" />
+                  <FaYoutube className="text-white text-lg" />
                 </a>
               </li>
 
               <li>
                 <a
                   href="/"
-                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-3 text-center hover:bg-fill"
+                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-2 text-center hover:bg-fill"
                 >
-                  <FaLinkedin className="text-white" />
+                  <FaLinkedin className="text-white text-lg" />
                 </a>
               </li>
 
               <li>
                 <a
                   href="/"
-                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-3 text-center hover:bg-fill"
+                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-2 text-center hover:bg-fill"
                 >
-                  <FaSpotify className="text-white" />
+                  <FaSpotify className="text-white text-lg" />
                 </a>
               </li>
 
               <li>
                 <a
                   href="/"
-                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-3 text-center hover:bg-fill"
+                  className="mx-2 flex w-10 h-10 items-center justify-center rounded-full bg-gray-700 px-2 text-center hover:bg-fill"
                 >
-                  <FaCloudflare className="text-white" />
+                  <FaCloudflare className="text-white text-lg" />
                 </a>
               </li>
             </ul>
