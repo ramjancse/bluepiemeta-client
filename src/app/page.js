@@ -11,11 +11,11 @@ export default function Home() {
       <Header />
 
       <main className="flex">
-        <div className="h-full w-1/6 hidden">
+        <div className="h-full w-1/6 hidden lg:block">
           <Sidebar />
         </div>
 
-        <div className="w-full xl:border-l-[1px] xl:border-divideColor">
+        <div className="w-full lg:border-l-[1px] lg:border-divideColor">
           <Intro />
 
           <Songs />

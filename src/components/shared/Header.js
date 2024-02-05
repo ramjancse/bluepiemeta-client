@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaBars } from "react-icons/fa6";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import MobileMenu from "./MobileMenu";
 
 const Header = () => {
   return (
@@ -236,6 +237,11 @@ const Header = () => {
               />
             </span>
           </div>
+        </div>
+
+        {/* mobile menu show only mobile screen */}
+        <div className="hidden mobile-menu  bg-slate-400 absolute left-0 top-0 w-full h-full">
+          <MobileMenu />
         </div>
       </header>
     </>
