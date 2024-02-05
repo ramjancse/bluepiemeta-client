@@ -15,7 +15,7 @@ export default function Home() {
           <Sidebar />
         </div>
 
-        <div className="w-full border-l-[1px] border-divideColor">
+        <div className="w-full xl:border-l-[1px] xl:border-divideColor">
           <Intro />
 
           <Songs />
