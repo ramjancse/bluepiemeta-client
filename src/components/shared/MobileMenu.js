@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { FaAngleRight } from "react-icons/fa6";
 
 const MobileMenu = () => {
   const menus = [
@@ -46,15 +47,15 @@ const MobileMenu = () => {
     <nav className="">
       <ul className="flex flex-col">
         {menus.map((menu) => (
-          <li key={menu.id} className="border-2 border-black block m-1">
+          <li
+            key={menu.id}
+            className="border-b-[1px] border-gray-400 px-6 py-2 block"
+          >
             <Link
               href={menu.link}
-              className="p-2 hover:font-medium hover:text-fill"
+              className="hover:font-medium hover:text-fill flex items-center justify-between"
             >
-              {/* <div className="circle relative mr-3 h-3 w-3 rounded-full border-2 border-blue-400">
-                <div className="fill absolute left-[2px] h-3 w-3 rounded-full bg-fill"></div>
-              </div> */}
-              {menu.name}
+              <span>{menu.name}</span> <FaAngleRight />
             </Link>
           </li>
         ))}

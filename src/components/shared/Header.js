@@ -139,7 +139,12 @@ const Header = () => {
         </div>
 
         {/* mobile menu show only mobile screen */}
-        <div className=" mobile-menu  bg-slate-400 absolute left-0 top-0 w-full h-full">
+        <div className="hidden mobile-menu bg-slate-200 absolute left-0 top-0 w-full h-screen">
+          <div className="bar px-6 py-3 border-b-2 border-divideColor">
+            <a href="/">
+              <FaBars className="text-3xl text-primary" />
+            </a>
+          </div>
           <MobileMenu />
         </div>
       </header>
