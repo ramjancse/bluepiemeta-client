@@ -11,9 +11,9 @@ export default function Home() {
       <Header />
 
       <main className="flex">
-        {/* <div className="h-full w-1/6 hidden">
+        <div className="h-full w-1/6 hidden">
           <Sidebar />
-        </div> */}
+        </div>
 
         <div className="w-full border-l-[1px] border-divideColor">
           <Intro />
