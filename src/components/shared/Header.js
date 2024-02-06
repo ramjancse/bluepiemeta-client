@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaBars } from "react-icons/fa6";
 import { FaMagnifyingGlass } from "react-icons/fa6";
-import MobileMenu from "./MobileMenu";
 import { useState } from "react";
+import Menu from "./Menu";
 
 const Header = () => {
   const [show, setShow] = useState(false);
@@ -112,9 +112,11 @@ const Header = () => {
                 </li>
 
                 <li className="mr-4">
-                  <button>
-                    <FaBars className="text-[26px] text-primary" />
-                  </button>
+                  <Menu side="left">
+                    <button>
+                      <FaBars className="text-2xl text-primary" />
+                    </button>
+                  </Menu>
                 </li>
               </ul>
             </nav>
@@ -124,9 +126,11 @@ const Header = () => {
         {/* this section show only less than 1024 mobile screen */}
         <div className="bottom border-b-[1px] border-divideColor flex items-center px-2 py-2 lg:hidden">
           <div className="w-[20px]">
-            <button onClick={handleClick}>
-              <FaBars className="text-2xl text-primary" />
-            </button>
+            <Menu side="right">
+              <button>
+                <FaBars className="text-2xl text-primary" />
+              </button>
+            </Menu>
           </div>
 
           <div className="search text-center w-full pl-1 pr-[20px]">
@@ -144,21 +148,6 @@ const Header = () => {
               />
             </span>
           </div>
-        </div>
-
-        {/* mobile menu show only mobile screen */}
-        <div
-          className={`${
-            show ? "block" : "hidden"
-          }  bg-slate-200 absolute left-0 top-[86px] transition duration-[2000ms] ease-linear w-full h-screen sm:w-[300px] z-50`}
-        >
-          <div className="bar px-6 py-2 border-b-[1px] border-gray-400 flex justify-between">
-            <button onClick={handleClick} className="px-2 py-1">
-              <FaBars className="text-2xl text-primary" />
-            </button>
-          </div>
-
-          <MobileMenu />
         </div>
       </header>
     </>
