@@ -8,8 +8,8 @@ const Header = () => {
   return (
     <>
       <header className="font-ralewayMedium">
-        <div className="top flex border-b-[1px] border-divideColor">
-          <div className="flex w-1/6 flex-col items-center">
+        <div className="top flex  border-b-[1px] border-divideColor">
+          <div className="flex w-1/4 sm:w-1/6 flex-col justify-center">
             <a
               href="/"
               className="flex flex-col items-center hover:font-medium hover:text-fill"
