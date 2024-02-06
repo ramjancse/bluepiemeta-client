@@ -1,10 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaBars } from "react-icons/fa6";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import MobileMenu from "./MobileMenu";
+import { useState } from "react";
 
 const Header = () => {
+  const [show, setShow] = useState(false);
+
+  const handleClick = () => {
+    setShow(!show);
+  };
   return (
     <>
       <header className="font-ralewayMedium">
@@ -59,8 +67,8 @@ const Header = () => {
               </ul>
             </nav>
 
-            {/* this section show only less than 768 mobile screen */}
-            <div className="dashboard mr-2 md:hidden">
+            {/* this section show only less than 1024 mobile screen */}
+            <div className="dashboard mr-2 lg:hidden">
               <a href="/">
                 <Image
                   src="/images/main_banner.jpg"
@@ -72,8 +80,8 @@ const Header = () => {
               </a>
             </div>
 
-            {/* this section show only large than 768 screen */}
-            <nav className="hidden md:block">
+            {/* this section show only large than 1024 screen */}
+            <nav className="hidden lg:block">
               <ul className="flex items-center justify-end">
                 <li>
                   <span className="relative">
@@ -104,21 +112,21 @@ const Header = () => {
                 </li>
 
                 <li className="mr-4">
-                  <a href="/">
+                  <button>
                     <FaBars className="text-[26px] text-primary" />
-                  </a>
+                  </button>
                 </li>
               </ul>
             </nav>
           </div>
         </div>
 
-        {/* this section show only less than 768 mobile screen */}
-        <div className="bottom border-b-[1px] border-divideColor flex items-center px-2 py-2 md:hidden">
+        {/* this section show only less than 1024 mobile screen */}
+        <div className="bottom border-b-[1px] border-divideColor flex items-center px-2 py-2 lg:hidden">
           <div className="w-[20px]">
-            <a href="/">
+            <button onClick={handleClick}>
               <FaBars className="text-2xl text-primary" />
-            </a>
+            </button>
           </div>
 
           <div className="search text-center w-full pl-1 pr-[20px]">
@@ -128,7 +136,7 @@ const Header = () => {
               </span>
 
               <input
-                className="z-10 rounded-full bg-gray-200 px-7 py-1 focus:outline-none"
+                className="z-10 rounded-full bg-gray-200 px-7 py-1 focus:outline-none w-[70%]"
                 type="text"
                 name="search"
                 id="search"
@@ -139,12 +147,17 @@ const Header = () => {
         </div>
 
         {/* mobile menu show only mobile screen */}
-        <div className="hidden mobile-menu bg-slate-200 absolute left-0 top-0 w-full h-screen">
-          <div className="bar px-6 py-3 border-b-[1px] border-gray-400">
-            <a href="/">
-              <FaBars className="text-3xl text-primary" />
-            </a>
+        <div
+          className={`${
+            show ? "block" : "hidden"
+          }  bg-slate-200 absolute left-0 top-[86px] transition duration-[2000ms] ease-linear w-full h-screen sm:w-[300px] z-50`}
+        >
+          <div className="bar px-6 py-2 border-b-[1px] border-gray-400 flex justify-between">
+            <button onClick={handleClick} className="px-2 py-1">
+              <FaBars className="text-2xl text-primary" />
+            </button>
           </div>
+
           <MobileMenu />
         </div>
       </header>
