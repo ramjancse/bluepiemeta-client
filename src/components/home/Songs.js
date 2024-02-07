@@ -6,7 +6,7 @@ import musicIcon from "@/assets/images/play_music.png";
 const Songs = () => {
   return (
     <div className="songs border-b-[1px] border-divideColor">
-      <div className="album  bg-gray-200 p-3 overflow-hidden m-2">
+      {/* <div className="album  bg-gray-200 p-3 overflow-hidden m-2">
         <div className="top flex items-center">
           <div className="cover w-[14%] text-center">
             <Image
@@ -38,7 +38,7 @@ const Songs = () => {
             </button>
           </div>
 
-          {/* <div className="action w-[20%]">
+          <div className="action w-[20%]">
             <button className="mr-4 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
               <a href="/">Edit</a>
             </button>
@@ -46,7 +46,7 @@ const Songs = () => {
             <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
               <a href="/">License</a>
             </button>
-          </div> */}
+          </div>
         </div>
 
         <div className="bottom mt-2">
@@ -167,6 +167,48 @@ const Songs = () => {
           <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
             <a href="/">License</a>
           </button>
+        </div>
+      </div> */}
+
+      <div className="album bg-gray-200 p-3 flex flex-wrap">
+        <div className="cover mr-2 xs:mr-3 w-[70px] xs:w-[80px]">
+          <Image
+            src={albumImage}
+            className="w-full"
+            alt="Album"
+            width={70}
+            height={70}
+          />
+        </div>
+
+        <div className="right">
+          <div className="name">
+            <h6 className="text-sm font-medium">
+              <a href="/" className="hover:text-fill">
+                Can I Have Forever with You
+              </a>
+            </h6>
+
+            <p className="text-[11px] text-[#686868]">
+              Graham Cotton - <span>Folk, Indie, Song-Songwriter</span>{" "}
+            </p>
+          </div>
+
+          <div className="action flex justify-between items-center mt-3">
+            <div className="left">
+              <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                <a href="/">Edit</a>
+              </button>
+
+              <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                <a href="/">License</a>
+              </button>
+            </div>
+
+            <div className="count flex h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold">
+              +1
+            </div>
+          </div>
         </div>
       </div>
     </div>
