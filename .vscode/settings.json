@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
         "raleway"
-    ]
+    ],
+    "tailwindCSS.emmetCompletions": true
+    // "css.validate": false
+
 }

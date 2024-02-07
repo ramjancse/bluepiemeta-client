@@ -5,7 +5,7 @@ import musicIcon from "@/assets/images/play_music.png";
 
 const Songs = () => {
   return (
-    <div className="songs border-b-[1px] border-divideColor">
+    <div className="songs border-b-[1px] border-divideColor px-12 py-8">
       {/* <div className="album  bg-gray-200 p-3 overflow-hidden m-2">
         <div className="top flex items-center">
           <div className="cover w-[14%] text-center">
@@ -181,33 +181,55 @@ const Songs = () => {
           />
         </div>
 
-        <div className="right">
-          <div className="name">
-            <h6 className="text-sm font-medium">
-              <a href="/" className="hover:text-fill">
-                Can I Have Forever with You
-              </a>
-            </h6>
+        <div className="right w-[calc(100%-78px)] xs:w-[calc(100%-92px)] flex items-center justify-between">
+          <div className="left lg:flex lg:w-full lg:items-center lg:justify-between">
+            <div className="name">
+              <h6 className="text-sm font-medium">
+                <a href="/" className="hover:text-fill">
+                  Can I Have Forever with You{" "}
+                  {/* this section show only 640px to 1023px screen only  */}
+                  <span className="hidden sm:inline-block lg:hidden">
+                    -{" "}
+                    <span className="text-xs text-[#686868] hidden sm:inline-block italic">
+                      Graham Cotton
+                    </span>
+                  </span>
+                </a>
+              </h6>
 
-            <p className="text-[11px] text-[#686868]">
-              Graham Cotton - <span>Folk, Indie, Song-Songwriter</span>{" "}
-            </p>
-          </div>
+              <p className="text-[11px] text-[#686868] sm:hidden">
+                Graham Cotton - <span>Folk, Indie, Song-Songwriter</span>{" "}
+              </p>
 
-          <div className="action flex justify-between items-center mt-3">
-            <div className="left">
-              <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                <a href="/">Edit</a>
-              </button>
-
-              <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                <a href="/">License</a>
-              </button>
+              {/* only show when screen greater than 1024 */}
+              <p className="text-[11px] text-[#686868] hidden lg:block">
+                Graham Cotton
+              </p>
             </div>
 
-            <div className="count flex h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold">
+            <div className="count h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold hidden lg:block">
               +1
             </div>
+
+            <div className="text-[11px] hidden sm:flex sm:justify-between">
+              Folk, Indie, Song-Songwriter
+            </div>
+
+            <div className="action flex items-center mt-3">
+              <div className="left">
+                <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">Edit</a>
+                </button>
+
+                <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">License</a>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="count flex h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold lg:hidden">
+            +1
           </div>
         </div>
       </div>
