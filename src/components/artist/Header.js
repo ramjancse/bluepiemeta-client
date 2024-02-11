@@ -1,5 +1,8 @@
+import Image from "next/image";
 import React from "react";
 import { FaBars, FaMagnifyingGlass } from "react-icons/fa6";
+import logoImage from "@/assets/images/logo.png";
+import dashboardImage from "@/assets/images/main_banner.jpg";
 
 const Header = () => {
   return (
@@ -10,7 +13,13 @@ const Header = () => {
             href="/"
             className="flex flex-col items-center hover:font-medium hover:text-fill"
           >
-            <img className="w-20" src="/images/logo.png" alt="Logo Image" />
+            <Image
+              className="w-20"
+              src={logoImage}
+              alt="Logo Image"
+              width={80}
+              height={80}
+            />
           </a>
         </div>
 
@@ -47,8 +56,8 @@ const Header = () => {
 
               <li className="ml-4">
                 <a href="/dist/index.html">
-                  <img
-                    src="/images/main_banner.jpg"
+                  <Image
+                    src={dashboardImage}
                     className="w-[28px] rounded-full"
                     alt="Profile Image"
                   />

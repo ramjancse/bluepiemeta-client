@@ -1,13 +1,17 @@
+import Image from "next/image";
 import React from "react";
+import mainBanner from "@/assets/images/main_banner.jpg";
 
 const Main = () => {
   return (
     <main>
       <div className="intro">
-        <img
+        <Image
           className="h-36 w-full object-cover sm:h-52 md:h-64 lg:h-72 xl:h-80 2xl:h-96"
-          src="/images/main_banner.jpg"
+          src={mainBanner}
           alt="Intro Image"
+          width={100}
+          height={144}
         />
       </div>
 
@@ -252,10 +256,12 @@ const Main = () => {
             <form>
               <div className="w-full">
                 <div className="image">
-                  <img
-                    src="/images/main_banner.jpg"
+                  <Image
+                    src={mainBanner}
                     className="h-full cursor-pointer rounded"
                     alt="Profile Picture"
+                    width={100}
+                    height={100}
                   />
                 </div>
 
