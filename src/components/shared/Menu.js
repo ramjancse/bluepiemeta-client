@@ -86,13 +86,13 @@ const Menu = ({ children, side = "bottom" }) => {
         <DropdownMenuContent className="w-80" side={side}>
           <DropdownMenuGroup>
             {menus.map((menuItem) => (
-              <>
-                <DropdownMenuItem key={menuItem.id}>
+              <span key={menuItem.id}>
+                <DropdownMenuItem>
                   {/* <User className="mr-2 h-4 w-4" /> */}
                   <span>{menuItem.name}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-              </>
+              </span>
             ))}
           </DropdownMenuGroup>
         </DropdownMenuContent>
