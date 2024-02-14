@@ -1,42 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import React from "react";
-import { FaAngleRight, FaBars } from "react-icons/fa6";
-
-import {
-  Cloud,
-  CreditCard,
-  Github,
-  Keyboard,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserPlus,
-  Users,
-} from "lucide-react";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const Menu = ({ children, side = "bottom" }) => {
+const Menu = ({ children, side = "bottom", align = "center" }) => {
   const menus = [
     {
       id: 1,
@@ -83,12 +57,11 @@ const Menu = ({ children, side = "bottom" }) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 
-        <DropdownMenuContent className="w-80" side={side}>
+        <DropdownMenuContent className="w-80" side={side} align={align}>
           <DropdownMenuGroup>
             {menus.map((menuItem) => (
               <span key={menuItem.id}>
                 <DropdownMenuItem>
-                  {/* <User className="mr-2 h-4 w-4" /> */}
                   <span>{menuItem.name}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

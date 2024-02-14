@@ -18,10 +18,7 @@ const Header = () => {
       <header className="font-ralewayMedium">
         <div className="top flex  border-b-[1px] border-divideColor">
           <div className="flex w-1/4 sm:w-1/6 flex-col justify-center">
-            <a
-              href="/"
-              className="flex flex-col items-center hover:font-medium hover:text-fill"
-            >
+            <a href="/" className="flex flex-col items-center hover:text-fill">
               <Image
                 className="-mb-2 w-20"
                 src="/images/logo.png"
@@ -41,7 +38,7 @@ const Header = () => {
                 <li className="text-center">
                   <Link
                     href="/songs"
-                    className="px-3 hover:font-medium hover:text-fill"
+                    className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
                   >
                     Songs
                   </Link>
@@ -50,7 +47,7 @@ const Header = () => {
                 <li className="text-center">
                   <a
                     href="/projects"
-                    className="px-3 hover:font-medium hover:text-fill"
+                    className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
                   >
                     Projects
                   </a>
@@ -59,7 +56,7 @@ const Header = () => {
                 <li className="text-center">
                   <a
                     href="/artist"
-                    className="px-3 hover:font-medium hover:text-fill"
+                    className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
                   >
                     Artist
                   </a>
@@ -90,11 +87,12 @@ const Header = () => {
                     </span>
 
                     <input
-                      className="z-10 rounded-full bg-gray-200 px-7 py-1 focus:outline-none"
+                      className="z-10 rounded-full bg-gray-200 px-7 py-1 focus:outline-none focus:ring-2 ring-fill ring-offset-2"
                       type="text"
                       name="search"
                       id="search"
                       placeholder="Search Song"
+                      autoComplete="off"
                     />
                   </span>
                 </li>
@@ -112,7 +110,7 @@ const Header = () => {
                 </li>
 
                 <li className="mr-4">
-                  <Menu side="left">
+                  <Menu side="left" align="start">
                     <button>
                       <FaBars className="text-2xl text-primary" />
                     </button>
@@ -126,7 +124,7 @@ const Header = () => {
         {/* this section show only less than 1024 mobile screen */}
         <div className="bottom border-b-[1px] border-divideColor flex items-center px-2 py-2 lg:hidden">
           <div className="w-[20px]">
-            <Menu side="right">
+            <Menu side="right" align="start">
               <button>
                 <FaBars className="text-2xl text-primary" />
               </button>
@@ -140,7 +138,7 @@ const Header = () => {
               </span>
 
               <input
-                className="z-10 rounded-full bg-gray-200 px-7 py-1 focus:outline-none w-[70%]"
+                className="z-10 rounded-full bg-gray-200 px-7 py-1 focus:outline-none w-[70%] focus:ring-2 ring-fill ring-offset-2"
                 type="text"
                 name="search"
                 id="search"
