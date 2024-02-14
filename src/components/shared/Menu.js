@@ -61,7 +61,7 @@ const Menu = ({ children, side = "bottom", align = "center" }) => {
           <DropdownMenuGroup>
             {menus.map((menuItem) => (
               <span key={menuItem.id}>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="data-[highlighted]:bg-gray-200 data-[highlighted]:text-fill cursor-pointer">
                   <span>{menuItem.name}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

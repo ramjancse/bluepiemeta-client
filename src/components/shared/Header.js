@@ -34,7 +34,7 @@ const Header = () => {
 
           <div className="w-full flex h-[87px] items-center justify-between lg:border-l-[1px] lg:border-divideColor">
             <nav>
-              <ul className="flex items-center text-lg text-primary">
+              <ul className="flex items-center text-lg">
                 <li className="text-center">
                   <Link
                     href="/songs"
@@ -111,7 +111,7 @@ const Header = () => {
 
                 <li className="mr-4">
                   <Menu side="left" align="start">
-                    <button>
+                    <button className="outline-none">
                       <FaBars className="text-2xl text-primary" />
                     </button>
                   </Menu>
@@ -125,7 +125,7 @@ const Header = () => {
         <div className="bottom border-b-[1px] border-divideColor flex items-center px-2 py-2 lg:hidden">
           <div className="w-[20px]">
             <Menu side="right" align="start">
-              <button>
+              <button className="outline-none">
                 <FaBars className="text-2xl text-primary" />
               </button>
             </Menu>
