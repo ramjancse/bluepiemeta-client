@@ -5,7 +5,7 @@ import musicIcon from "@/assets/images/play_music.png";
 
 const Songs = () => {
   return (
-    <div className="songs border-b-[1px] border-divideColor px-12 py-8">
+    <div className="songs border-y-[1px] border-divideColor px-4 py-3 xs:px-6 xs:py-4 xsm:px-8 xsm:py-5 sm:px-10 sm:py-6 xl:px-12 xl:py-8">
       {/* <div className="album  bg-gray-200 p-3 overflow-hidden m-2">
         <div className="top flex items-center">
           <div className="cover w-[14%] text-center">
@@ -170,7 +170,203 @@ const Songs = () => {
         </div>
       </div> */}
 
+      <div className="border-b-[1px] border-divideColor mb-3">
+        <h2 className="text-xl pb-2">Trending</h2>
+      </div>
+
       <div className="album bg-gray-200 p-3 flex flex-wrap">
+        <div className="cover mr-2 xs:mr-3 w-[70px] xs:w-[80px]">
+          <Image
+            src={albumImage}
+            className="w-full"
+            alt="Album"
+            width={70}
+            height={70}
+          />
+        </div>
+
+        <div className="right w-[calc(100%-78px)] xs:w-[calc(100%-92px)] flex items-center justify-between">
+          <div className="left lg:flex lg:w-full lg:items-center lg:justify-between">
+            <div className="name">
+              <h6 className="text-sm font-medium">
+                <a href="/" className="hover:text-fill">
+                  Can I Have Forever with You{" "}
+                  {/* this section show only 640px to 1023px screen only  */}
+                  <span className="hidden sm:inline-block lg:hidden">
+                    -{" "}
+                    <span className="text-xs text-[#686868] hidden sm:inline-block italic">
+                      Graham Cotton
+                    </span>
+                  </span>
+                </a>
+              </h6>
+
+              <p className="text-[11px] text-[#686868] sm:hidden">
+                Graham Cotton - <span>Folk, Indie, Song-Songwriter</span>{" "}
+              </p>
+
+              {/* only show when screen greater than 1024 */}
+              <p className="text-[11px] text-[#686868] hidden lg:block">
+                Graham Cotton
+              </p>
+            </div>
+
+            <div className="count h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold hidden lg:block">
+              +1
+            </div>
+
+            <div className="text-[11px] hidden sm:flex sm:justify-between">
+              Folk, Indie, Song-Songwriter
+            </div>
+
+            <div className="action flex items-center mt-3">
+              <div className="left">
+                <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">Edit</a>
+                </button>
+
+                <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">License</a>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="count flex h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold lg:hidden">
+            +1
+          </div>
+        </div>
+      </div>
+
+      <div className="album bg-gray-200 p-3 flex flex-wrap mt-3">
+        <div className="cover mr-2 xs:mr-3 w-[70px] xs:w-[80px]">
+          <Image
+            src={albumImage}
+            className="w-full"
+            alt="Album"
+            width={70}
+            height={70}
+          />
+        </div>
+
+        <div className="right w-[calc(100%-78px)] xs:w-[calc(100%-92px)] flex items-center justify-between">
+          <div className="left lg:flex lg:w-full lg:items-center lg:justify-between">
+            <div className="name">
+              <h6 className="text-sm font-medium">
+                <a href="/" className="hover:text-fill">
+                  Can I Have Forever with You{" "}
+                  {/* this section show only 640px to 1023px screen only  */}
+                  <span className="hidden sm:inline-block lg:hidden">
+                    -{" "}
+                    <span className="text-xs text-[#686868] hidden sm:inline-block italic">
+                      Graham Cotton
+                    </span>
+                  </span>
+                </a>
+              </h6>
+
+              <p className="text-[11px] text-[#686868] sm:hidden">
+                Graham Cotton - <span>Folk, Indie, Song-Songwriter</span>{" "}
+              </p>
+
+              {/* only show when screen greater than 1024 */}
+              <p className="text-[11px] text-[#686868] hidden lg:block">
+                Graham Cotton
+              </p>
+            </div>
+
+            <div className="count h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold hidden lg:block">
+              +1
+            </div>
+
+            <div className="text-[11px] hidden sm:flex sm:justify-between">
+              Folk, Indie, Song-Songwriter
+            </div>
+
+            <div className="action flex items-center mt-3">
+              <div className="left">
+                <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">Edit</a>
+                </button>
+
+                <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">License</a>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="count flex h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold lg:hidden">
+            +1
+          </div>
+        </div>
+      </div>
+
+      <div className="album bg-gray-200 p-3 flex flex-wrap mt-3">
+        <div className="cover mr-2 xs:mr-3 w-[70px] xs:w-[80px]">
+          <Image
+            src={albumImage}
+            className="w-full"
+            alt="Album"
+            width={70}
+            height={70}
+          />
+        </div>
+
+        <div className="right w-[calc(100%-78px)] xs:w-[calc(100%-92px)] flex items-center justify-between">
+          <div className="left lg:flex lg:w-full lg:items-center lg:justify-between">
+            <div className="name">
+              <h6 className="text-sm font-medium">
+                <a href="/" className="hover:text-fill">
+                  Can I Have Forever with You{" "}
+                  {/* this section show only 640px to 1023px screen only  */}
+                  <span className="hidden sm:inline-block lg:hidden">
+                    -{" "}
+                    <span className="text-xs text-[#686868] hidden sm:inline-block italic">
+                      Graham Cotton
+                    </span>
+                  </span>
+                </a>
+              </h6>
+
+              <p className="text-[11px] text-[#686868] sm:hidden">
+                Graham Cotton - <span>Folk, Indie, Song-Songwriter</span>{" "}
+              </p>
+
+              {/* only show when screen greater than 1024 */}
+              <p className="text-[11px] text-[#686868] hidden lg:block">
+                Graham Cotton
+              </p>
+            </div>
+
+            <div className="count h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold hidden lg:block">
+              +1
+            </div>
+
+            <div className="text-[11px] hidden sm:flex sm:justify-between">
+              Folk, Indie, Song-Songwriter
+            </div>
+
+            <div className="action flex items-center mt-3">
+              <div className="left">
+                <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">Edit</a>
+                </button>
+
+                <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                  <a href="/">License</a>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="count flex h-5 w-5 items-center justify-center rounded border-2 border-slate-400 text-center text-xs font-bold lg:hidden">
+            +1
+          </div>
+        </div>
+      </div>
+
+      <div className="album bg-gray-200 p-3 flex flex-wrap mt-3">
         <div className="cover mr-2 xs:mr-3 w-[70px] xs:w-[80px]">
           <Image
             src={albumImage}
