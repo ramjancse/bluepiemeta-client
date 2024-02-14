@@ -49,11 +49,8 @@ const Sidebar = () => {
           <li key={menu.id}>
             <Link
               href={menu.link}
-              className="flex items-center p-2 hover:font-medium hover:text-fill"
+              className="flex items-center px-4 py-2 rounded hover:text-fill hover:bg-gray-200 duration-500"
             >
-              <div className="circle relative mr-3 h-3 w-3 rounded-full border-2 border-blue-400">
-                <div className="fill absolute left-[2px] h-3 w-3 rounded-full bg-fill"></div>
-              </div>
               {menu.name}
             </Link>
           </li>
