@@ -1,7 +1,72 @@
+"use client";
+
 import Image from "next/image";
 import logoImage from "@/assets/images/loginLogo.png";
 
-const page = () => {
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { axiosPublicInstance } from "@/config/axios";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+const schema = yup
+  .object({
+    // username: yup.string().trim().required("Username is required").lowercase(),
+    email: yup
+      .string()
+      .trim()
+      .email("Must be a valid email")
+      .required("Email is required")
+      .lowercase(),
+    password: yup.string().trim().required("Password is required"),
+  })
+  .required();
+
+const LoginPage = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const router = useRouter();
+
+  const onSubmit = async (data) => {
+    try {
+      const res = await axiosPublicInstance.post("/auth/login", data);
+      console.log(res, "res");
+
+      // show success message
+      toast.success("Login successful");
+
+      // redirect to home page
+      router.push("/");
+    } catch (error) {
+      // show error message
+      console.log(error, "error");
+      toast.error("Something went wrong");
+    }
+  };
+
+  useEffect(() => {
+    loginError(errors);
+  }, [errors]);
+
+  const loginError = ({ email, password }) => {
+    if (email) {
+      toast.error(email.message);
+      return false;
+    }
+
+    if (password) {
+      toast.error(password.message);
+      return false;
+    }
+  };
+
   return (
     <div className="flex h-screen items-center justify-center bg-gradient-to-r from-cyan-100 to-blue-500">
       <div
@@ -21,7 +86,7 @@ const page = () => {
         </div>
 
         <div className="input-area mt-12">
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <p className="mb-2 text-sm font-medium">
               <label htmlFor="username" className="block cursor-pointer">
                 Log in to your account
@@ -30,11 +95,12 @@ const page = () => {
 
             <div className="input">
               <input
-                type="text"
-                name="username"
-                id="username"
-                placeholder="Username"
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Email"
                 className="w-full rounded-t-xl border-l-8 border-blue-700 bg-gray-200 px-4 py-2 focus:outline-none"
+                {...register("email")}
               />
             </div>
 
@@ -45,6 +111,7 @@ const page = () => {
                 id="password"
                 placeholder="Password"
                 className="w-full rounded-b-xl border-l-8 border-blue-700 bg-gray-200 px-4 py-2 focus:outline-none"
+                {...register("password")}
               />
             </div>
 
@@ -77,4 +144,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default LoginPage;

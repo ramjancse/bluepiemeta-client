@@ -9,7 +9,6 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { axiosPublicInstance } from "@/config/axios";
 import { useRouter } from "next/navigation";
 
