@@ -60,6 +60,8 @@ const Header = () => {
                     src={dashboardImage}
                     className="w-[28px] rounded-full"
                     alt="Profile Image"
+                    width={28}
+                    height={28}
                   />
                 </a>
               </li>

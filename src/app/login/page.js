@@ -1,4 +1,5 @@
 import Image from "next/image";
+import logoImage from "@/assets/images/loginLogo.png";
 
 const page = () => {
   return (
@@ -11,7 +12,7 @@ const page = () => {
           <a href="/" className="flex items-center">
             <Image
               className="w-32"
-              src="/images/Logo -Login page.png"
+              src={logoImage}
               alt="Logo Image"
               width={128}
               height={80}
@@ -22,7 +23,7 @@ const page = () => {
         <div className="input-area mt-12">
           <form>
             <p className="mb-2 text-sm font-medium">
-              <label for="username" className="block cursor-pointer">
+              <label htmlFor="username" className="block cursor-pointer">
                 Log in to your account
               </label>
             </p>
@@ -55,7 +56,7 @@ const page = () => {
                 id="check"
               />
               <label
-                for="check"
+                htmlFor="check"
                 className="ml-1 cursor-pointer text-xs font-medium"
               >
                 Keep me signed in

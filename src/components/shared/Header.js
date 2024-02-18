@@ -6,6 +6,8 @@ import { FaBars } from "react-icons/fa6";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useState } from "react";
 import Menu from "./Menu";
+import logo from "@/assets/images/logo.png";
+import mainBanner from "@/assets/images/main_banner.jpg";
 
 const Header = () => {
   const [show, setShow] = useState(false);
@@ -21,7 +23,7 @@ const Header = () => {
             <a href="/" className="flex flex-col items-center hover:text-fill">
               <Image
                 className="-mb-2 w-20"
-                src="/images/logo.png"
+                src={logo}
                 alt="Logo Image"
                 width={200}
                 height={100}
@@ -68,7 +70,7 @@ const Header = () => {
             <div className="dashboard mr-2 lg:hidden">
               <a href="/">
                 <Image
-                  src="/images/main_banner.jpg"
+                  src={mainBanner}
                   className="w-8 rounded-full"
                   alt="Profile Image"
                   width={36}
@@ -100,7 +102,7 @@ const Header = () => {
                 <li className="mx-2">
                   <a href="/">
                     <Image
-                      src="/images/main_banner.jpg"
+                      src={mainBanner}
                       className="w-7 rounded-full"
                       alt="Profile Image"
                       width={28}
