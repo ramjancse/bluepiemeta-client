@@ -47,7 +47,7 @@ const LoginPage = () => {
     } catch (error) {
       // show error message
       console.log(error, "error");
-      toast.error("Something went wrong");
+      toast.error("Invalid email or password");
     }
   };
 
@@ -99,7 +99,11 @@ const LoginPage = () => {
                 name="email"
                 id="email"
                 placeholder="Email"
-                className="w-full rounded-t-xl border-l-8 border-blue-700 bg-gray-200 px-4 py-2 focus:outline-none"
+                className={`w-full rounded-t-xl border-l-8 ${
+                  errors.email?.message
+                    ? "border-t border-r border-b border-red-400"
+                    : "border-blue-700"
+                } bg-gray-200 px-4 py-2 focus:outline-none`}
                 {...register("email")}
               />
             </div>
