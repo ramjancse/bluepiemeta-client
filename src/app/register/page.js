@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { axiosPublicInstance } from "@/config/axios";
 import { useRouter } from "next/navigation";
+import { FaCircleInfo } from "react-icons/fa6";
 
 const schema = yup
   .object({
@@ -66,32 +67,6 @@ const RegisterPage = () => {
     }
   };
 
-  useEffect(() => {
-    registerError(errors);
-  }, [errors]);
-
-  const registerError = ({ name, email, password, confirmPassword }) => {
-    if (name) {
-      toast.error(name.message);
-      return false;
-    }
-
-    if (email) {
-      toast.error(email.message);
-      return false;
-    }
-
-    if (password) {
-      toast.error(password.message);
-      return false;
-    }
-
-    if (confirmPassword) {
-      toast.error(confirmPassword.message);
-      return false;
-    }
-  };
-
   return (
     <main className="flex h-screen items-center justify-center bg-gradient-to-r from-cyan-100 to-blue-500">
       <div
@@ -118,48 +93,116 @@ const RegisterPage = () => {
               </label>
             </p>
 
-            <div className="input">
+            <div className="input relative">
               <input
                 type="text"
                 name="name"
                 id="name"
                 placeholder="Full Name"
-                className="w-full rounded-t-xl border-l-8 border-blue-700 bg-gray-200 px-4 py-2 focus:outline-none"
+                className={`w-full rounded-t-xl border-l-8 ${
+                  errors.name?.message
+                    ? "border-t border-r border-b border-red-500"
+                    : "border-t-[0.5px] border-r border-b border-blue-700"
+                } bg-gray-200 px-4 py-2 focus:outline-none`}
                 {...register("name")}
               />
+
+              <div
+                className={`absolute right-0 -top-6 ${
+                  errors.name?.message ? "block" : "hidden"
+                }`}
+              >
+                <span
+                  className={`w-[180px] text-xs  bg-gray-300 rounded px-2 py-1 flex items-center`}
+                >
+                  <FaCircleInfo className="text-red-600 mr-1" />
+                  {errors.name?.message}
+                </span>
+              </div>
             </div>
 
-            <div className="input mt-1">
+            <div className="input mt-1 relative">
               <input
                 type="email"
                 name="email"
                 id="email"
                 placeholder="Email"
-                className="w-full border-l-8 border-blue-700 bg-gray-200 px-4 py-2 focus:outline-none"
+                className={`w-full border-l-8 ${
+                  errors.email?.message
+                    ? "border-t border-r border-b border-red-500"
+                    : "border-t-[0.5px] border-r border-b border-blue-700"
+                } bg-gray-200 px-4 py-2 focus:outline-none`}
                 {...register("email")}
               />
+
+              <div
+                className={`absolute right-0 -top-6 ${
+                  errors.email?.message ? "block" : "hidden"
+                }`}
+              >
+                <span
+                  className={`w-[180px] text-xs  bg-gray-300 rounded px-2 py-1 flex items-center`}
+                >
+                  <FaCircleInfo className="text-red-600 mr-1" />
+                  {errors.email?.message}
+                </span>
+              </div>
             </div>
 
-            <div className="input mt-1">
+            <div className="input mt-1 relative">
               <input
                 type="password"
                 name="password"
                 id="password"
                 placeholder="Password"
-                className="w-full border-l-8 border-blue-700 bg-gray-200 px-4 py-2 focus:outline-none"
+                className={`w-full border-l-8 ${
+                  errors.password?.message
+                    ? "border-t border-r border-b border-red-500"
+                    : "border-t-[0.5px] border-r border-b border-blue-700"
+                } bg-gray-200 px-4 py-2 focus:outline-none`}
                 {...register("password")}
               />
+
+              <div
+                className={`absolute right-0 -top-6 ${
+                  errors.password?.message ? "block" : "hidden"
+                }`}
+              >
+                <span
+                  className={`w-[180px] text-xs  bg-gray-300 rounded px-2 py-1 flex items-center`}
+                >
+                  <FaCircleInfo className="text-red-600 mr-1" />
+                  {errors.password?.message}
+                </span>
+              </div>
             </div>
 
-            <div className="input mt-1">
+            <div className="input mt-1 relative">
               <input
                 type="password"
                 name="confirmPassword"
                 id="confirmPassword"
                 placeholder="Confirm Password"
-                className="w-full rounded-b-xl border-l-8 border-blue-700 bg-gray-200 px-4 py-2 focus:outline-none"
+                className={`w-full rounded-b-xl border-l-8 ${
+                  errors.email?.message
+                    ? "border-t border-r border-b border-red-500"
+                    : "border-t-[0.5px] border-r border-b border-blue-700"
+                } bg-gray-200 px-4 py-2 focus:outline-none`}
                 {...register("confirmPassword")}
               />
+
+              <div
+                className={`absolute right-0 -top-6 ${
+                  errors.confirmPassword?.message ? "block" : "hidden"
+                }`}
+              >
+                <span
+                  className={`w-[180px] text-xs  bg-gray-300 rounded px-2 py-1 flex items-center`}
+                >
+                  <FaCircleInfo className="text-red-600 mr-1" />
+                  {errors.confirmPassword?.message}
+                </span>
+              </div>
             </div>
 
             <div className="input mb-3 mt-2">
