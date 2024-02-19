@@ -11,7 +11,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="footer border-t">
       <div className="left flex flex-wrap px-10 py-6 md:justify-center">
         <div className="services w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/6 xl:w-1/12">
           <h3 className="mb-3 text-base font-semibold uppercase">

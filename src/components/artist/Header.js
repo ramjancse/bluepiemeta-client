@@ -6,7 +6,7 @@ import dashboardImage from "@/assets/images/main_banner.jpg";
 
 const Header = () => {
   return (
-    <header>
+    <header className="border-b">
       <div className="flex items-center overflow-hidden py-3">
         <div className="flex w-1/6 flex-col items-center">
           <a
