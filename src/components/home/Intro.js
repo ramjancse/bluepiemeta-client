@@ -1,4 +1,9 @@
 import Image from "next/image";
+import mainImage from "@/assets/images/test/630.png";
+import posterOne from "@/assets/images/poster/poster-1.jpg";
+import posterTwo from "@/assets/images/poster/poster-2.jpg";
+import posterThree from "@/assets/images/poster/poster-3.jpg";
+import posterFive from "@/assets/images/poster/poster-5.jpg";
 
 const Intro = () => {
   return (
@@ -10,7 +15,7 @@ const Intro = () => {
               width={500}
               height={500}
               className="w-full h-[calc(100%-1.6rem)]"
-              src="/images/test/630.png"
+              src={mainImage}
               alt="Poster One"
             />
             <p className="hover:text-fill mt-[2px]">Top Chart</p>
@@ -19,26 +24,14 @@ const Intro = () => {
 
         <div className="one col-start-1 row-start-3 md:col-start-1 md:row-start-1 text-center">
           <a href="/">
-            <Image
-              width={500}
-              height={500}
-              className=""
-              src="/images/poster/poster-1.jpg"
-              alt="Logo Image"
-            />
+            <Image width={500} height={500} src={posterOne} alt="Logo Image" />
             <p className="hover:text-fill mt-[2px]">Top Chart</p>
           </a>
         </div>
 
         <div className="two col-start-1 row-start-4 md:col-start-1 md:row-start-2 text-center">
           <a href="/">
-            <Image
-              width={500}
-              height={500}
-              className=""
-              src="/images/poster/poster-2.jpg"
-              alt="Logo Image"
-            />
+            <Image width={500} height={500} src={posterTwo} alt="Logo Image" />
             <p className="hover:text-fill mt-[2px]">Top Chart</p>
           </a>
         </div>
@@ -48,8 +41,7 @@ const Intro = () => {
             <Image
               width={500}
               height={500}
-              className=""
-              src="/images/poster/poster-3.jpg"
+              src={posterThree}
               alt="Logo Image"
             />
             <p className="hover:text-fill mt-[2px]">Top Chart</p>
@@ -58,13 +50,7 @@ const Intro = () => {
 
         <div className="four col-start-2 row-start-4 md:col-start-4 md:row-start-2 text-center">
           <a href="/">
-            <Image
-              width={500}
-              height={500}
-              className=""
-              src="/images/poster/poster-5.jpg"
-              alt="Logo Image"
-            />
+            <Image width={500} height={500} src={posterFive} alt="Logo Image" />
             <p className="hover:text-fill mt-[2px]">Top Chart</p>
           </a>
         </div>
