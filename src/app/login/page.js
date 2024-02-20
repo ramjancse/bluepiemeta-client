@@ -44,7 +44,7 @@ const LoginPage = () => {
       toast.success("Login successful");
 
       // redirect to home page
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       // show error message
       console.log(error, "error");
