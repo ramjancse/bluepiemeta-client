@@ -1,15 +1,12 @@
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
-import Main from "@/components/artist/Main";
 import { getAllArtists } from "@/lib/artist";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { FaTwitter } from "react-icons/fa6";
 
 const page = async () => {
   const { data: artists } = await getAllArtists();
-  console.log(artists, "artists");
+
   return (
     <>
       <Header />
