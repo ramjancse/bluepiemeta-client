@@ -20,7 +20,7 @@ const Songs = () => {
 
           <div className="control w-[60%] mx-3">
             <Image
-              src="/images/play_music.png"
+              
               className="h-[45px] w-full"
               alt="Play Music"
               width={400}

@@ -6,13 +6,10 @@ import dashboardImage from "@/assets/images/main_banner.jpg";
 
 const Header = () => {
   return (
-    <header>
+    <header className="border-b">
       <div className="flex items-center overflow-hidden py-3">
         <div className="flex w-1/6 flex-col items-center">
-          <a
-            href="/"
-            className="flex flex-col items-center hover:font-medium hover:text-fill"
-          >
+          <a href="/" className="flex flex-col items-center hover:text-fill">
             <Image
               className="w-20"
               src={logoImage}
@@ -27,14 +24,14 @@ const Header = () => {
           <nav className="w-full">
             <ul className="font-ralewayMedium flex text-lg text-primary">
               <li className="ml-3 text-center">
-                <a href="/" className="px-3 hover:font-medium hover:text-fill">
-                  Songs
+                <a href="/artists" className="px-3 hover:text-fill">
+                  Artists
                 </a>
               </li>
 
               <li className="text-center">
-                <a href="/" className="px-3 hover:font-medium hover:text-fill">
-                  Projects
+                <a href="/albums" className="px-3 hover:text-fill">
+                  Albums
                 </a>
               </li>
             </ul>
@@ -60,6 +57,8 @@ const Header = () => {
                     src={dashboardImage}
                     className="w-[28px] rounded-full"
                     alt="Profile Image"
+                    width={28}
+                    height={28}
                   />
                 </a>
               </li>
