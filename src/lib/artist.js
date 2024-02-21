@@ -6,7 +6,7 @@ export const getAllArtists = async () => {
     return data;
   } catch (error) {
     console.log(error, "error");
-    throw new Error(error);
+    return new Error("Something went wrong");
   }
 };
 

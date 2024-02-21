@@ -260,8 +260,8 @@ const Main = () => {
                     src={mainBanner}
                     className="h-full cursor-pointer rounded"
                     alt="Profile Picture"
-                    width={100}
-                    height={100}
+                    width={400}
+                    height={400}
                   />
                 </div>
 
