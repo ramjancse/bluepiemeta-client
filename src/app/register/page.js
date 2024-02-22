@@ -53,7 +53,6 @@ const RegisterPage = () => {
   const onSubmit = async (data) => {
     try {
       const res = await axiosPublicInstance.post("/auth/register", data);
-      console.log(res, "res");
 
       // show success message
       toast.success("Registration successful");
@@ -62,7 +61,7 @@ const RegisterPage = () => {
       router.push("/login");
     } catch (error) {
       // show error message
-      console.log(error, "error");
+      console.log(error, "error in register");
       toast.error("Something went wrong");
     }
   };

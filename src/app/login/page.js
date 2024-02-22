@@ -38,16 +38,15 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     try {
       const res = await axiosPublicInstance.post("/auth/login", data);
-      console.log(res, "res");
 
       // show success message
       toast.success("Login successful");
 
       // redirect to home page
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       // show error message
-      console.log(error, "error");
+      console.log(error, "error in login");
       toast.error("Invalid email or password");
     }
   };
