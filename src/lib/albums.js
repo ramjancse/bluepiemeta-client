@@ -6,7 +6,7 @@ export const getAllAlbums = async () => {
     return data;
   } catch (error) {
     console.log(error, "error");
-    throw new Error(error);
+    return new Error("Something went wrong");
   }
 };
 
@@ -16,6 +16,6 @@ export const getAlbumById = async (albumId) => {
     return data;
   } catch (error) {
     console.log(error, "error");
-    throw new Error(error);
+    return new Error("Something went wrong");
   }
 };
