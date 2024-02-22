@@ -174,6 +174,209 @@ const page = () => {
             </div>
           </div>
 
+          <div className="metadata mt-5">
+            <h2 className="text-2xl">Metadata</h2>
+
+            <div className="input-area border-2 mt-1 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14">
+              <div className="top flex mb-4">
+                <div className="left">
+                  <input
+                    type="radio"
+                    name="metadata"
+                    id="lyrical"
+                    className="mr-1"
+                  />
+                  <label
+                    htmlFor="lyrical"
+                    className="cursor-pointer select-none"
+                  >
+                    Lyrical
+                  </label>
+                </div>
+
+                <div className="middle">
+                  <input
+                    type="radio"
+                    name="metadata"
+                    id="instrumental"
+                    className="ml-5 mr-1"
+                  />
+                  <label
+                    htmlFor="instrumental"
+                    className="cursor-pointer select-none"
+                  >
+                    Instrumental
+                  </label>
+                </div>
+
+                <div className="right">
+                  <input
+                    type="radio"
+                    name="metadata"
+                    id="mixed"
+                    className="ml-5 mr-1"
+                  />
+                  <label htmlFor="mixed" className="cursor-pointer select-none">
+                    Mixed
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 grid-rows-2 gap-3">
+                <div className="input col-start-1 col-end-13 sm:col-end-7">
+                  <label htmlFor="audioLanguage" className="select-none">
+                    Audio Language
+                  </label>
+
+                  <div className="">
+                    <select
+                      name="audioLanguage"
+                      id="audioLanguage"
+                      className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    >
+                      <option value="">Select Audio Language</option>
+                      <option value="bangla">Bangla</option>
+                      <option value="english">English</option>
+                      <option value="hindi">Hindi</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                  <label htmlFor="genre" className="select-none">
+                    Genre
+                  </label>
+
+                  <div className="">
+                    <select
+                      name="genre"
+                      id="genre"
+                      className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    >
+                      <option value="">Select Genre</option>
+                      <option value="bangla">Bangla</option>
+                      <option value="english">English</option>
+                      <option value="hindi">Hindi</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-end-7">
+                  <label
+                    htmlFor="releaseDate"
+                    className="cursor-pointer select-none"
+                  >
+                    Release date
+                  </label>
+
+                  <input
+                    type="text"
+                    name="releaseDate"
+                    id="releaseDate"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                  <label htmlFor="label" className="cursor-pointer select-none">
+                    Label
+                  </label>
+
+                  <input
+                    type="text"
+                    name="label"
+                    id="label"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-end-7">
+                  <label htmlFor="cLine" className="cursor-pointer select-none">
+                    C Line
+                  </label>
+
+                  <input
+                    type="text"
+                    name="cLine"
+                    id="cLine"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                  <label
+                    htmlFor="cLineYear"
+                    className="cursor-pointer select-none"
+                  >
+                    C Line Year
+                  </label>
+
+                  <input
+                    type="text"
+                    name="cLineYear"
+                    id="cLineYear"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-end-7">
+                  <label htmlFor="pLine" className="cursor-pointer select-none">
+                    P Line
+                  </label>
+
+                  <input
+                    type="text"
+                    name="pLine"
+                    id="pLine"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                  <label
+                    htmlFor="pLineYear"
+                    className="cursor-pointer select-none"
+                  >
+                    P Line Year
+                  </label>
+
+                  <input
+                    type="text"
+                    name="pLineYear"
+                    id="pLineYear"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-end-7">
+                  <label htmlFor="upc" className="cursor-pointer select-none">
+                    UPC
+                  </label>
+
+                  <input
+                    type="text"
+                    name="upc"
+                    id="upc"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+
+                <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                  <label htmlFor="isrc" className="cursor-pointer select-none">
+                    ISRC
+                  </label>
+
+                  <input
+                    type="text"
+                    name="isrc"
+                    id="isrc"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="submit mt-7">
             <input
               type="submit"
