@@ -47,10 +47,11 @@ export const authOptions = {
   pages: {
     signIn: "/login",
   },
-  //   secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user, account, profile, isNewUser }) {
       if (user) {
+        // checking user logged in provider
         const isGithubUser = account.provider === "github";
 
         if (isGithubUser) {
@@ -62,7 +63,8 @@ export const authOptions = {
           token.jwt = data.jwt;
           token.user = data.user;
         } else {
-          token.userId = user.user.id;
+          // that means credential user
+          //   token.userId = user.user.id;
           token.jwt = user.jwt;
           token.user = user.user;
         }
@@ -72,7 +74,7 @@ export const authOptions = {
     },
     async session({ session, token, user }) {
       // modify for front-end
-      session.userId = token.userId;
+      // session.userId = token.userId;
       session.jwt = token.jwt;
       session.user = token.user;
 
