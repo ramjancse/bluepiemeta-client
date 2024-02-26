@@ -6,7 +6,6 @@ import React from "react";
 
 const page = async ({ params: { albumId } }) => {
   const {
-    _id,
     albumCover,
     albumGenre,
     albumName,
@@ -115,6 +114,7 @@ const page = async ({ params: { albumId } }) => {
                 <table className="w-full mt-2 border-collapse">
                   <thead className="bg-gray-700 text-white">
                     <tr>
+                      <th className="border p-2 text-left">SL</th>
                       <th className="border p-2 text-left">Title</th>
                       <th className="border p-2 text-left">Performer</th>
                       <th className="border p-2 text-center">Duration</th>
@@ -123,7 +123,7 @@ const page = async ({ params: { albumId } }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {tracks.map((track) => {
+                    {tracks.map((track, index) => {
                       const {
                         _id,
                         trackId,
@@ -141,12 +141,31 @@ const page = async ({ params: { albumId } }) => {
 
                       return (
                         <tr className="even:bg-gray-100" key={_id}>
-                          <td className="border p-2">{titleOfTrack}</td>
-                          <td className="border p-2">{primaryArtist}</td>
+                          <td className="border p-2">{index + 1}</td>
+                          <td className="border p-2">
+                            <Link
+                              href={`/albums/${albumId}/tracks/${_id}`}
+                              className="block"
+                            >
+                              {titleOfTrack}
+                            </Link>
+                          </td>
+
+                          <td className="border p-2">
+                            <Link
+                              href={`/albums/${albumId}/tracks/${_id}`}
+                              className="block"
+                            >
+                              {primaryArtist}
+                            </Link>
+                          </td>
+
                           <td className="border p-2">3.21</td>
                           <td className="border p-2">{isrc}</td>
                           <td className="border p-2 text-center">
-                            <Link href={`/tracks/${trackId}`}>Details</Link>
+                            <Link href={`/albums/${albumId}/tracks/${_id}`}>
+                              Details
+                            </Link>
                           </td>
                         </tr>
                       );
