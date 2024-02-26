@@ -7,7 +7,6 @@ const page = () => {
     <div className="font-ralewayRegular">
       <Header />
       <Main />
-
       <Footer />
     </div>
   );
