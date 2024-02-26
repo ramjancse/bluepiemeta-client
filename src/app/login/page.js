@@ -2,15 +2,14 @@
 
 import Image from "next/image";
 import logoImage from "@/assets/images/loginLogo.png";
-
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { axiosPublicInstance } from "@/config/axios";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { FaCircleInfo } from "react-icons/fa6";
+import { signIn } from "next-auth/react";
 
 const schema = yup
   .object({
@@ -35,19 +34,54 @@ const LoginPage = () => {
   });
   const router = useRouter();
 
+  // const onSubmit = async (data) => {
+  //   try {
+  //     const res = await axiosPublicInstance.post("/auth/login", data);
+
+  //     // show success message
+  //     toast.success("Login successful");
+
+  //     // redirect to home page
+  //     router.push("/dashboard");
+  //   } catch (error) {
+  //     // show error message
+  //     console.log(error, "error in login");
+  //     toast.error("Invalid email or password");
+  //   }
+  // };
+
   const onSubmit = async (data) => {
     try {
-      const res = await axiosPublicInstance.post("/auth/login", data);
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
 
-      // show success message
-      toast.success("Login successful");
+      if (!result.error) {
+        // show success message
+        toast.success("Login success!");
 
-      // redirect to home page
-      router.push("/dashboard");
+        // send to restricted route
+        // const route = getCallbackUrl(callbackUrl);
+        // if (!pathName.endsWith("/enroll")) {
+        //   router.push(`/${route ? route : "dashboard"}`);
+        // }
+
+        // send to homepage
+        router.push("/");
+      } else {
+        // show error message
+        const error = JSON.parse(result.error);
+        console.log(error, "error in next auth login");
+        toast.error(error?.error?.message || "Something went wrong!");
+      }
     } catch (error) {
       // show error message
-      console.log(error, "error in login");
-      toast.error("Invalid email or password");
+      console.log(error, "error in login submit response");
+      toast.error(
+        error?.response?.data?.error?.message ?? "Something went wrong!"
+      );
     }
   };
 
