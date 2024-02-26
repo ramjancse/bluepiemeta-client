@@ -84,25 +84,45 @@ const page = async ({ params: { albumId, trackId } }) => {
                   </div>
 
                   <div className="info border-b py-2">
-                    <p className="font-semibold">Version</p>
-                    <p className="text-sm">{version}</p>
+                    <p className="font-semibold">Type</p>
+                    <p className="text-sm">-</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">Genre</p>
+                    <p className="text-sm">{trackGenre}</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">Performer</p>
+                    <p className="text-sm">-</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">Composer</p>
+                    <p className="text-sm">-</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">Featuring</p>
+                    <p className="text-sm">-</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Explicit</p>
                     <p className="text-sm">{explicitContent || "-"}</p>
                   </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Catalogue Number</p>
-                    <p className="text-sm">{catalogNumber}</p>
-                  </div>
                 </div>
 
                 <div className="two w-1/2 ml-3">
                   <div className="info border-b py-2">
-                    <p className="font-semibold">Genre</p>
-                    <p className="text-sm">{trackGenre}</p>
+                    <p className="font-semibold">Version</p>
+                    <p className="text-sm">{version}</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">ISRC</p>
+                    <p className="text-sm">{isrc}</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -111,8 +131,23 @@ const page = async ({ params: { albumId, trackId } }) => {
                   </div>
 
                   <div className="info border-b py-2">
-                    <p className="font-semibold">ISRC</p>
-                    <p className="text-sm">{isrc}</p>
+                    <p className="font-semibold">Lyricist</p>
+                    <p className="text-sm">-</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">Arranger</p>
+                    <p className="text-sm">-</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">Producer</p>
+                    <p className="text-sm">-</p>
+                  </div>
+
+                  <div className="info border-b py-2">
+                    <p className="font-semibold">Catalogue Number</p>
+                    <p className="text-sm">{catalogNumber}</p>
                   </div>
                 </div>
               </div>
