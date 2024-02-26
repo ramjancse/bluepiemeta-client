@@ -6,7 +6,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { axiosPublicInstance } from "@/config/axios";
 import { useRouter } from "next/navigation";
 import { FaCircleInfo } from "react-icons/fa6";
 import { signIn } from "next-auth/react";
@@ -74,7 +73,7 @@ const LoginPage = () => {
         // show error message
         const error = JSON.parse(result.error);
         console.log(error, "error in next auth login");
-        toast.error(error?.error?.message || "Something went wrong!");
+        toast.error(error?.message || "Something went wrong!");
       }
     } catch (error) {
       // show error message

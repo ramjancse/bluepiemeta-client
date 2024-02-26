@@ -3,9 +3,14 @@ import Songs from "@/components/home/Songs";
 import Footer from "@/components/shared/Footer";
 import Header from "@/components/shared/Header";
 import Sidebar from "@/components/shared/Sidebar";
+import { getServerSession } from "next-auth";
 import React from "react";
+import { authOptions } from "./api/auth/[...nextauth]/authOptions";
 
-const page = () => {
+const page = async () => {
+  const session = await getServerSession(authOptions);
+  console.log(session, "session");
+
   return (
     <>
       <Header />
