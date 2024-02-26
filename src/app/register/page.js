@@ -52,7 +52,7 @@ const RegisterPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      const res = await axiosPublicInstance.post("/auth/register", data);
+      await axiosPublicInstance.post("/auth/register", data);
 
       // show success message
       toast.success("Registration successful");
