@@ -9,7 +9,7 @@ import { authOptions } from "./api/auth/[...nextauth]/authOptions";
 
 const page = async () => {
   const session = await getServerSession(authOptions);
-  console.log(session, "session");
+  // console.log(session, "session");
 
   return (
     <>
