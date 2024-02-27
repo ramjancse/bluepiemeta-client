@@ -6,9 +6,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import { FaCircleInfo } from "react-icons/fa6";
 import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const schema = yup
   .object({
@@ -31,23 +31,11 @@ const LoginPage = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
   const router = useRouter();
-
-  // const onSubmit = async (data) => {
-  //   try {
-  //     const res = await axiosPublicInstance.post("/auth/login", data);
-
-  //     // show success message
-  //     toast.success("Login successful");
-
-  //     // redirect to home page
-  //     router.push("/dashboard");
-  //   } catch (error) {
-  //     // show error message
-  //     console.log(error, "error in login");
-  //     toast.error("Invalid email or password");
-  //   }
-  // };
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
+  console.log(callbackUrl, "callbackUrl");
 
   const onSubmit = async (data) => {
     try {
@@ -60,15 +48,7 @@ const LoginPage = () => {
       if (!result.error) {
         // show success message
         toast.success("Login success!");
-
-        // send to restricted route
-        // const route = getCallbackUrl(callbackUrl);
-        // if (!pathName.endsWith("/enroll")) {
-        //   router.push(`/${route ? route : "dashboard"}`);
-        // }
-
-        // send to homepage
-        router.push("/");
+        router.push(callbackUrl);
       } else {
         // show error message
         const error = JSON.parse(result.error);
