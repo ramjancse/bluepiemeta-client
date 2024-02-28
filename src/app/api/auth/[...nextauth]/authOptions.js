@@ -13,7 +13,7 @@ export const authOptions = {
         try {
           const {
             data: {
-              data: { access_token },
+              data: { access_token, user },
             },
           } = await axiosPublicInstance.post(`/auth/login`, {
             email: credentials.email,
@@ -21,9 +21,11 @@ export const authOptions = {
           });
 
           return {
-            user: {},
+            user,
             jwt: access_token,
           };
+
+          return {};
         } catch (error) {
           throw new Error(JSON.stringify(error?.response?.data, 2));
         }
@@ -64,7 +66,7 @@ export const authOptions = {
           token.user = data.user;
         } else {
           // that means credential user
-          //   token.userId = user.user.id;
+          token.userId = user.user.id;
           token.jwt = user.jwt;
           token.user = user.user;
         }
@@ -74,7 +76,7 @@ export const authOptions = {
     },
     async session({ session, token, user }) {
       // modify for front-end
-      // session.userId = token.userId;
+      session.userId = token.userId;
       session.jwt = token.jwt;
       session.user = token.user;
 
