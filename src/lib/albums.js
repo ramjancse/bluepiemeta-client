@@ -16,7 +16,10 @@ export const getAllAlbums = async () => {
 
 export const getAlbumById = async (albumId) => {
   try {
-    const { data } = await axiosPublicInstance.get(`/albums/${albumId}`);
+    const res = await fetch(`${BASE_URL}/api/v1/albums/${albumId}`, {
+      cache: "no-store",
+    });
+    const data = await res.json();
     return data;
   } catch (error) {
     console.log(error, "error");

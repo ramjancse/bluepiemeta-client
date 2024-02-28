@@ -1,8 +1,13 @@
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
-import { getArtistById } from "@/lib/artist";
+import { getAllArtists, getArtistById } from "@/lib/artist";
 import Link from "next/link";
 import React from "react";
+
+// export const generateStaticParams = async () => {
+//   const { data: artists } = await getAllArtists();
+//   return artists.map((artist) => ({ artistId: artist._id }));
+// };
 
 const page = async ({ params: { artistId } }) => {
   const {
@@ -62,7 +67,7 @@ const page = async ({ params: { artistId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
-                    <p className="text-sm">{nameOfType}</p>
+                    <p className="text-sm">-</p>
                   </div>
 
                   <div className="info border-b py-2">

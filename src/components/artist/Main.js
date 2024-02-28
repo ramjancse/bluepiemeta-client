@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import mainBanner from "@/assets/images/main_banner.jpg";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
+import { axiosPublicInstance } from "@/config/axios";
+import { toast } from "react-toastify";
 
 const schema = yup
   .object({
@@ -20,7 +22,7 @@ const schema = yup
       .trim()
       .required("Full name is required")
       .min(3, "Full name must be at least 3 character"),
-    gender: yup
+    sex: yup
       .string()
       .trim()
       .required("Gender is required")
@@ -88,28 +90,28 @@ const Main = () => {
   const onSubmit = async (data) => {
     data.nameOfType = [];
     if (data.indie) {
-      data.nameOfType.push("Indie");
+      data.nameOfType.push({ name: "Indie" });
     }
     if (data.singer) {
-      data.nameOfType.push("Singer");
+      data.nameOfType.push({ name: "Singer" });
     }
     if (data.artist) {
-      data.nameOfType.push("Artist");
+      data.nameOfType.push({ name: "Artist" });
     }
     if (data.lyricist) {
-      data.nameOfType.push("Lyricist");
+      data.nameOfType.push({ name: "Lyricist" });
     }
     if (data.composer) {
-      data.nameOfType.push("Composer");
+      data.nameOfType.push({ name: "Composer" });
     }
     if (data.producer) {
-      data.nameOfType.push("Producer");
+      data.nameOfType.push({ name: "Producer" });
     }
     if (data.band) {
-      data.nameOfType.push("Band");
+      data.nameOfType.push({ name: "Band" });
     }
     if (data.group) {
-      data.nameOfType.push("Group");
+      data.nameOfType.push({ name: "Group" });
     }
 
     // update artist type field
@@ -117,17 +119,18 @@ const Main = () => {
 
     console.log(data, "data");
 
-    // try {
-    //   const res = await axiosPublicInstance.post("/auth/register", data);
-    //   // show success message
-    //   toast.success("Registration successful");
-    //   // redirect to another route
-    //   router.push("/login");
-    // } catch (error) {
-    //   // show error message
-    //   console.log(error, "error in register");
-    //   toast.error("Something went wrong");
-    // }
+    try {
+      const res = await axiosPublicInstance.post("/artists", data);
+      console.log(res, "res");
+      // show success message
+      toast.success("Artist add successful");
+      // redirect to another route
+      // router.push("/login");
+    } catch (error) {
+      // show error message
+      console.log(error, "error in add artist");
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -210,7 +213,7 @@ const Main = () => {
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
-                    htmlFor="gender"
+                    htmlFor="sex"
                     className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold"
                   >
                     Gender
@@ -219,10 +222,10 @@ const Main = () => {
 
                 <div className="input sm:ml-2 sm:w-2/3">
                   <select
-                    name="gender"
-                    id="gender"
+                    name="sex"
+                    id="sex"
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
-                    {...register("gender")}
+                    {...register("sex")}
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -475,7 +478,10 @@ const Main = () => {
                         defaultChecked={artistType === "single"}
                         onChange={() => setArtistType("single")}
                       />
-                      <label htmlFor="single" className="ml-2 cursor-pointer">
+                      <label
+                        htmlFor="single"
+                        className="ml-2 cursor-pointer select-none"
+                      >
                         Single
                       </label>
                     </div>
@@ -489,7 +495,10 @@ const Main = () => {
                         defaultChecked={artistType === "multiple"}
                         onChange={() => setArtistType("multiple")}
                       />
-                      <label htmlFor="multiple" className="ml-2 cursor-pointer">
+                      <label
+                        htmlFor="multiple"
+                        className="ml-2 cursor-pointer select-none"
+                      >
                         Multiple
                       </label>
                     </div>

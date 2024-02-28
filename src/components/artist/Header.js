@@ -3,13 +3,15 @@ import React from "react";
 import { FaBars, FaMagnifyingGlass } from "react-icons/fa6";
 import logoImage from "@/assets/images/logo.png";
 import dashboardImage from "@/assets/images/main_banner.jpg";
+import Menu from "../shared/Menu";
+import Link from "next/link";
 
 const Header = () => {
   return (
     <header className="sm:border-b">
       <div className="flex items-center overflow-hidden py-3">
         <div className="flex w-1/6 flex-col items-center">
-          <a href="/" className="flex flex-col items-center hover:text-fill">
+          <Link href="/" className="flex flex-col items-center hover:text-fill">
             <Image
               className="w-20"
               src={logoImage}
@@ -17,22 +19,28 @@ const Header = () => {
               width={80}
               height={80}
             />
-          </a>
+          </Link>
         </div>
 
         <div className="flex w-5/6">
           <nav className="w-full">
             <ul className="font-ralewayMedium flex text-lg text-primary">
               <li className="ml-3 text-center">
-                <a href="/artists" className="px-3 hover:text-fill">
+                <Link
+                  href="/artists"
+                  className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
+                >
                   Artists
-                </a>
+                </Link>
               </li>
 
               <li className="text-center">
-                <a href="/albums" className="px-3 hover:text-fill">
+                <Link
+                  href="/albums"
+                  className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
+                >
                   Albums
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>
@@ -52,7 +60,7 @@ const Header = () => {
               </li>
 
               <li className="ml-4">
-                <a href="/dist/index.html">
+                <a href="/">
                   <Image
                     src={dashboardImage}
                     className="w-[28px] rounded-full"
@@ -64,9 +72,11 @@ const Header = () => {
               </li>
 
               <li className="ml-2 mr-1">
-                <a href="/dist/index.html">
-                  <FaBars className="text-2xl text-primary" />
-                </a>
+                <Menu side="right" align="start">
+                  <button className="outline-none">
+                    <FaBars className="text-2xl text-primary" />
+                  </button>
+                </Menu>
               </li>
             </ul>
           </nav>
