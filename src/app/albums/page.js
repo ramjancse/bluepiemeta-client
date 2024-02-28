@@ -27,7 +27,7 @@ const page = async () => {
               </tr>
             </thead>
             <tbody>
-              {albums.length ? (
+              {albums?.length ? (
                 albums.map((album) => {
                   const {
                     _id,
