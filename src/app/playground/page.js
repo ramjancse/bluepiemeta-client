@@ -3,7 +3,7 @@
 import React from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 
 const schema = yup
   .object({
@@ -30,6 +30,8 @@ const PlayGround = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  const {} = useFieldArray({});
 
   const onSubmit = async (data) => {
     console.log(data, "data");
