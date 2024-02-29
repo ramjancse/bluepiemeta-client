@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import mainBanner from "@/assets/images/main_banner.jpg";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import { axiosPrivateInstance, axiosPublicInstance } from "@/config/axios";
+import { axiosPrivateInstance } from "@/config/axios";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -39,51 +39,12 @@ const schema = yup
     phoneNumber: yup.string().trim().required("Phone number is required"),
     address: yup.string().trim().required("Address is required"),
     region: yup.string().trim().required("Region is required"),
-    // coverPhoto: yup.string().trim().required("Cover Photo is required"),
-    // profileImage: yup.string().trim().required("Profile image is required"),
-    artistType: yup
-      .string()
-      .trim()
-      // .required("Artist type is required")
-      .oneOf(
-        ["Single", "Multiple"],
-        "Artist type must be select single or multiple"
-      ),
-    nameOfType: yup
-      .string()
-      // .trim()
-      // .required("Name of type is required")
-      .oneOf(
-        [
-          "Indie",
-          "Singer",
-          "Artist",
-          "Lyricist",
-          "Composer",
-          "Producer",
-          "Band",
-          "Group",
-        ],
-        "Name of type must be select between fields"
-      ),
   })
   .required();
-
-const defaultValues = {
-  artistName: "Elias",
-  fullName: "Elias Ahmed",
-  email: "Elias@gmail.com",
-  sex: "male",
-  areaCode: "+880",
-  phoneNumber: "1715103606",
-  address: "Noapara, AvoyNagar, Jessore",
-  region: "Bangladesh",
-};
 
 const Main = () => {
   const [artistType, setArtistType] = useState("Multiple");
   const [singleTypes, setSingleTypes] = useState({});
-  const [multipleTypes, setMultipleTypes] = useState({});
 
   const {
     register,
@@ -99,36 +60,44 @@ const Main = () => {
   const session = useSession();
   const router = useRouter();
 
+  const getNameOfTypesArr = (data) => {
+    let types = [];
+    let filteredTypes = [];
+
+    // artists type single selected checkbox make an array here for need DB
+    if (artistType === "Single") {
+      types = Object.keys(singleTypes);
+
+      types.forEach((type) => {
+        if (singleTypes[type]) {
+          filteredTypes.push({ name: type });
+        }
+      });
+    } else {
+      filteredTypes.push({ name: data.multiTypes });
+    }
+
+    return filteredTypes;
+  };
+
   const onSubmit = async (data) => {
     // update artist type field
-    setValue("artistType", artistType);
-
-    const types = Object.keys(
-      artistType === "Single" ? singleTypes : multipleTypes
-    );
-    const filteredTypes = [];
-    types.forEach((type) => {
-      if (artistType === "Single" ? singleTypes[type] : multipleTypes[type]) {
-        filteredTypes.push({ name: type });
-      }
-    });
+    setValue("artistType", "Single");
 
     // updated array in this field
-    setValue("nameOfType", filteredTypes);
+    setValue("nameOfType", getNameOfTypesArr(data));
 
     // update some field need to be database
     setValue("artistImage", "");
+    setValue("artistDiscription", "This is artist description");
     setValue("artistLinks", []);
     setValue("socialMedia", []);
-    setValue("artistDiscription", "This is artist description");
-
-    console.log(data, "data");
 
     try {
       await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
 
       // show success message
-      toast.success("Artist add successfully");
+      toast.success("Artist added successfully");
 
       // redirect to another route
       router.push("/artists");
@@ -176,7 +145,6 @@ const Main = () => {
                     placeholder="Artist Name"
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
                     {...register("artistName")}
-                    defaultValue={defaultValues.artistName}
                   />
 
                   <p
@@ -207,7 +175,6 @@ const Main = () => {
                     placeholder="Full Name"
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
                     {...register("fullName")}
-                    defaultValue={defaultValues.fullName}
                   />
 
                   <p
@@ -236,7 +203,6 @@ const Main = () => {
                     id="sex"
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
                     {...register("sex")}
-                    defaultValue={defaultValues.sex}
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -319,7 +285,6 @@ const Main = () => {
                     placeholder="Email"
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
                     {...register("email")}
-                    defaultValue={defaultValues.email}
                   />
 
                   <p
@@ -352,7 +317,6 @@ const Main = () => {
                         placeholder="Area Code"
                         className="w-full rounded border-none px-2 py-2 focus:outline-none"
                         {...register("areaCode")}
-                        defaultValue={defaultValues.areaCode}
                       />
                     </div>
 
@@ -364,7 +328,6 @@ const Main = () => {
                         placeholder="Phone Number"
                         className="w-full rounded border-none px-5 py-2 focus:outline-none"
                         {...register("phoneNumber")}
-                        defaultValue={defaultValues.phoneNumber}
                       />
                     </div>
                   </div>
@@ -399,7 +362,6 @@ const Main = () => {
                     placeholder="Address"
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
                     {...register("address")}
-                    defaultValue={defaultValues.address}
                   />
                   <p
                     className={`${
@@ -429,7 +391,6 @@ const Main = () => {
                     placeholder="Region"
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
                     {...register("region")}
-                    defaultValue={defaultValues.region}
                   />
                   <p
                     className={`${
@@ -493,7 +454,10 @@ const Main = () => {
                         id="Single"
                         value="Single"
                         defaultChecked={artistType === "Single"}
-                        onChange={() => setArtistType("Single")}
+                        onChange={() => {
+                          setArtistType("Single");
+                          setValue("artistType", "Single");
+                        }}
                       />
                       <label
                         htmlFor="Single"
@@ -510,7 +474,10 @@ const Main = () => {
                         id="Multiple"
                         value="Multiple"
                         defaultChecked={artistType === "Multiple"}
-                        onChange={() => setArtistType("Multiple")}
+                        onChange={() => {
+                          setArtistType("Multiple");
+                          setValue("artistType", "Multiple");
+                        }}
                       />
                       <label
                         htmlFor="Multiple"
@@ -667,16 +634,11 @@ const Main = () => {
                     <div className="flex">
                       <div className="flex items-center">
                         <input
-                          type="checkbox"
-                          name="band"
+                          type="radio"
+                          name="multiTypes"
                           id="band"
-                          {...register("band")}
-                          onChange={(e) =>
-                            setMultipleTypes({
-                              ...multipleTypes,
-                              [e.target.name]: e.target.checked,
-                            })
-                          }
+                          value="Band"
+                          {...register("multiTypes")}
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -688,16 +650,11 @@ const Main = () => {
 
                       <div className="flex ml-5 items-center">
                         <input
-                          type="checkbox"
-                          name="group"
+                          type="radio"
+                          name="multiTypes"
                           id="group"
-                          {...register("group")}
-                          onChange={(e) =>
-                            setMultipleTypes({
-                              ...multipleTypes,
-                              [e.target.name]: e.target.checked,
-                            })
-                          }
+                          value="Group"
+                          {...register("multiTypes")}
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"

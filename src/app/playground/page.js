@@ -33,8 +33,10 @@ const PlayGround = () => {
 
   const onSubmit = async (data) => {
     console.log(data, "data");
+    setValue("profession", []);
   };
 
+  console.log("Rendering...");
   return (
     <div>
       <h2>Welcome to Playground</h2>
