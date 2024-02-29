@@ -11,7 +11,12 @@ const page = async () => {
     <>
       <Header />
       <main className="px-3 py-2 xs:px-5 xs:py-3 md:px-20 md:py-10">
-        <h2 className="text-xl">All Artists</h2>
+        <div className="top flex items-center justify-between">
+          <h2 className="text-xl mb-3">All Artists</h2>
+          <Link href="/artists/add" className="px-10 py-2 rounded bg-gray-200">
+            Add artist
+          </Link>
+        </div>
 
         <div className="overflow-x-auto mt-2">
           <table className="w-full border-collapse">

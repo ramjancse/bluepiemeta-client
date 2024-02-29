@@ -8,6 +8,7 @@ import { useState } from "react";
 import Menu from "./Menu";
 import logo from "@/assets/images/logo.png";
 import mainBanner from "@/assets/images/main_banner.jpg";
+import LogOut from "../artist/LogOut";
 
 const Header = () => {
   const [show, setShow] = useState(false);
@@ -62,6 +63,10 @@ const Header = () => {
                   >
                     Albums
                   </a>
+                </li>
+
+                <li className="text-center">
+                  <LogOut />
                 </li>
               </ul>
             </nav>
