@@ -1,48 +1,84 @@
-import React from "react";
+"use client";
 
-const page = () => {
-  const links = [
-    { id: 1, label: "Website", name: "website" },
-    { id: 2, label: "iTunes", name: "iTunes" },
-    { id: 3, label: "Facebook", name: "facebook" },
-    { id: 4, label: "Vimeo", name: "vimeo" },
-    { id: 5, label: "Youtube", name: "youtube" },
-  ];
+import React from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useForm, useFieldArray } from "react-hook-form";
+
+const schema = yup
+  .object({
+    fullName: yup
+      .string()
+      .trim()
+      .required("Full name is required")
+      .min(3, "Full name must be at least 3 character"),
+    email: yup
+      .string()
+      .trim()
+      .email("Must be a valid email")
+      .required("Email is required")
+      .lowercase(),
+  })
+  .required();
+
+const PlayGround = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const {} = useFieldArray({});
+
+  const onSubmit = async (data) => {
+    console.log(data, "data");
+    setValue("profession", []);
+  };
+
+  console.log("Rendering...");
   return (
     <div>
       <h2>Welcome to Playground</h2>
       <br />
 
-      <div className="flex flex-wrap">
-        {/* <div className="one border border-blue-400 w-1/4">One</div>
-        <div className="two border border-blue-400 w-1/4">Two</div>
-        <div className="three border border-blue-400 w-1/4">Three</div>
-        <div className="four border border-blue-400 w-1/4">Four</div>
-        <div className="five border border-blue-500 w-1/4">Five</div> */}
-
-        {links.map((link) => (
-          <div className="input w-1/2" key={link.id}>
-            <div className="flex">
-              <label
-                className="border-2 px-10 py-1 cursor-pointer"
-                htmlFor={link.name}
-              >
-                {link.label}
-              </label>
-
-              <input
-                type="text"
-                name={link.name}
-                id={link.name}
-                className="bg-gray-200 pl-10 pr-2 focus:outline-none w-full"
-                placeholder="https://example.com"
-              />
-            </div>
+      <div className="form">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="first">
+            <label htmlFor="fullName">Full Name</label>
+            <input
+              type="text"
+              placeholder="Full Name"
+              name="fullName"
+              id="fullName"
+              className="px-10 py-1 focus:outline-none ring-2 ring-offset-2 ring-blue-400 rounded"
+              {...register("fullName")}
+            />
           </div>
-        ))}
+
+          <div className="second mt-3">
+            <label htmlFor="email">Email</label>
+            <input
+              type="text"
+              name="email"
+              id="email"
+              placeholder="Last Name"
+              className="px-10 py-1 focus:outline-none ring-2 ring-offset-2 ring-blue-400 rounded"
+              {...register("email")}
+            />
+          </div>
+
+          <input
+            type="submit"
+            value="Submit"
+            className="px-4 py-1 rounded bg-blue-400 text-white cursor-pointer mt-5"
+          />
+        </form>
       </div>
     </div>
   );
 };
 
-export default page;
+export default PlayGround;

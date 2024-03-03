@@ -1,30 +1,195 @@
+"use client";
+
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import React from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import { IoIosCloseCircle } from "react-icons/io";
 import { MdCloudUpload } from "react-icons/md";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useForm, useFieldArray } from "react-hook-form";
+import { toast } from "react-toastify";
+import { axiosPrivateInstance } from "@/config/axios";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import AddTrack from "@/components/albums/AddTrack";
 
-const page = () => {
-  const links = [
-    { id: 1, label: "Website", name: "website" },
-    { id: 2, label: "iTunes", name: "iTunes" },
-    { id: 3, label: "Facebook", name: "facebook" },
-    { id: 4, label: "Vimeo", name: "vimeo" },
-    { id: 4, label: "Youtube", name: "youtube" },
-    { id: 4, label: "Deezer", name: "deezer" },
-    { id: 4, label: "Instagram", name: "instagram" },
-    { id: 4, label: "Spotify", name: "spotify" },
-    { id: 4, label: "Twitter", name: "twitter" },
-    { id: 4, label: "Daily Motion", name: "dailyMotion" },
-    { id: 4, label: "Tiktok", name: "tikTok" },
-    { id: 4, label: "Video Rating", name: "videoRating" },
-  ];
+const schema = yup
+  .object({
+    type: yup.string().trim().required("Album type is required"),
+    albumTitle: yup
+      .string()
+      .trim()
+      .required("Album title is required")
+      .min(3, "Album title must be at least 3 character"),
+    titleLanguage: yup
+      .string()
+      .trim()
+      .required("Album title language is required")
+      .min(2, "Album title language must be at least 2 character"),
+    primaryArtists: yup.array().of(
+      yup.object({
+        artistName: yup
+          .string()
+          .trim()
+          .required("Primary Artist name is required")
+          .min(3, "Primary Artist name must be at least 3 characters"),
+      })
+    ),
+    featuringArtists: yup.array().of(
+      yup.object({
+        artistName: yup
+          .string()
+          .trim()
+          .required("Featuring Artist name is required")
+          .min(3, "Featuring Artist name must be at least 3 characters"),
+      })
+    ),
+    trackType: yup
+      .string()
+      .trim()
+      .required("Track type is required")
+      .oneOf(
+        ["lyrical", "instrumental"],
+        "Track type must select lyrical or instrumental"
+      ),
+    audioLanguage: yup
+      .string()
+      .trim()
+      .required("Audio language is required")
+      .min(2, "Audio language must be at least 2 character"),
+    genre: yup
+      .string()
+      .trim()
+      .required("Genre is required")
+      .oneOf(
+        [
+          "Indie",
+          "Singer",
+          "Artist",
+          "Lyricist",
+          "Composer",
+          "Producer",
+          "Band",
+          "Group",
+        ],
+        "Genre must be select between fields"
+      ),
+    releaseDate: yup
+      .string()
+      .trim()
+      .required("Release date is required")
+      .min(3, "Release date must be at least 3 character"),
+    label: yup
+      .string()
+      .trim()
+      .required("Label is required")
+      .min(3, "Label must be at least 3 character"),
+    cLine: yup
+      .string()
+      .trim()
+      .required("C Line is required")
+      .min(3, "C Line must be at least 3 character"),
+    cLineYear: yup
+      .string()
+      .trim()
+      .required("C Line Year is required")
+      .min(3, "C Line Year must be at least 3 character"),
+    pLine: yup
+      .string()
+      .trim()
+      .required("P Line is required")
+      .min(3, "P Line must be at least 3 character"),
+    pLineYear: yup
+      .string()
+      .trim()
+      .required("P Line Year is required")
+      .min(3, "P Line Year must be at least 3 character"),
+    upc: yup
+      .string()
+      .trim()
+      .required("UPC is required")
+      .min(3, "UPC must be at least 3 character"),
+    isrc: yup
+      .string()
+      .trim()
+      .required("ISRC is required")
+      .min(3, "ISRC must be at least 3 character"),
+  })
+  .required();
+
+const links = [
+  { id: 1, label: "Website", name: "website" },
+  { id: 2, label: "iTunes", name: "iTunes" },
+  { id: 3, label: "Facebook", name: "facebook" },
+  { id: 4, label: "Vimeo", name: "vimeo" },
+  { id: 4, label: "Youtube", name: "youtube" },
+  { id: 4, label: "Deezer", name: "deezer" },
+  { id: 4, label: "Instagram", name: "instagram" },
+  { id: 4, label: "Spotify", name: "spotify" },
+  { id: 4, label: "Twitter", name: "twitter" },
+  { id: 4, label: "Daily Motion", name: "dailyMotion" },
+  { id: 4, label: "Tiktok", name: "tikTok" },
+  { id: 4, label: "Video Rating", name: "videoRating" },
+];
+
+const AddAlbumPage = () => {
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    setError,
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      primaryArtists: [{ artistName: "" }],
+      featuringArtists: [{ artistName: "" }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    name: "primaryArtists",
+    control,
+  });
+
+  const {
+    fields: featuringFields,
+    append: featuringAppend,
+    remove: featuringRemove,
+  } = useFieldArray({
+    name: "featuringArtists",
+    control,
+  });
+
+  const session = useSession();
+  const router = useRouter();
+
+  const onSubmit = async (data) => {
+    console.log(data, "data");
+
+    try {
+      await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+
+      // show success message
+      toast.success("Album added successfully");
+
+      // redirect to another route
+      router.push("/albums");
+    } catch (error) {
+      console.log(error, "error in add album page");
+
+      // show error message
+      toast.error("Something went wrong");
+    }
+  };
+
   return (
     <>
       <Header />
       <main className="px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 xl:px-20 xl:py-10">
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="asset">
             <h2 className="text-2xl">Album</h2>
 
@@ -33,36 +198,51 @@ const page = () => {
                 <h3>Type</h3>
                 <hr />
 
-                <div className="top flex mt-2 mb-4">
-                  <div className="left">
-                    <input
-                      type="radio"
-                      name="type"
-                      id="albumEpisode"
-                      className="mr-1"
-                    />
-                    <label
-                      htmlFor="albumEpisode"
-                      className="cursor-pointer select-none"
-                    >
-                      Album/Episode
-                    </label>
+                <div className="top mt-2 mb-4">
+                  <div className="flex">
+                    <div className="left">
+                      <input
+                        type="radio"
+                        name="type"
+                        id="albumEpisode"
+                        className="mr-1"
+                        value="albumOrEpisode"
+                        {...register("type")}
+                        defaultChecked
+                      />
+                      <label
+                        htmlFor="albumEpisode"
+                        className="cursor-pointer select-none"
+                      >
+                        Album/Episode
+                      </label>
+                    </div>
+
+                    <div className="right flex items-center">
+                      <input
+                        type="radio"
+                        name="type"
+                        id="single"
+                        className="ml-5 mr-1"
+                        value="single"
+                        {...register("type")}
+                      />
+                      <label
+                        htmlFor="single"
+                        className="cursor-pointer select-none"
+                      >
+                        Single
+                      </label>
+                    </div>
                   </div>
 
-                  <div className="right flex items-center">
-                    <input
-                      type="radio"
-                      name="type"
-                      id="single"
-                      className="ml-5 mr-1"
-                    />
-                    <label
-                      htmlFor="single"
-                      className="cursor-pointer select-none"
-                    >
-                      Single
-                    </label>
-                  </div>
+                  <p
+                    className={`${
+                      errors.type?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.type?.message}
+                  </p>
                 </div>
 
                 <div className="input">
@@ -79,7 +259,16 @@ const page = () => {
                     id="albumTitle"
                     placeholder="Album name"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("albumTitle")}
                   />
+
+                  <p
+                    className={`${
+                      errors.albumTitle?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.albumTitle?.message}
+                  </p>
                 </div>
 
                 <div className="input mt-3">
@@ -94,12 +283,21 @@ const page = () => {
                     name="titleLanguage"
                     id="titleLanguage"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("titleLanguage")}
                   >
                     <option value="">Select Title Language</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
+                    <option value="bangla">Bangla</option>
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi</option>
                   </select>
+
+                  <p
+                    className={`${
+                      errors.titleLanguage?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.titleLanguage?.message}
+                  </p>
                 </div>
               </div>
 
@@ -116,60 +314,103 @@ const page = () => {
 
             <div className="input-area border-2 mt-2 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 grid grid-cols-12 grid-rows-1 gap-3">
               <div className="input col-start-1 col-end-13 sm:col-end-7">
-                <label className="cursor-pointer block" htmlFor="primaryArtist">
+                <label
+                  className="cursor-pointer block select-none"
+                  htmlFor="primaryArtist"
+                >
                   Primary Artist
                 </label>
-                <div className="flex items-center">
-                  <input
-                    type="text"
-                    name="primaryArtist"
-                    id="primaryArtist"
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    placeholder="Primary Artist"
-                  />
-                  <FaCirclePlus className="ml-2 text-blue-700 text-xl cursor-pointer" />
-                </div>
 
-                <div className="hidden items-center">
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    placeholder="Primary Artist"
-                  />
-                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
-                </div>
+                {fields.map((filed, index) => (
+                  <div key={filed.id}>
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        name={`primaryArtists[${index}].artistName`}
+                        id={`primaryArtists[${index}].artistName`}
+                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                        placeholder="Primary Artist"
+                        {...register(`primaryArtists.${index}.artistName`)}
+                      />
+
+                      {!index > 0 && (
+                        <FaCirclePlus
+                          onClick={() => append({ artistName: "" })}
+                          className="ml-2 text-blue-700 text-xl cursor-pointer"
+                        />
+                      )}
+
+                      {index > 0 && (
+                        <IoIosCloseCircle
+                          onClick={() => remove(index)}
+                          className="ml-1 text-red-500 text-2xl cursor-pointer"
+                        />
+                      )}
+                    </div>
+
+                    <p
+                      className={`${
+                        errors.primaryArtists &&
+                        errors.primaryArtists[index]?.artistName
+                          ? "block"
+                          : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                    >
+                      {errors.primaryArtists &&
+                        errors.primaryArtists[index]?.artistName?.message}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                 <label
-                  className="cursor-pointer block"
+                  className="cursor-pointer block select-none"
                   htmlFor="featuringArtist"
                 >
                   Featuring Artist
                 </label>
-                <div className="flex items-center">
-                  <input
-                    type="text"
-                    name="featuringArtist"
-                    id="featuringArtist"
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    placeholder="Featuring Artist"
-                  />
-                  <FaCirclePlus className="ml-2 text-blue-700 text-xl cursor-pointer" />
-                </div>
 
-                <div className="items-center hidden">
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    placeholder="Primary Artist"
-                  />
-                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
-                </div>
+                {featuringFields.map((filed, index) => (
+                  <div key={filed.id}>
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        name={`featuringArtists[${index}].artistName`}
+                        id={`featuringArtists[${index}].artistName`}
+                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                        placeholder="Featuring Artist"
+                        {...register(`featuringArtists.${index}.artistName`)}
+                      />
+
+                      {!index > 0 && (
+                        <FaCirclePlus
+                          onClick={() => featuringAppend({ artistName: "" })}
+                          className="ml-2 text-blue-700 text-xl cursor-pointer"
+                        />
+                      )}
+
+                      {index > 0 && (
+                        <IoIosCloseCircle
+                          onClick={() => featuringRemove(index)}
+                          className="ml-1 text-red-500 text-2xl cursor-pointer"
+                        />
+                      )}
+                    </div>
+
+                    <p
+                      className={`${
+                        errors.featuringArtists &&
+                        errors.featuringArtists[index]?.artistName
+                          ? "block"
+                          : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                    >
+                      {errors.featuringArtists &&
+                        errors.featuringArtists[index]?.artistName?.message}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -178,48 +419,51 @@ const page = () => {
             <h2 className="text-2xl">Metadata</h2>
 
             <div className="input-area border-2 mt-1 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14">
-              <div className="top flex mb-4">
-                <div className="left">
-                  <input
-                    type="radio"
-                    name="metadata"
-                    id="lyrical"
-                    className="mr-1"
-                  />
-                  <label
-                    htmlFor="lyrical"
-                    className="cursor-pointer select-none"
-                  >
-                    Lyrical
-                  </label>
+              <div className="top mb-4">
+                <div className="flex">
+                  <div className="left">
+                    <input
+                      type="radio"
+                      name="trackType"
+                      id="lyrical"
+                      className="mr-1"
+                      value="lyrical"
+                      {...register("trackType")}
+                      defaultChecked
+                    />
+                    <label
+                      htmlFor="lyrical"
+                      className="cursor-pointer select-none"
+                    >
+                      Lyrical
+                    </label>
+                  </div>
+
+                  <div className="right">
+                    <input
+                      type="radio"
+                      name="trackType"
+                      id="instrumental"
+                      className="ml-5 mr-1"
+                      value="instrumental"
+                      {...register("trackType")}
+                    />
+                    <label
+                      htmlFor="instrumental"
+                      className="cursor-pointer select-none"
+                    >
+                      Instrumental
+                    </label>
+                  </div>
                 </div>
 
-                <div className="middle">
-                  <input
-                    type="radio"
-                    name="metadata"
-                    id="instrumental"
-                    className="ml-5 mr-1"
-                  />
-                  <label
-                    htmlFor="instrumental"
-                    className="cursor-pointer select-none"
-                  >
-                    Instrumental
-                  </label>
-                </div>
-
-                <div className="right">
-                  <input
-                    type="radio"
-                    name="metadata"
-                    id="mixed"
-                    className="ml-5 mr-1"
-                  />
-                  <label htmlFor="mixed" className="cursor-pointer select-none">
-                    Mixed
-                  </label>
-                </div>
+                <p
+                  className={`${
+                    errors.trackType?.message ? "block" : "hidden"
+                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                >
+                  {errors.trackType?.message}
+                </p>
               </div>
 
               <div className="grid grid-cols-12 grid-rows-2 gap-3">
@@ -228,11 +472,12 @@ const page = () => {
                     Audio Language
                   </label>
 
-                  <div className="">
+                  <div>
                     <select
                       name="audioLanguage"
                       id="audioLanguage"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                      {...register("audioLanguage")}
                     >
                       <option value="">Select Audio Language</option>
                       <option value="bangla">Bangla</option>
@@ -240,6 +485,14 @@ const page = () => {
                       <option value="hindi">Hindi</option>
                     </select>
                   </div>
+
+                  <p
+                    className={`${
+                      errors.audioLanguage?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.audioLanguage?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -252,13 +505,26 @@ const page = () => {
                       name="genre"
                       id="genre"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                      {...register("genre")}
                     >
                       <option value="">Select Genre</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
+                      <option value="Indie">Indie</option>
+                      <option value="Singer">Singer</option>
+                      <option value="Artist">Artist</option>
+                      <option value="Lyricist">Lyricist</option>
+                      <option value="Composer">Composer</option>
+                      <option value="Producer">Producer</option>
+                      <option value="Band">Band</option>
+                      <option value="Group">Group</option>
                     </select>
                   </div>
+                  <p
+                    className={`${
+                      errors.genre?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.genre?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-end-7">
@@ -274,7 +540,16 @@ const page = () => {
                     name="releaseDate"
                     id="releaseDate"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("releaseDate")}
                   />
+
+                  <p
+                    className={`${
+                      errors.releaseDate?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.releaseDate?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -287,7 +562,16 @@ const page = () => {
                     name="label"
                     id="label"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("label")}
                   />
+
+                  <p
+                    className={`${
+                      errors.label?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.label?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-end-7">
@@ -300,7 +584,16 @@ const page = () => {
                     name="cLine"
                     id="cLine"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("cLine")}
                   />
+
+                  <p
+                    className={`${
+                      errors.cLine?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.cLine?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -316,7 +609,16 @@ const page = () => {
                     name="cLineYear"
                     id="cLineYear"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("cLineYear")}
                   />
+
+                  <p
+                    className={`${
+                      errors.cLineYear?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.cLineYear?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-end-7">
@@ -329,7 +631,16 @@ const page = () => {
                     name="pLine"
                     id="pLine"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("pLine")}
                   />
+
+                  <p
+                    className={`${
+                      errors.pLine?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.pLine?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -345,7 +656,16 @@ const page = () => {
                     name="pLineYear"
                     id="pLineYear"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("pLineYear")}
                   />
+
+                  <p
+                    className={`${
+                      errors.pLineYear?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.pLineYear?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-end-7">
@@ -358,7 +678,16 @@ const page = () => {
                     name="upc"
                     id="upc"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("upc")}
                   />
+
+                  <p
+                    className={`${
+                      errors.upc?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.upc?.message}
+                  </p>
                 </div>
 
                 <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -371,7 +700,16 @@ const page = () => {
                     name="isrc"
                     id="isrc"
                     className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    {...register("isrc")}
                   />
+
+                  <p
+                    className={`${
+                      errors.isrc?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.isrc?.message}
+                  </p>
                 </div>
               </div>
             </div>
@@ -384,6 +722,8 @@ const page = () => {
               className="text-center bg-green-600 px-14 py-2 font-semibold rounded-full text-white cursor-pointer"
             />
           </div>
+
+          {/* <AddTrack /> */}
         </form>
       </main>
       <Footer />
@@ -391,4 +731,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default AddAlbumPage;

@@ -11,7 +11,12 @@ const page = async () => {
     <>
       <Header />
       <main className="px-3 py-2 xs:px-5 xs:py-3 md:px-20 md:py-10">
-        <h2 className="text-xl">All Albums</h2>
+        <div className="top flex items-center justify-between">
+          <h2 className="text-xl mb-3">All Albums</h2>
+          <Link href="/albums/add" className="px-10 py-2 rounded bg-gray-200">
+            Add album
+          </Link>
+        </div>
 
         <div className="mt-2 overflow-x-auto">
           <table className="w-full mt-2 border-collapse">
@@ -27,7 +32,7 @@ const page = async () => {
               </tr>
             </thead>
             <tbody>
-              {albums.length ? (
+              {albums?.length ? (
                 albums.map((album) => {
                   const {
                     _id,
