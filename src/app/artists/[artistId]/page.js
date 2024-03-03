@@ -37,7 +37,7 @@ const page = async ({ params: { artistId } }) => {
           </div>
 
           <div className="right mt-5 md:mt-0 md:ml-3 md:w-3/4">
-            <div className="">
+            <div>
               <h2 className="text-2xl">Artist Information</h2>
               <hr />
 
@@ -67,7 +67,11 @@ const page = async ({ params: { artistId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
-                    <p className="text-sm">-</p>
+                    <p className="text-sm">
+                      {nameOfType.map((type) => (
+                        <span key={type._id}>{type.name}, </span>
+                      ))}
+                    </p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -92,95 +96,24 @@ const page = async ({ params: { artistId } }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="even:bg-gray-100">
-                      <td className="border p-2">QQ Music</td>
-                      <td className="border p-2">
-                        <Link
-                          className="text-sm text-blue-700"
-                          href={`${artistLinks.qqMusic}`}
-                        >
-                          {artistLinks.qqMusic}
-                        </Link>
-                      </td>
-                      <td className="border p-2 text-center">Edit</td>
-                    </tr>
-
-                    <tr className="even:bg-gray-100">
-                      <td className="border p-2">NetEase Music</td>
-                      <td className="border p-2">
-                        <Link
-                          className="text-sm text-blue-700"
-                          href={`${artistLinks?.netEaseMusic}`}
-                        >
-                          {artistLinks?.netEaseMusic}
-                        </Link>
-                      </td>
-                      <td className="border p-2 text-center">Edit</td>
-                    </tr>
-
-                    <tr className="even:bg-gray-100">
-                      <td className="border p-2">Spotify</td>
-                      <td className="border p-2">
-                        <Link
-                          className="text-sm text-blue-700"
-                          href={`${artistLinks?.spotify}`}
-                        >
-                          {artistLinks?.spotify}
-                        </Link>
-                      </td>
-                      <td className="border p-2 text-center">Edit</td>
-                    </tr>
-
-                    <tr className="even:bg-gray-100">
-                      <td className="border p-2">Apple Music</td>
-                      <td className="border p-2">
-                        <Link
-                          className="text-sm text-blue-700"
-                          href={`${artistLinks?.AppleMusic}`}
-                        >
-                          {artistLinks?.AppleMusic}
-                        </Link>
-                      </td>
-                      <td className="border p-2 text-center">Edit</td>
-                    </tr>
-                    <tr className="even:bg-gray-100">
-                      <td className="border p-2">SoundCloud</td>
-                      <td className="border p-2">
-                        <Link
-                          className="text-sm text-blue-700"
-                          href={`${artistLinks?.soundCloud}`}
-                        >
-                          {artistLinks?.soundCloud}
-                        </Link>
-                      </td>
-                      <td className="border p-2 text-center">Edit</td>
-                    </tr>
-
-                    <tr className="even:bg-gray-100">
-                      <td className="border p-2">Beatport</td>
-                      <td className="border p-2">
-                        <Link
-                          className="text-sm text-blue-700"
-                          href={`${artistLinks?.beatport}`}
-                        >
-                          {artistLinks?.beatport}
-                        </Link>
-                      </td>
-                      <td className="border p-2 text-center">Edit</td>
-                    </tr>
-
-                    <tr className="even:bg-gray-100">
-                      <td className="border p-2">Deezer</td>
-                      <td className="border p-2">
-                        <Link
-                          className="text-sm text-blue-700"
-                          href={`${artistLinks?.deezer}`}
-                        >
-                          {artistLinks?.deezer}
-                        </Link>
-                      </td>
-                      <td className="border p-2 text-center">Edit</td>
-                    </tr>
+                    {artistLinks.map((artistLink) => {
+                      const { _id, name, link } = artistLink;
+                      return (
+                        <tr className="even:bg-gray-100" key={_id}>
+                          <td className="border p-2">{name}</td>
+                          <td className="border p-2">
+                            <a
+                              className="text-sm text-blue-700"
+                              href={`${link}`}
+                              target="_blank"
+                            >
+                              {link}
+                            </a>
+                          </td>
+                          <td className="border p-2 text-center">Edit</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

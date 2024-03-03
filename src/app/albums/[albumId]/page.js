@@ -88,7 +88,7 @@ const page = async ({ params: { albumId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Distribution Date</p>
-                    <p className="text-sm">{distributionDate}</p>
+                    <p className="text-sm">{distributionDate ?? "-"}</p>
                   </div>
 
                   <div className="info border-b py-2">

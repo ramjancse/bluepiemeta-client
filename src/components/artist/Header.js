@@ -5,6 +5,7 @@ import logoImage from "@/assets/images/logo.png";
 import dashboardImage from "@/assets/images/main_banner.jpg";
 import Menu from "../shared/Menu";
 import Link from "next/link";
+import LogOut from "./LogOut";
 
 const Header = () => {
   return (
@@ -24,7 +25,7 @@ const Header = () => {
 
         <div className="flex w-5/6">
           <nav className="w-full">
-            <ul className="font-ralewayMedium flex text-lg text-primary">
+            <ul className="font-ralewayMedium flex text-lg text-primary items-center">
               <li className="ml-3 text-center">
                 <Link
                   href="/artists"
@@ -41,6 +42,10 @@ const Header = () => {
                 >
                   Albums
                 </Link>
+              </li>
+
+              <li className="text-center">
+                <LogOut />
               </li>
             </ul>
           </nav>

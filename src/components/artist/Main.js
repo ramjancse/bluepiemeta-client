@@ -1,14 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import mainBanner from "@/assets/images/main_banner.jpg";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import { axiosPublicInstance } from "@/config/axios";
+import { axiosPrivateInstance } from "@/config/axios";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const schema = yup
   .object({
@@ -37,98 +39,72 @@ const schema = yup
     phoneNumber: yup.string().trim().required("Phone number is required"),
     address: yup.string().trim().required("Address is required"),
     region: yup.string().trim().required("Region is required"),
-    coverPhoto: yup.string().trim().required("Cover Photo is required"),
-    profileImage: yup.string().trim().required("Profile image is required"),
-    artistType: yup
-      .string()
-      .trim()
-      // .required("Artist type is required")
-      .oneOf(
-        ["single", "multiple"],
-        "Artist type must be select single or multiple"
-      ),
-    nameOfType: yup
-      .string()
-      // .trim()
-      // .required("Name of type is required")
-      .oneOf(
-        [
-          "Indie",
-          "Singer",
-          "Artist",
-          "Lyricist",
-          "Composer",
-          "Producer",
-          "Band",
-          "Group",
-        ],
-        "Name of type must be select between fields"
-      ),
   })
   .required();
 
 const Main = () => {
-  const [artistType, setArtistType] = useState("multiple");
+  const [artistType, setArtistType] = useState("Multiple");
+  const [singleTypes, setSingleTypes] = useState({});
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
     setValue,
+    getValues,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      coverPhoto: "https://bluepiemeta/uploads/profilepucture.jpg",
-      profileImage: "https://bluepiemeta/uploads/profilepucture.jpg",
-      artistImage: "https://bluepiemeta/uploads/profilepucture.jpg",
-      artistLinks: [],
-      socialMedia: [],
-      artistDiscription: "",
-    },
   });
 
+  const session = useSession();
+  const router = useRouter();
+
+  const getNameOfTypesArr = (data) => {
+    let types = [];
+    let filteredTypes = [];
+
+    // artists type single selected checkbox make an array here for need DB
+    if (artistType === "Single") {
+      types = Object.keys(singleTypes);
+
+      types.forEach((type) => {
+        if (singleTypes[type]) {
+          filteredTypes.push({ name: type });
+        }
+      });
+    } else {
+      filteredTypes.push({ name: data.multiTypes });
+    }
+
+    return filteredTypes;
+  };
+
   const onSubmit = async (data) => {
-    data.nameOfType = [];
-    if (data.indie) {
-      data.nameOfType.push({ name: "Indie" });
-    }
-    if (data.singer) {
-      data.nameOfType.push({ name: "Singer" });
-    }
-    if (data.artist) {
-      data.nameOfType.push({ name: "Artist" });
-    }
-    if (data.lyricist) {
-      data.nameOfType.push({ name: "Lyricist" });
-    }
-    if (data.composer) {
-      data.nameOfType.push({ name: "Composer" });
-    }
-    if (data.producer) {
-      data.nameOfType.push({ name: "Producer" });
-    }
-    if (data.band) {
-      data.nameOfType.push({ name: "Band" });
-    }
-    if (data.group) {
-      data.nameOfType.push({ name: "Group" });
-    }
-
     // update artist type field
-    setValue("artistType", artistType);
+    setValue("artistType", "Single");
 
-    console.log(data, "data");
+    // updated array in this field
+    setValue("nameOfType", getNameOfTypesArr(data));
+
+    // update some field need to be database
+    setValue("artistImage", "");
+    setValue("artistDiscription", "This is artist description");
+    setValue("artistLinks", []);
+    setValue("socialMedia", []);
 
     try {
-      const res = await axiosPublicInstance.post("/artists", data);
-      console.log(res, "res");
+      await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
+
       // show success message
-      toast.success("Artist add successful");
+      toast.success("Artist added successfully");
+
       // redirect to another route
-      // router.push("/login");
+      router.push("/artists");
     } catch (error) {
+      console.log(error, "error in add artist page");
+
       // show error message
-      console.log(error, "error in add artist");
       toast.error("Something went wrong");
     }
   };
@@ -170,6 +146,7 @@ const Main = () => {
                     className="w-full rounded border-none px-5 py-2 focus:outline-none"
                     {...register("artistName")}
                   />
+
                   <p
                     className={`${
                       errors.artistName?.message ? "block" : "hidden"
@@ -425,6 +402,7 @@ const Main = () => {
                 </div>
               </div>
 
+              {/* cover photo upload input */}
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -473,13 +451,16 @@ const Main = () => {
                       <input
                         type="radio"
                         name="artistType"
-                        id="single"
-                        value="single"
-                        defaultChecked={artistType === "single"}
-                        onChange={() => setArtistType("single")}
+                        id="Single"
+                        value="Single"
+                        defaultChecked={artistType === "Single"}
+                        onChange={() => {
+                          setArtistType("Single");
+                          setValue("artistType", "Single");
+                        }}
                       />
                       <label
-                        htmlFor="single"
+                        htmlFor="Single"
                         className="ml-2 cursor-pointer select-none"
                       >
                         Single
@@ -490,13 +471,16 @@ const Main = () => {
                       <input
                         type="radio"
                         name="artistType"
-                        id="multiple"
-                        value="multiple"
-                        defaultChecked={artistType === "multiple"}
-                        onChange={() => setArtistType("multiple")}
+                        id="Multiple"
+                        value="Multiple"
+                        defaultChecked={artistType === "Multiple"}
+                        onChange={() => {
+                          setArtistType("Multiple");
+                          setValue("artistType", "Multiple");
+                        }}
                       />
                       <label
-                        htmlFor="multiple"
+                        htmlFor="Multiple"
                         className="ml-2 cursor-pointer select-none"
                       >
                         Multiple
@@ -507,7 +491,7 @@ const Main = () => {
                   {/* By default selected single and show children */}
                   <div
                     className={`children mt-3 ${
-                      artistType === "single" ? "block" : "hidden"
+                      artistType === "Single" ? "block" : "hidden"
                     } h-[80px]`}
                   >
                     <div className="flex">
@@ -517,6 +501,12 @@ const Main = () => {
                           name="indie"
                           id="indie"
                           {...register("indie")}
+                          onChange={(e) =>
+                            setSingleTypes({
+                              ...singleTypes,
+                              [e.target.name]: e.target.checked,
+                            })
+                          }
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -532,6 +522,12 @@ const Main = () => {
                           name="singer"
                           id="singer"
                           {...register("singer")}
+                          onChange={(e) =>
+                            setSingleTypes({
+                              ...singleTypes,
+                              [e.target.name]: e.target.checked,
+                            })
+                          }
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -547,6 +543,12 @@ const Main = () => {
                           name="artist"
                           id="artist"
                           {...register("artist")}
+                          onChange={(e) =>
+                            setSingleTypes({
+                              ...singleTypes,
+                              [e.target.name]: e.target.checked,
+                            })
+                          }
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -564,6 +566,12 @@ const Main = () => {
                           name="lyricist"
                           id="lyricist"
                           {...register("lyricist")}
+                          onChange={(e) =>
+                            setSingleTypes({
+                              ...singleTypes,
+                              [e.target.name]: e.target.checked,
+                            })
+                          }
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -579,6 +587,12 @@ const Main = () => {
                           name="composer"
                           id="composer"
                           {...register("composer")}
+                          onChange={(e) =>
+                            setSingleTypes({
+                              ...singleTypes,
+                              [e.target.name]: e.target.checked,
+                            })
+                          }
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -594,6 +608,12 @@ const Main = () => {
                           name="producer"
                           id="producer"
                           {...register("producer")}
+                          onChange={(e) =>
+                            setSingleTypes({
+                              ...singleTypes,
+                              [e.target.name]: e.target.checked,
+                            })
+                          }
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -608,16 +628,17 @@ const Main = () => {
                   {/* when select multiple then show children */}
                   <div
                     className={`children mt-3 ${
-                      artistType === "multiple" ? "block" : "hidden"
+                      artistType === "Multiple" ? "block" : "hidden"
                     }  h-[80px]`}
                   >
                     <div className="flex">
                       <div className="flex items-center">
                         <input
-                          type="checkbox"
-                          name="band"
+                          type="radio"
+                          name="multiTypes"
                           id="band"
-                          {...register("band")}
+                          value="Band"
+                          {...register("multiTypes")}
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
@@ -629,10 +650,11 @@ const Main = () => {
 
                       <div className="flex ml-5 items-center">
                         <input
-                          type="checkbox"
-                          name="group"
+                          type="radio"
+                          name="multiTypes"
                           id="group"
-                          {...register("group")}
+                          value="Group"
+                          {...register("multiTypes")}
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
