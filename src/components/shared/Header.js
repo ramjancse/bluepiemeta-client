@@ -39,15 +39,6 @@ const Header = () => {
             <nav>
               <ul className="flex items-center text-lg">
                 <li className="text-center">
-                  <Link
-                    href="/songs"
-                    className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
-                  >
-                    Songs
-                  </Link>
-                </li>
-
-                <li className="text-center">
                   <a
                     href="/artists"
                     className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"

@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { axiosPrivateInstance } from "@/config/axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import AddTrack from "@/components/albums/AddTrack";
 
 const schema = yup
   .object({
@@ -27,17 +28,24 @@ const schema = yup
       .trim()
       .required("Album title language is required")
       .min(2, "Album title language must be at least 2 character"),
-    // primaryArtist: yup
-    //   .string()
-    //   .trim()
-    //   .required("Primary artist name is required")
-    //   .min(3, "Primary artist name must be at least 3 character"),
-
-    featuringArtist: yup
-      .string()
-      .trim()
-      .required("Featuring artist name is required")
-      .min(3, "Featuring artist name must be at least 3 character"),
+    primaryArtists: yup.array().of(
+      yup.object({
+        artistName: yup
+          .string()
+          .trim()
+          .required("Primary Artist name is required")
+          .min(3, "Primary Artist name must be at least 3 characters"),
+      })
+    ),
+    featuringArtists: yup.array().of(
+      yup.object({
+        artistName: yup
+          .string()
+          .trim()
+          .required("Featuring Artist name is required")
+          .min(3, "Featuring Artist name must be at least 3 characters"),
+      })
+    ),
     trackType: yup
       .string()
       .trim()
@@ -132,10 +140,12 @@ const AddAlbumPage = () => {
     handleSubmit,
     control,
     formState: { errors },
+    setError,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       primaryArtists: [{ artistName: "" }],
+      featuringArtists: [{ artistName: "" }],
     },
   });
 
@@ -143,6 +153,16 @@ const AddAlbumPage = () => {
     name: "primaryArtists",
     control,
   });
+
+  const {
+    fields: featuringFields,
+    append: featuringAppend,
+    remove: featuringRemove,
+  } = useFieldArray({
+    name: "featuringArtists",
+    control,
+  });
+
   const session = useSession();
   const router = useRouter();
 
@@ -164,8 +184,6 @@ const AddAlbumPage = () => {
       toast.error("Something went wrong");
     }
   };
-
-  const handleAdd = () => {};
 
   return (
     <>
@@ -296,87 +314,103 @@ const AddAlbumPage = () => {
 
             <div className="input-area border-2 mt-2 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 grid grid-cols-12 grid-rows-1 gap-3">
               <div className="input col-start-1 col-end-13 sm:col-end-7">
-                <label className="cursor-pointer block" htmlFor="primaryArtist">
+                <label
+                  className="cursor-pointer block select-none"
+                  htmlFor="primaryArtist"
+                >
                   Primary Artist
                 </label>
 
                 {fields.map((filed, index) => (
-                  <div className="flex items-center" key={filed.id}>
-                    <input
-                      type="text"
-                      name="primaryArtist"
-                      id="primaryArtist"
-                      className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      placeholder="Primary Artist"
-                      {...register(`primaryArtists.${index}.artistName`)}
-                    />
-
-                    {!index > 0 && (
-                      <FaCirclePlus
-                        onClick={() => append({ artistName: "" })}
-                        className="ml-2 text-blue-700 text-xl cursor-pointer"
+                  <div key={filed.id}>
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        name={`primaryArtists[${index}].artistName`}
+                        id={`primaryArtists[${index}].artistName`}
+                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                        placeholder="Primary Artist"
+                        {...register(`primaryArtists.${index}.artistName`)}
                       />
-                    )}
 
-                    {index > 0 && (
-                      <IoIosCloseCircle
-                        onClick={() => remove(index)}
-                        className="ml-1 text-red-500 text-2xl cursor-pointer"
-                      />
-                    )}
+                      {!index > 0 && (
+                        <FaCirclePlus
+                          onClick={() => append({ artistName: "" })}
+                          className="ml-2 text-blue-700 text-xl cursor-pointer"
+                        />
+                      )}
+
+                      {index > 0 && (
+                        <IoIosCloseCircle
+                          onClick={() => remove(index)}
+                          className="ml-1 text-red-500 text-2xl cursor-pointer"
+                        />
+                      )}
+                    </div>
+
+                    <p
+                      className={`${
+                        errors.primaryArtists &&
+                        errors.primaryArtists[index]?.artistName
+                          ? "block"
+                          : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                    >
+                      {errors.primaryArtists &&
+                        errors.primaryArtists[index]?.artistName?.message}
+                    </p>
                   </div>
                 ))}
-
-                <div className="hidden items-center">
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    placeholder="Primary Artist"
-                  />
-                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
-                </div>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                 <label
-                  className="cursor-pointer block"
+                  className="cursor-pointer block select-none"
                   htmlFor="featuringArtist"
                 >
                   Featuring Artist
                 </label>
 
-                <div className="flex items-center">
-                  <input
-                    type="text"
-                    name="featuringArtist"
-                    id="featuringArtist"
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    placeholder="Featuring Artist"
-                    {...register("featuringArtist")}
-                  />
-                  <FaCirclePlus className="ml-2 text-blue-700 text-xl cursor-pointer" />
-                </div>
+                {featuringFields.map((filed, index) => (
+                  <div key={filed.id}>
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        name={`featuringArtists[${index}].artistName`}
+                        id={`featuringArtists[${index}].artistName`}
+                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                        placeholder="Featuring Artist"
+                        {...register(`featuringArtists.${index}.artistName`)}
+                      />
 
-                <p
-                  className={`${
-                    errors.featuringArtist?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.featuringArtist?.message}
-                </p>
+                      {!index > 0 && (
+                        <FaCirclePlus
+                          onClick={() => featuringAppend({ artistName: "" })}
+                          className="ml-2 text-blue-700 text-xl cursor-pointer"
+                        />
+                      )}
 
-                <div className="items-center hidden">
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    placeholder="Primary Artist"
-                  />
-                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
-                </div>
+                      {index > 0 && (
+                        <IoIosCloseCircle
+                          onClick={() => featuringRemove(index)}
+                          className="ml-1 text-red-500 text-2xl cursor-pointer"
+                        />
+                      )}
+                    </div>
+
+                    <p
+                      className={`${
+                        errors.featuringArtists &&
+                        errors.featuringArtists[index]?.artistName
+                          ? "block"
+                          : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                    >
+                      {errors.featuringArtists &&
+                        errors.featuringArtists[index]?.artistName?.message}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -688,6 +722,8 @@ const AddAlbumPage = () => {
               className="text-center bg-green-600 px-14 py-2 font-semibold rounded-full text-white cursor-pointer"
             />
           </div>
+
+          {/* <AddTrack /> */}
         </form>
       </main>
       <Footer />

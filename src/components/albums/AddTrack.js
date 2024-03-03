@@ -1,5 +1,3 @@
-"use client";
-
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import React from "react";
@@ -7,49 +5,36 @@ import { FaCirclePlus, FaUpload } from "react-icons/fa6";
 import { IoIosCloseCircle } from "react-icons/io";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useFieldArray, useForm } from "react-hook-form";
 
 const schema = yup
   .object({
+    type: yup.string().trim().required("Album type is required"),
+    albumTitle: yup
+      .string()
+      .trim()
+      .required("Album title is required")
+      .min(3, "Album title must be at least 3 character"),
     titleLanguage: yup
       .string()
       .trim()
-      .required("Track title language is required")
-      .min(2, "Track title language must be at least 2 character"),
+      .required("Album title language is required")
+      .min(2, "Album title language must be at least 2 character"),
     primaryArtists: yup.array().of(
       yup.object({
-        name: yup
+        artistName: yup
           .string()
           .trim()
           .required("Primary Artist name is required")
           .min(3, "Primary Artist name must be at least 3 characters"),
       })
     ),
-    composers: yup.array().of(
+    featuringArtists: yup.array().of(
       yup.object({
-        name: yup
+        artistName: yup
           .string()
           .trim()
-          .required("Composer name is required")
-          .min(3, "Composer name must be at least 3 characters"),
-      })
-    ),
-    lyricists: yup.array().of(
-      yup.object({
-        name: yup
-          .string()
-          .trim()
-          .required("Lyricist name is required")
-          .min(3, "Lyricist name must be at least 3 characters"),
-      })
-    ),
-    producers: yup.array().of(
-      yup.object({
-        name: yup
-          .string()
-          .trim()
-          .required("Producer name is required")
-          .min(3, "Producer name must be at least 3 characters"),
+          .required("Featuring Artist name is required")
+          .min(3, "Featuring Artist name must be at least 3 characters"),
       })
     ),
     trackType: yup
@@ -58,13 +43,13 @@ const schema = yup
       .required("Track type is required")
       .oneOf(
         ["lyrical", "instrumental"],
-        "Track type must be select lyrical or instrumental"
+        "Track type must select lyrical or instrumental"
       ),
-    language: yup
+    audioLanguage: yup
       .string()
       .trim()
-      .required("Language is required")
-      .min(2, "Language must be at least 2 character"),
+      .required("Audio language is required")
+      .min(2, "Audio language must be at least 2 character"),
     genre: yup
       .string()
       .trim()
@@ -82,33 +67,6 @@ const schema = yup
         ],
         "Genre must be select between fields"
       ),
-    mood: yup
-      .string()
-      .trim()
-      .required("Mood is required")
-      .oneOf(
-        ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
-        "Mood must be select between fields"
-      ),
-    mix: yup
-      .string()
-      .trim()
-      .required("Mix is required")
-      .oneOf(
-        ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
-        "Mix must be select between fields"
-      ),
-    instruments: yup
-      .string()
-      .trim()
-      .required("Instruments is required")
-      .oneOf(
-        ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
-        "Instruments must be select between fields"
-      ),
-    duration: yup.string().trim().required("Duration is required"),
-    bpm: yup.string().trim().required("BPM is required"),
-    tags: yup.string().trim().required("Tags is required"),
     releaseDate: yup
       .string()
       .trim()
@@ -158,73 +116,20 @@ const AddTrack = () => {
     { id: 2, label: "iTunes", name: "iTunes" },
     { id: 3, label: "Facebook", name: "facebook" },
     { id: 4, label: "Vimeo", name: "vimeo" },
-    { id: 5, label: "Youtube", name: "youtube" },
-    { id: 6, label: "Deezer", name: "deezer" },
-    { id: 7, label: "Instagram", name: "instagram" },
-    { id: 8, label: "Spotify", name: "spotify" },
-    { id: 9, label: "Twitter", name: "twitter" },
-    { id: 10, label: "Daily Motion", name: "dailyMotion" },
-    { id: 11, label: "Tiktok", name: "tikTok" },
-    { id: 12, label: "Video Rating", name: "videoRating" },
+    { id: 4, label: "Youtube", name: "youtube" },
+    { id: 4, label: "Deezer", name: "deezer" },
+    { id: 4, label: "Instagram", name: "instagram" },
+    { id: 4, label: "Spotify", name: "spotify" },
+    { id: 4, label: "Twitter", name: "twitter" },
+    { id: 4, label: "Daily Motion", name: "dailyMotion" },
+    { id: 4, label: "Tiktok", name: "tikTok" },
+    { id: 4, label: "Video Rating", name: "videoRating" },
   ];
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    setError,
-  } = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      primaryArtists: [{ name: "" }],
-      composers: [{ name: "" }],
-      lyricists: [{ name: "" }],
-      producers: [{ name: "" }],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    name: "primaryArtists",
-    control,
-  });
-
-  const {
-    fields: composerFields,
-    append: composerAppend,
-    remove: composerRemove,
-  } = useFieldArray({
-    name: "composers",
-    control,
-  });
-
-  const {
-    fields: lyricistFields,
-    append: lyricistAppend,
-    remove: lyricistRemove,
-  } = useFieldArray({
-    name: "lyricists",
-    control,
-  });
-
-  const {
-    fields: producerFields,
-    append: producerAppend,
-    remove: producerRemove,
-  } = useFieldArray({
-    name: "producers",
-    control,
-  });
-
-  const onSubmit = async (data) => {
-    console.log(data, "data");
-  };
 
   return (
     <>
-      <Header />
       <main className="px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 xl:px-20 xl:py-10">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form>
           <div className="asset">
             <h2 className="text-2xl">Asset</h2>
 
@@ -252,41 +157,27 @@ const AddTrack = () => {
               </div>
 
               <div className="input mt-4">
-                <label htmlFor="title" className="cursor-pointer">
+                <label htmlFor="title" className="cursor-pointer block">
                   Title
                 </label>
-
                 <div className="flex flex-col sm:flex-row">
-                  <div className="sm:w-3/5 lg:w-4/6 sm:mr-3">
-                    <input
-                      type="file"
-                      name="file"
-                      id="file"
-                      className="my-1 bg-gray-200 outline-none px-2 py-2 border-l-8 border-blue-700 text-sm cursor-pointer w-full"
-                    />
-                  </div>
+                  <input
+                    type="file"
+                    name="title"
+                    id="title"
+                    className="my-1 bg-gray-200 outline-none px-2 py-2 border-l-8 border-blue-700 text-sm sm:w-3/5 lg:w-5/6 sm:mr-3"
+                  />
 
-                  <div className="sm:w-2/5 lg:w-2/6">
-                    <select
-                      name="titleLanguage"
-                      id="titleLanguage"
-                      className="my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm w-full"
-                      {...register("titleLanguage")}
-                    >
-                      <option value="">Title Language</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
-                    </select>
-
-                    <p
-                      className={`${
-                        errors.titleLanguage?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1`}
-                    >
-                      {errors.titleLanguage?.message}
-                    </p>
-                  </div>
+                  <select
+                    name=""
+                    id=""
+                    className="my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm sm:w-2/5 lg:w-1/6"
+                  >
+                    <option value="">Title Language</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -295,199 +186,113 @@ const AddTrack = () => {
           <div className="contributors mt-8">
             <h2 className="text-2xl">Contributors</h2>
 
-            <div className="input-area border-2 mt-2 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 grid grid-cols-12 grid-rows-1 gap-3">
+            <div className="input-area border-2 mt-2 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 grid grid-cols-12 grid-rows-2 gap-3">
               <div className="input col-start-1 col-end-13 sm:col-end-7">
-                <label
-                  className="cursor-pointer block select-none"
-                  htmlFor="primaryArtist"
-                >
+                <label className="cursor-pointer block" htmlFor="primaryArtist">
                   Primary Artist
                 </label>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    name="primaryArtist"
+                    id="primaryArtist"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Primary Artist"
+                  />
+                  <FaCirclePlus className="ml-2 text-blue-700 text-xl cursor-pointer" />
+                </div>
 
-                {fields.map((filed, index) => (
-                  <div key={filed.id}>
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        name={`primaryArtists[${index}].name`}
-                        id={`primaryArtists[${index}].name`}
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        placeholder="Primary Artist"
-                        {...register(`primaryArtists.${index}.name`)}
-                      />
-
-                      {!index > 0 && (
-                        <FaCirclePlus
-                          onClick={() => append({ name: "" })}
-                          className="ml-2 text-blue-700 text-xl cursor-pointer"
-                        />
-                      )}
-
-                      {index > 0 && (
-                        <IoIosCloseCircle
-                          onClick={() => remove(index)}
-                          className="ml-1 text-red-500 text-2xl cursor-pointer"
-                        />
-                      )}
-                    </div>
-
-                    <p
-                      className={`${
-                        errors.primaryArtists &&
-                        errors.primaryArtists[index]?.name
-                          ? "block"
-                          : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                    >
-                      {errors.primaryArtists &&
-                        errors.primaryArtists[index]?.name?.message}
-                    </p>
-                  </div>
-                ))}
+                <div className="hidden items-center">
+                  <input
+                    type="text"
+                    name=""
+                    id=""
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Primary Artist"
+                  />
+                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
+                </div>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                <label
-                  className="cursor-pointer block select-none"
-                  htmlFor="composer"
-                >
+                <label className="cursor-pointer block" htmlFor="composer">
                   Composer
                 </label>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    name="composer"
+                    id="composer"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Composer"
+                  />
+                  <FaCirclePlus className="ml-2 text-blue-700 text-xl cursor-pointer" />
+                </div>
 
-                {composerFields.map((filed, index) => (
-                  <div key={filed.id}>
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        name={`composers[${index}].name`}
-                        id={`composers[${index}].name`}
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        placeholder="Composer"
-                        {...register(`composers.${index}.name`)}
-                      />
-
-                      {!index > 0 && (
-                        <FaCirclePlus
-                          onClick={() => composerAppend({ name: "" })}
-                          className="ml-2 text-blue-700 text-xl cursor-pointer"
-                        />
-                      )}
-
-                      {index > 0 && (
-                        <IoIosCloseCircle
-                          onClick={() => composerRemove(index)}
-                          className="ml-1 text-red-500 text-2xl cursor-pointer"
-                        />
-                      )}
-                    </div>
-
-                    <p
-                      className={`${
-                        errors.composers && errors.composers[index]?.name
-                          ? "block"
-                          : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                    >
-                      {errors.composers &&
-                        errors.composers[index]?.name?.message}
-                    </p>
-                  </div>
-                ))}
+                <div className="items-center hidden">
+                  <input
+                    type="text"
+                    name=""
+                    id=""
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Primary Artist"
+                  />
+                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
+                </div>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-end-7">
-                <label
-                  className="cursor-pointer block select-none"
-                  htmlFor="lyricist"
-                >
+                <label className="cursor-pointer block" htmlFor="lyricist">
                   Lyricist
                 </label>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    name="lyricist"
+                    id="lyricist"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Lyricist"
+                  />
+                  <FaCirclePlus className="ml-2 text-blue-700 text-xl cursor-pointer" />
+                </div>
 
-                {lyricistFields.map((filed, index) => (
-                  <div key={filed.id}>
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        name={`lyricists[${index}].name`}
-                        id={`lyricists[${index}].name`}
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        placeholder="Lyricist"
-                        {...register(`lyricists.${index}.name`)}
-                      />
-
-                      {!index > 0 && (
-                        <FaCirclePlus
-                          onClick={() => lyricistAppend({ name: "" })}
-                          className="ml-2 text-blue-700 text-xl cursor-pointer"
-                        />
-                      )}
-
-                      {index > 0 && (
-                        <IoIosCloseCircle
-                          onClick={() => lyricistRemove(index)}
-                          className="ml-1 text-red-500 text-2xl cursor-pointer"
-                        />
-                      )}
-                    </div>
-
-                    <p
-                      className={`${
-                        errors.lyricists && errors.lyricists[index]?.name
-                          ? "block"
-                          : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                    >
-                      {errors.lyricists &&
-                        errors.lyricists[index]?.name?.message}
-                    </p>
-                  </div>
-                ))}
+                <div className="hidden items-center">
+                  <input
+                    type="text"
+                    name=""
+                    id=""
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Primary Artist"
+                  />
+                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
+                </div>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                 <label className="cursor-pointer block" htmlFor="producer">
                   Producer
                 </label>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    name="producer"
+                    id="producer"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Producer"
+                  />
+                  <FaCirclePlus className="ml-2 text-blue-700 text-xl cursor-pointer" />
+                </div>
 
-                {producerFields.map((filed, index) => (
-                  <div key={filed.id}>
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        name={`producers[${index}].name`}
-                        id={`producers[${index}].name`}
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        placeholder="Producer"
-                        {...register(`producers.${index}.name`)}
-                      />
-
-                      {!index > 0 && (
-                        <FaCirclePlus
-                          onClick={() => producerAppend({ name: "" })}
-                          className="ml-2 text-blue-700 text-xl cursor-pointer"
-                        />
-                      )}
-
-                      {index > 0 && (
-                        <IoIosCloseCircle
-                          onClick={() => producerRemove(index)}
-                          className="ml-1 text-red-500 text-2xl cursor-pointer"
-                        />
-                      )}
-                    </div>
-
-                    <p
-                      className={`${
-                        errors.producers && errors.producers[index]?.name
-                          ? "block"
-                          : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                    >
-                      {errors.producers &&
-                        errors.producers[index]?.name?.message}
-                    </p>
-                  </div>
-                ))}
+                <div className="items-center hidden">
+                  <input
+                    type="text"
+                    name=""
+                    id=""
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                    placeholder="Producer"
+                  />
+                  <IoIosCloseCircle className="ml-1 text-red-500 text-2xl cursor-pointer" />
+                </div>
               </div>
             </div>
           </div>
@@ -496,53 +301,36 @@ const AddTrack = () => {
             <h2 className="text-2xl">Technical</h2>
 
             <div className="input-area border-2 mt-1 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7">
-              <div className="top mb-4">
-                <div className="flex">
-                  <div className="left">
-                    <div className="">
-                      <input
-                        type="radio"
-                        name="trackType"
-                        id="lyrical"
-                        className="mr-1"
-                        value="lyrical"
-                        {...register("trackType")}
-                        defaultChecked
-                      />
-                      <label
-                        htmlFor="lyrical"
-                        className="cursor-pointer select-none"
-                      >
-                        Lyrical
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="right">
-                    <input
-                      type="radio"
-                      name="trackType"
-                      id="instrumental"
-                      className="ml-5 mr-1"
-                      value="instrumental"
-                      {...register("trackType")}
-                    />
-                    <label
-                      htmlFor="instrumental"
-                      className="cursor-pointer select-none"
-                    >
-                      Instrumental
-                    </label>
-                  </div>
+              <div className="top flex mb-4">
+                <div className="left">
+                  <input
+                    type="checkbox"
+                    name="lyrical"
+                    id="lyrical"
+                    className="mr-1"
+                  />
+                  <label
+                    htmlFor="lyrical"
+                    className="cursor-pointer select-none"
+                  >
+                    Lyrical
+                  </label>
                 </div>
 
-                <p
-                  className={`${
-                    errors.trackType?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.trackType?.message}
-                </p>
+                <div className="right">
+                  <input
+                    type="checkbox"
+                    name="instrumental"
+                    id="instrumental"
+                    className="ml-5 mr-1"
+                  />
+                  <label
+                    htmlFor="instrumental"
+                    className="cursor-pointer select-none"
+                  >
+                    Instrumental
+                  </label>
+                </div>
               </div>
 
               <div className="grid grid-cols-12 grid-rows-1 gap-x-6 gap-y-3">
@@ -556,21 +344,12 @@ const AddTrack = () => {
                       name="language"
                       id="language"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("language")}
                     >
                       <option value="">Select Language</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.language?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.language?.message}
-                    </p>
                   </div>
                 </div>
 
@@ -584,21 +363,12 @@ const AddTrack = () => {
                       name="genre"
                       id="genre"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("genre")}
                     >
                       <option value="">Select Genre</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.genre?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.genre?.message}
-                    </p>
                   </div>
                 </div>
 
@@ -612,21 +382,12 @@ const AddTrack = () => {
                       name="mood"
                       id="mood"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("mood")}
                     >
                       <option value="">Select Mood</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.mood?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.mood?.message}
-                    </p>
                   </div>
                 </div>
 
@@ -640,21 +401,12 @@ const AddTrack = () => {
                       name="mix"
                       id="mix"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("mix")}
                     >
                       <option value="">Select Mix</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.mix?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.mix?.message}
-                    </p>
                   </div>
                 </div>
 
@@ -668,21 +420,12 @@ const AddTrack = () => {
                       name="instruments"
                       id="instruments"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("instruments")}
                     >
                       <option value="">Select Instruments</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.instruments?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.instruments?.message}
-                    </p>
                   </div>
                 </div>
 
@@ -696,21 +439,12 @@ const AddTrack = () => {
                       name="duration"
                       id="duration"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("duration")}
                     >
                       <option value="">Select Duration</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.duration?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.duration?.message}
-                    </p>
                   </div>
                 </div>
 
@@ -724,21 +458,12 @@ const AddTrack = () => {
                       name="bpm"
                       id="bpm"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("bpm")}
                     >
                       <option value="">Select BPM</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.bpm?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.bpm?.message}
-                    </p>
                   </div>
                 </div>
 
@@ -752,21 +477,12 @@ const AddTrack = () => {
                       name="tags"
                       id="tags"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                      {...register("tags")}
                     >
                       <option value="">Select Tags</option>
                       <option value="bangla">Bangla</option>
                       <option value="english">English</option>
                       <option value="hindi">Hindi</option>
                     </select>
-
-                    <p
-                      className={`${
-                        errors.tags?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.tags?.message}
-                    </p>
                   </div>
                 </div>
               </div>
@@ -790,16 +506,7 @@ const AddTrack = () => {
                   name="releaseDate"
                   id="releaseDate"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("releaseDate")}
                 />
-
-                <p
-                  className={`${
-                    errors.releaseDate?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.releaseDate?.message}
-                </p>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -812,16 +519,7 @@ const AddTrack = () => {
                   name="label"
                   id="label"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("label")}
                 />
-
-                <p
-                  className={`${
-                    errors.label?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.label?.message}
-                </p>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-end-7">
@@ -834,16 +532,7 @@ const AddTrack = () => {
                   name="cLine"
                   id="cLine"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("cLine")}
                 />
-
-                <p
-                  className={`${
-                    errors.cLine?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.cLine?.message}
-                </p>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -859,16 +548,7 @@ const AddTrack = () => {
                   name="cLineYear"
                   id="cLineYear"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("cLineYear")}
                 />
-
-                <p
-                  className={`${
-                    errors.cLineYear?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.cLineYear?.message}
-                </p>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-end-7">
@@ -881,16 +561,7 @@ const AddTrack = () => {
                   name="pLine"
                   id="pLine"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("pLine")}
                 />
-
-                <p
-                  className={`${
-                    errors.pLine?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.pLine?.message}
-                </p>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -906,16 +577,7 @@ const AddTrack = () => {
                   name="pLineYear"
                   id="pLineYear"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("pLineYear")}
                 />
-
-                <p
-                  className={`${
-                    errors.pLineYear?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.pLineYear?.message}
-                </p>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-end-7">
@@ -928,16 +590,7 @@ const AddTrack = () => {
                   name="upc"
                   id="upc"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("upc")}
                 />
-
-                <p
-                  className={`${
-                    errors.upc?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.upc?.message}
-                </p>
               </div>
 
               <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
@@ -950,21 +603,12 @@ const AddTrack = () => {
                   name="isrc"
                   id="isrc"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("isrc")}
                 />
-
-                <p
-                  className={`${
-                    errors.isrc?.message ? "block" : "hidden"
-                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                >
-                  {errors.isrc?.message}
-                </p>
               </div>
             </div>
           </div>
 
-          {/* <div className="links mt-5">
+          <div className="links mt-5">
             <h2 className="text-2xl">Links</h2>
 
             <div className="border-2 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7">
@@ -996,7 +640,7 @@ const AddTrack = () => {
                 ))}
               </div>
             </div>
-          </div> */}
+          </div>
 
           <div className="bottom mt-10 sm:flex">
             <div className="legal sm:w-1/2 mr-5">
@@ -1147,7 +791,6 @@ const AddTrack = () => {
           </div>
         </form>
       </main>
-      <Footer />
     </>
   );
 };
