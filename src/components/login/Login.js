@@ -41,21 +41,16 @@ const Login = () => {
         email: data.email,
         password: data.password,
       });
+      console.log(result, "login result");
 
-      // if (!result.error) {
-      //   // show success message
-      //   toast.success("Login success!");
-      //   router.push(callbackUrl);
-      // } else {
-      //   // show error message
-      //   const error = JSON.parse(result.error);
-      //   console.log(error, "error in next auth login");
-      //   toast.error(error?.message || "Something went wrong!");
-      // }
-
-      // show success message
-      toast.success("Login success!");
-      router.push(callbackUrl);
+      if (!result.error) {
+        // show success message
+        toast.success("Login success!");
+        router.push(callbackUrl);
+      } else {
+        // show error message
+        toast.error("Something went wrong!");
+      }
     } catch (error) {
       // show error message
       console.log(error, "error in login submit response");
