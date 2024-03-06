@@ -587,9 +587,14 @@ const AddTrack = () => {
                       {...register("genre")}
                     >
                       <option value="">Select Genre</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
+                      <option value="Indie">Indie</option>
+                      <option value="Singer">Singer</option>
+                      <option value="Artist">Artist</option>
+                      <option value="Lyricist">Lyricist</option>
+                      <option value="Composer">Composer</option>
+                      <option value="Producer">Producer</option>
+                      <option value="Band">Band</option>
+                      <option value="Group">Group</option>
                     </select>
 
                     <p
@@ -615,9 +620,11 @@ const AddTrack = () => {
                       {...register("mood")}
                     >
                       <option value="">Select Mood</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
+                      <option value="Sad">Sad</option>
+                      <option value="Angry">Angry</option>
+                      <option value="Emotional">Emotional</option>
+                      <option value="Peaceful">Peaceful</option>
+                      <option value="Romantic">Romantic</option>
                     </select>
 
                     <p
@@ -642,10 +649,12 @@ const AddTrack = () => {
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                       {...register("mix")}
                     >
-                      <option value="">Select Mix</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
+                      <option value="">Select Mood</option>
+                      <option value="Sad">Sad</option>
+                      <option value="Angry">Angry</option>
+                      <option value="Emotional">Emotional</option>
+                      <option value="Peaceful">Peaceful</option>
+                      <option value="Romantic">Romantic</option>
                     </select>
 
                     <p
@@ -670,10 +679,12 @@ const AddTrack = () => {
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                       {...register("instruments")}
                     >
-                      <option value="">Select Instruments</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
+                      <option value="">Select Mood</option>
+                      <option value="Sad">Sad</option>
+                      <option value="Angry">Angry</option>
+                      <option value="Emotional">Emotional</option>
+                      <option value="Peaceful">Peaceful</option>
+                      <option value="Romantic">Romantic</option>
                     </select>
 
                     <p
@@ -692,17 +703,14 @@ const AddTrack = () => {
                   </label>
 
                   <div className="">
-                    <select
+                    <input
+                      type="text"
                       name="duration"
                       id="duration"
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                       {...register("duration")}
-                    >
-                      <option value="">Select Duration</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
-                    </select>
+                      placeholder="00:00"
+                    />
 
                     <p
                       className={`${

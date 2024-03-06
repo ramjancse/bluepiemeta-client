@@ -9,49 +9,70 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { signOut } from "next-auth/react";
 
 const Menu = ({ children, side = "bottom", align = "center" }) => {
+  // const menus = [
+  //   {
+  //     id: 1,
+  //     name: "Genre",
+  //     link: "/genre",
+  //     icon: "User",
+  //   },
+
+  //   {
+  //     id: 2,
+  //     name: "Mood",
+  //     link: "/mood",
+  //   },
+
+  //   {
+  //     id: 3,
+  //     name: "Country",
+  //     link: "/country",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Artist",
+  //     link: "/artist",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Year",
+  //     link: "/year",
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Instrumental",
+  //     link: "/instrumental",
+  //   },
+  //   {
+  //     id: 7,
+  //     name: "Advanced",
+  //     link: "/advanced",
+  //   },
+  // ];
+
   const menus = [
     {
       id: 1,
-      name: "Genre",
-      link: "/genre",
+      name: "Profile",
+      link: "/profile",
       icon: "User",
     },
-
     {
       id: 2,
-      name: "Mood",
-      link: "/mood",
+      name: "Activity Log",
+      link: "/activity",
+      icon: "User",
     },
-
     {
       id: 3,
-      name: "Country",
-      link: "/country",
-    },
-    {
-      id: 4,
-      name: "Artist",
-      link: "/artist",
-    },
-    {
-      id: 5,
-      name: "Year",
-      link: "/year",
-    },
-    {
-      id: 6,
-      name: "Instrumental",
-      link: "/instrumental",
-    },
-    {
-      id: 7,
-      name: "Advanced",
-      link: "/advanced",
+      name: "Log Out",
+      link: "/",
+      icon: "User",
     },
   ];
-
   return (
     <>
       <DropdownMenu>
@@ -61,9 +82,18 @@ const Menu = ({ children, side = "bottom", align = "center" }) => {
           <DropdownMenuGroup>
             {menus.map((menuItem) => (
               <span key={menuItem.id}>
-                <DropdownMenuItem className="data-[highlighted]:bg-gray-200 data-[highlighted]:text-fill cursor-pointer">
-                  <span>{menuItem.name}</span>
-                </DropdownMenuItem>
+                {menuItem.id === 3 ? (
+                  <DropdownMenuItem
+                    className="data-[highlighted]:bg-gray-200 data-[highlighted]:text-fill cursor-pointer"
+                    onClick={() => signOut()}
+                  >
+                    <span>{menuItem.name}</span>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem className="data-[highlighted]:bg-gray-200 data-[highlighted]:text-fill cursor-pointer">
+                    <span>{menuItem.name}</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
               </span>
             ))}

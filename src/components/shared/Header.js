@@ -55,10 +55,6 @@ const Header = () => {
                     Albums
                   </a>
                 </li>
-
-                <li className="text-center">
-                  <LogOut />
-                </li>
               </ul>
             </nav>
 
