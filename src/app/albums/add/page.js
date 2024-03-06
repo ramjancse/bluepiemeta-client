@@ -18,29 +18,47 @@ import ReactDatePicker from "react-datepicker";
 
 const schema = yup
   .object({
+    albumCover: yup
+      .mixed()
+      .required("Album cover picture is require")
+      .test("fileSize", "The file size is too large", (value) => {
+        return value && value[0].size <= 1000000;
+      }),
     albumType: yup.string().trim().required("Album type is required"),
-    albumTitle: yup
+    albumName: yup
       .string()
       .trim()
-      .required("Album title is required")
-      .min(3, "Album title must be at least 3 character"),
+      .required("Album name is required")
+      .min(3, "Album name must be at least 3 character"),
     metadataLanguage: yup
       .string()
       .trim()
       .required("Album title language is required")
-      .min(2, "Album title language must be at least 2 character"),
-    primaryArtists: yup.array().of(
+      .min(2, "Album title language must be at least 2 character")
+      .oneOf(
+        [
+          "English",
+          "Spanish",
+          "French",
+          "German",
+          "Chinese",
+          "Japanese",
+          "Other",
+        ],
+        "Language must be select between fields"
+      ),
+    primaryArtist: yup.array().of(
       yup.object({
-        artistName: yup
+        name: yup
           .string()
           .trim()
           .required("Primary Artist name is required")
           .min(3, "Primary Artist name must be at least 3 characters"),
       })
     ),
-    featuringArtists: yup.array().of(
+    featuringArtist: yup.array().of(
       yup.object({
-        artistName: yup
+        name: yup
           .string()
           .trim()
           .required("Featuring Artist name is required")
@@ -60,7 +78,7 @@ const schema = yup
       .trim()
       .required("Audio language is required")
       .min(2, "Audio language must be at least 2 character"),
-    genre: yup.array().of(
+    albumGenre: yup.array().of(
       yup.object({
         name: yup
           .string()
@@ -83,7 +101,7 @@ const schema = yup
           .oneOf([true, false], "Status can only true or false"),
       })
     ),
-    releaseDate: yup
+    originalReleaseDate: yup
       .string()
       .trim()
       .required("Release date is required")
@@ -113,7 +131,7 @@ const schema = yup
       .trim()
       .required("P Line Year is required")
       .min(3, "P Line Year must be at least 3 character"),
-    upc: yup
+    upcean: yup
       .string()
       .trim()
       .required("UPC is required")
@@ -137,6 +155,11 @@ const links = [
 ];
 
 const AddAlbumPage = () => {
+  const session = useSession();
+  const router = useRouter();
+  const [show, setShow] = useState(false);
+  const [tracks, setTracks] = useState([]);
+
   const {
     register,
     handleSubmit,
@@ -146,11 +169,16 @@ const AddAlbumPage = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      albumTitle: "This is album title",
-      metadataLanguage: "english",
-      primaryArtists: [{ artistName: "Kawsar Ahmed" }],
-      featuringArtists: [{ artistName: "Ramjan Ali" }],
-      genre: [
+      albumCover: "",
+      recordLabel: "",
+      artistId: "65dacec3be5e2d629d0d5c70",
+      userId: session?.data?.userId,
+      albumType: "Single",
+      albumName: "This is album title",
+      metadataLanguage: "English",
+      primaryArtist: [{ name: "Kawsar Ahmed" }],
+      featuringArtist: [{ name: "Ramjan Ali" }],
+      albumGenre: [
         { name: "Indie", status: true },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
@@ -160,20 +188,20 @@ const AddAlbumPage = () => {
         { name: "Band", status: false },
         { name: "Group", status: true },
       ],
-      audioLanguage: "bangla",
-      releaseDate: new Date(),
+      audioLanguage: "English",
+      originalReleaseDate: new Date(),
       label: "Blue Pie Records",
       cLine: "This is cLine text",
       cLineYear: new Date(),
       pLine: "This is p Line text",
       pLineYear: new Date(),
-      upc: "This is upc text",
+      upcean: "This is upc text",
       tracks: [],
     },
   });
 
   const { fields, append, remove } = useFieldArray({
-    name: "primaryArtists",
+    name: "primaryArtist",
     control,
   });
 
@@ -182,7 +210,7 @@ const AddAlbumPage = () => {
     append: featuringAppend,
     remove: featuringRemove,
   } = useFieldArray({
-    name: "featuringArtists",
+    name: "featuringArtist",
     control,
   });
 
@@ -191,14 +219,9 @@ const AddAlbumPage = () => {
     append: genreAppend,
     remove: genreRemove,
   } = useFieldArray({
-    name: "genre",
+    name: "albumGenre",
     control,
   });
-
-  const session = useSession();
-  const router = useRouter();
-  const [show, setShow] = useState(false);
-  const [tracks, setTracks] = useState([]);
 
   const handleAddTrack = () => {
     setShow((prevShow) => !prevShow);
@@ -213,8 +236,12 @@ const AddAlbumPage = () => {
 
     console.log(data, "data");
 
+    const formData = new FormData();
+    formData.append("file", data.albumCover);
+    formData.append("data", data);
+
     try {
-      await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+      await axiosPrivateInstance(session?.data?.jwt).post("/albums", formData);
 
       // show success message
       toast.success("Album added successfully");
@@ -254,7 +281,7 @@ const AddAlbumPage = () => {
                             name="albumType"
                             id="albumEpisode"
                             className="mr-1"
-                            value="albumOrEpisode"
+                            value="Album"
                             {...register("albumType")}
                             defaultChecked
                           />
@@ -272,7 +299,7 @@ const AddAlbumPage = () => {
                             name="albumType"
                             id="single"
                             className="ml-5 mr-1"
-                            value="single"
+                            value="Single"
                             {...register("albumType")}
                           />
                           <label
@@ -295,27 +322,27 @@ const AddAlbumPage = () => {
 
                     <div className="input">
                       <label
-                        htmlFor="albumTitle"
+                        htmlFor="albumName"
                         className="cursor-pointer select-none"
                       >
-                        Album Title
+                        Album Name
                       </label>
 
                       <input
                         type="text"
-                        name="albumTitle"
-                        id="albumTitle"
+                        name="albumName"
+                        id="albumName"
                         placeholder="Album name"
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("albumTitle")}
+                        {...register("albumName")}
                       />
 
                       <p
                         className={`${
-                          errors.albumTitle?.message ? "block" : "hidden"
+                          errors.albumName?.message ? "block" : "hidden"
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
-                        {errors.albumTitle?.message}
+                        {errors.albumName?.message}
                       </p>
                     </div>
 
@@ -334,9 +361,13 @@ const AddAlbumPage = () => {
                         {...register("metadataLanguage")}
                       >
                         <option value="">Select Title Language</option>
-                        <option value="bangla">Bangla</option>
-                        <option value="english">English</option>
-                        <option value="hindi">Hindi</option>
+                        <option value="English">English</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Other">Other</option>
                       </select>
 
                       <p
@@ -349,19 +380,30 @@ const AddAlbumPage = () => {
                     </div>
                   </div>
 
-                  <div className="right lg:w-1/2 text-center lg:flex lg:justify-end mt-5 lg:mt-0">
-                    <div className="file bg-gray-200 lg:w-[220px] h-[220px] flex items-center justify-center rounded">
-                      <label htmlFor="upload">
-                        <MdCloudUpload className="text-[40px] cursor-pointer" />
-                      </label>
+                  <div className="right lg:w-1/2 text-center mt-5 lg:mt-0">
+                    <div className="lg:flex lg:justify-end">
+                      <div className="bg-gray-200 lg:w-[220px] h-[220px] flex items-center justify-center rounded">
+                        <label htmlFor="upload">
+                          <MdCloudUpload className="text-[40px] cursor-pointer" />
+                        </label>
 
-                      <input
-                        className="hidden"
-                        type="file"
-                        name="upload"
-                        id="upload"
-                      />
+                        <input
+                          className="hidden"
+                          type="file"
+                          name="upload"
+                          id="upload"
+                          {...register("albumCover")}
+                        />
+                      </div>
                     </div>
+
+                    <p
+                      className={`${
+                        errors.albumCover?.message ? "block" : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 text-end`}
+                    >
+                      {errors.albumCover?.message}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -383,16 +425,16 @@ const AddAlbumPage = () => {
                         <div className="flex items-center">
                           <input
                             type="text"
-                            name={`primaryArtists[${index}].artistName`}
-                            id={`primaryArtists[${index}].artistName`}
+                            name={`primaryArtist[${index}].name`}
+                            id={`primaryArtist[${index}].name`}
                             className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                             placeholder="Primary Artist"
-                            {...register(`primaryArtists.${index}.artistName`)}
+                            {...register(`primaryArtist.${index}.name`)}
                           />
 
                           {!index > 0 && (
                             <FaCirclePlus
-                              onClick={() => append({ artistName: "" })}
+                              onClick={() => append({ name: "" })}
                               className="ml-2 text-blue-700 text-xl cursor-pointer"
                             />
                           )}
@@ -407,14 +449,14 @@ const AddAlbumPage = () => {
 
                         <p
                           className={`${
-                            errors.primaryArtists &&
-                            errors.primaryArtists[index]?.artistName
+                            errors.primaryArtist &&
+                            errors.primaryArtist[index]?.name
                               ? "block"
                               : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                         >
-                          {errors.primaryArtists &&
-                            errors.primaryArtists[index]?.artistName?.message}
+                          {errors.primaryArtist &&
+                            errors.primaryArtist[index]?.name?.message}
                         </p>
                       </div>
                     ))}
@@ -433,20 +475,16 @@ const AddAlbumPage = () => {
                         <div className="flex items-center">
                           <input
                             type="text"
-                            name={`featuringArtists[${index}].artistName`}
-                            id={`featuringArtists[${index}].artistName`}
+                            name={`featuringArtist[${index}].name`}
+                            id={`featuringArtist[${index}].name`}
                             className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                             placeholder="Featuring Artist"
-                            {...register(
-                              `featuringArtists.${index}.artistName`
-                            )}
+                            {...register(`featuringArtist.${index}.name`)}
                           />
 
                           {!index > 0 && (
                             <FaCirclePlus
-                              onClick={() =>
-                                featuringAppend({ artistName: "" })
-                              }
+                              onClick={() => featuringAppend({ name: "" })}
                               className="ml-2 text-blue-700 text-xl cursor-pointer"
                             />
                           )}
@@ -461,14 +499,14 @@ const AddAlbumPage = () => {
 
                         <p
                           className={`${
-                            errors.featuringArtists &&
-                            errors.featuringArtists[index]?.artistName
+                            errors.featuringArtist &&
+                            errors.featuringArtist[index]?.name
                               ? "block"
                               : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                         >
-                          {errors.featuringArtists &&
-                            errors.featuringArtists[index]?.artistName?.message}
+                          {errors.featuringArtist &&
+                            errors.featuringArtist[index]?.name?.message}
                         </p>
                       </div>
                     ))}
@@ -539,12 +577,12 @@ const AddAlbumPage = () => {
                             <div className="input px-3 py-1" key={field.id}>
                               <input
                                 type="checkbox"
-                                name={`genre[${index}].name`}
-                                id={`genre[${index}].name`}
-                                {...register(`genre.${index}.status`)}
+                                name={`albumGenre[${index}].name`}
+                                id={`albumGenre[${index}].name`}
+                                {...register(`albumGenre.${index}.status`)}
                               />
                               <label
-                                htmlFor={`genre[${index}].name`}
+                                htmlFor={`albumGenre[${index}].name`}
                                 className="ml-1 cursor-pointer select-none"
                               >
                                 {field.name}
@@ -567,9 +605,13 @@ const AddAlbumPage = () => {
                         {...register("audioLanguage")}
                       >
                         <option value="">Select Audio Language</option>
-                        <option value="bangla">Bangla</option>
-                        <option value="english">English</option>
-                        <option value="hindi">Hindi</option>
+                        <option value="English">English</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Other">Other</option>
                       </select>
 
                       <p
@@ -623,7 +665,7 @@ const AddAlbumPage = () => {
 
                       <Controller
                         control={control}
-                        name="releaseDate"
+                        name="originalReleaseDate"
                         render={({ field }) => (
                           <ReactDatePicker
                             selected={field.value}
@@ -642,10 +684,12 @@ const AddAlbumPage = () => {
 
                       <p
                         className={`${
-                          errors.releaseDate?.message ? "block" : "hidden"
+                          errors.originalReleaseDate?.message
+                            ? "block"
+                            : "hidden"
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
-                        {errors.releaseDate?.message}
+                        {errors.originalReleaseDate?.message}
                       </p>
                     </div>
 
@@ -700,7 +744,7 @@ const AddAlbumPage = () => {
 
                     <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                       <label
-                        htmlFor="upc"
+                        htmlFor="upcean"
                         className="cursor-pointer select-none"
                       >
                         UPC
@@ -708,18 +752,18 @@ const AddAlbumPage = () => {
 
                       <input
                         type="text"
-                        name="upc"
-                        id="upc"
+                        name="upcean"
+                        id="upcean"
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("upc")}
+                        {...register("upcean")}
                       />
 
                       <p
                         className={`${
-                          errors.upc?.message ? "block" : "hidden"
+                          errors.upcean?.message ? "block" : "hidden"
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
-                        {errors.upc?.message}
+                        {errors.upcean?.message}
                       </p>
                     </div>
 
@@ -867,8 +911,8 @@ const AddAlbumPage = () => {
                         <tbody>
                           {tracks.map((track, index) => {
                             const {
-                              trackTitle,
-                              primaryArtists,
+                              titleOfTrack,
+                              primaryArtist,
                               isrc,
                               duration,
                             } = track;
@@ -876,9 +920,9 @@ const AddAlbumPage = () => {
                             return (
                               <tr className="even:bg-gray-100" key={index}>
                                 <td className="border p-2">{index + 1}</td>
-                                <td className="border p-2">{trackTitle}</td>
+                                <td className="border p-2">{titleOfTrack}</td>
                                 <td className="border p-2">
-                                  {primaryArtists[0]?.name}
+                                  {primaryArtist[0]?.name}
                                 </td>
                                 <td className="border p-2">{isrc}</td>
                                 <td className="border p-2">{duration}</td>

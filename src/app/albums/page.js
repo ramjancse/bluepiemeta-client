@@ -22,11 +22,13 @@ const page = async () => {
           <table className="w-full mt-2 border-collapse">
             <thead className="bg-gray-700 text-white">
               <tr>
-                <th className="border p-2 text-left">Title/Upc</th>
+                <th className="border p-2 text-left">Title</th>
+                <th className="border p-2 text-left">UPC</th>
                 <th className="border p-2 text-left">Artist name</th>
                 <th className="border p-2 text-left">Genre</th>
                 <th className="border p-2 text-left">Type</th>
-                <th className="border p-2 text-left">Release Date</th>
+                <th className="border p-2 text-left">Release date</th>
+                <th className="border p-2 text-left">Total tracks</th>
                 <th className="border p-2 text-left">Updated At</th>
                 <th className="border p-2 text-left">Action</th>
               </tr>
@@ -55,6 +57,7 @@ const page = async () => {
                     tracks,
                     userId,
                     updatedAt,
+                    upcean,
                   } = album;
                   return (
                     <tr className="even:bg-gray-100" key={_id}>
@@ -68,37 +71,80 @@ const page = async () => {
                             alt="Image"
                             className="w-[40px] h-[40px]"
                           />
-                          <span className="ml-2">{albumName}</span>
+                          <span className="ml-2 text-blue-600">
+                            {albumName}
+                          </span>
                         </Link>
                       </td>
+
                       <td className="border p-2">
-                        <Link className="block" href={`/albums/${_id}`}>
-                          {primaryArtist}
+                        <Link
+                          className="block text-blue-600"
+                          href={`/albums/${_id}`}
+                        >
+                          {upcean}
                         </Link>
                       </td>
+
                       <td className="border p-2">
-                        <Link className="block" href={`/albums/${_id}`}>
-                          {albumGenre}
+                        <Link
+                          className="block text-blue-600"
+                          href={`/albums/${_id}`}
+                        >
+                          {primaryArtist[0]?.name}
                         </Link>
                       </td>
+
                       <td className="border p-2">
-                        <Link className="block" href={`/albums/${_id}`}>
+                        <Link
+                          className="block text-blue-600"
+                          href={`/albums/${_id}`}
+                        >
+                          Genre
+                        </Link>
+                      </td>
+
+                      <td className="border p-2">
+                        <Link
+                          className="block text-blue-600"
+                          href={`/albums/${_id}`}
+                        >
                           {albumType}
                         </Link>
                       </td>
+
                       <td className="border p-2">
-                        <Link className="block" href={`/albums/${_id}`}>
+                        <Link
+                          className="block text-blue-600"
+                          href={`/albums/${_id}`}
+                        >
                           {originalReleaseDate}
                         </Link>
                       </td>
 
                       <td className="border p-2">
-                        <Link className="block" href={`/albums/${_id}`}>
+                        <Link
+                          className="block text-blue-600"
+                          href={`/albums/${_id}`}
+                        >
+                          {tracks.length}
+                        </Link>
+                      </td>
+
+                      <td className="border p-2">
+                        <Link
+                          className="block text-blue-600"
+                          href={`/albums/${_id}`}
+                        >
                           {updatedAt}
                         </Link>
                       </td>
 
-                      <td className="border p-2">Edit</td>
+                      <td className="border p-2">
+                        <Link href="/albums" className="text-blue-600">
+                          Edit
+                        </Link>
+                      </td>
                     </tr>
                   );
                 })

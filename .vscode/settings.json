@@ -5,9 +5,11 @@
         "Hasan",
         "ISRC",
         "NEXTAUTH",
+        "pline",
         "raleway",
         "Ramjan",
-        "Tiktok"
+        "Tiktok",
+        "upcean"
     ],
     "tailwindCSS.emmetCompletions": true
     // "css.validate": false

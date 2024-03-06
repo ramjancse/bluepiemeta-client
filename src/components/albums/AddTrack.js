@@ -12,13 +12,25 @@ import "./AddTrack.css";
 
 const schema = yup
   .object({
-    trackTitle: yup.string().trim().required("Track title is required"),
+    titleOfTrack: yup.string().trim().required("Track title is required"),
     metadataLanguage: yup
       .string()
       .trim()
       .required("Track title language is required")
-      .min(2, "Track title language must be at least 2 character"),
-    primaryArtists: yup.array().of(
+      .min(2, "Track title language must be at least 2 character")
+      .oneOf(
+        [
+          "English",
+          "Spanish",
+          "French",
+          "German",
+          "Chinese",
+          "Japanese",
+          "Other",
+        ],
+        "Language must be select between fields"
+      ),
+    primaryArtist: yup.array().of(
       yup.object({
         name: yup
           .string()
@@ -27,7 +39,7 @@ const schema = yup
           .min(3, "Primary Artist name must be at least 3 characters"),
       })
     ),
-    composers: yup.array().of(
+    composer: yup.array().of(
       yup.object({
         name: yup
           .string()
@@ -36,7 +48,7 @@ const schema = yup
           .min(3, "Composer name must be at least 3 characters"),
       })
     ),
-    lyricists: yup.array().of(
+    lyricist: yup.array().of(
       yup.object({
         name: yup
           .string()
@@ -45,7 +57,7 @@ const schema = yup
           .min(3, "Lyricist name must be at least 3 characters"),
       })
     ),
-    producers: yup.array().of(
+    producer: yup.array().of(
       yup.object({
         name: yup
           .string()
@@ -66,7 +78,19 @@ const schema = yup
       .string()
       .trim()
       .required("Audio language is required")
-      .min(2, "Audio language must be at least 2 character"),
+      .min(2, "Audio language must be at least 2 character")
+      .oneOf(
+        [
+          "English",
+          "Spanish",
+          "French",
+          "German",
+          "Chinese",
+          "Japanese",
+          "Other",
+        ],
+        "Language must be select between fields"
+      ),
     mood: yup.array().of(
       yup.object({
         name: yup
@@ -81,7 +105,7 @@ const schema = yup
           .oneOf([true, false], "Status can only true or false"),
       })
     ),
-    genre: yup.array().of(
+    trackGenre: yup.array().of(
       yup.object({
         name: yup
           .string()
@@ -201,14 +225,20 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      trackTitle: "This is track title",
-      metadataLanguage: "english",
-      primaryArtists: [{ name: "Kawsar Ahmed" }],
-      composers: [{ name: "Ramjan Ali" }],
-      lyricists: [{ name: "Abid Hasan" }],
-      producers: [{ name: "Iqbal Hasan" }],
+      audioFile: "",
+      version: "",
+      arranger: [{ name: "Kawsar Ahmed" }],
+      featuringArtist: [{ name: "Ramjan Ali" }],
+      explicit: "Not explicit ",
+      catalogNumber: "CDTRAX210",
+      titleOfTrack: "This is track title",
+      metadataLanguage: "English",
+      primaryArtist: [{ name: "Kawsar Ahmed" }],
+      composer: [{ name: "Ramjan Ali" }],
+      lyricist: [{ name: "Abid Hasan" }],
+      producer: [{ name: "Iqbal Hasan" }],
       trackType: "lyrical",
-      audioLanguage: "bangla",
+      audioLanguage: "English",
       mood: [
         { name: "Sad", status: true },
         { name: "Angry", status: false },
@@ -216,7 +246,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
         { name: "Peaceful", status: false },
         { name: "Romantic", status: true },
       ],
-      genre: [
+      trackGenre: [
         { name: "Indie", status: true },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
@@ -237,12 +267,13 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
       pLine: "pLineText",
       pLineYear: new Date(),
       isrc: "this is isrc text",
-      lyrics: "Lorem Ipsum text",
+      lyrics:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati molestiae aut similique ut eveniet itaque quas quo illum laborum, harum alias rerum repudiandae aliquam ipsum. Iure quo necessitatibus amet quaerat ipsum? Inventore quam vero iusto dolore quibusdam repudiandae cum dolorum molestiae debitis nihil dolores magnam asperiores odio pariatur, modi iste.",
     },
   });
 
   const { fields, append, remove } = useFieldArray({
-    name: "primaryArtists",
+    name: "primaryArtist",
     control,
   });
 
@@ -251,7 +282,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     append: composerAppend,
     remove: composerRemove,
   } = useFieldArray({
-    name: "composers",
+    name: "composer",
     control,
   });
 
@@ -260,7 +291,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     append: lyricistAppend,
     remove: lyricistRemove,
   } = useFieldArray({
-    name: "lyricists",
+    name: "lyricist",
     control,
   });
 
@@ -269,7 +300,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     append: producerAppend,
     remove: producerRemove,
   } = useFieldArray({
-    name: "producers",
+    name: "producer",
     control,
   });
 
@@ -287,7 +318,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     append: genreAppend,
     remove: genreRemove,
   } = useFieldArray({
-    name: "genre",
+    name: "trackGenre",
     control,
   });
 
@@ -345,15 +376,15 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                     id="title"
                     className="my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm w-full"
                     placeholder="Track title"
-                    {...register("trackTitle")}
+                    {...register("titleOfTrack")}
                   />
 
                   <p
                     className={`${
-                      errors.trackTitle?.message ? "block" : "hidden"
+                      errors.titleOfTrack?.message ? "block" : "hidden"
                     } text-sm text-red-500 font-semibold mt-1`}
                   >
-                    {errors.trackTitle?.message}
+                    {errors.titleOfTrack?.message}
                   </p>
                 </div>
 
@@ -365,9 +396,13 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                     {...register("metadataLanguage")}
                   >
                     <option value="">Title Language</option>
-                    <option value="bangla">Bangla</option>
-                    <option value="english">English</option>
-                    <option value="hindi">Hindi</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Other">Other</option>
                   </select>
 
                   <p
@@ -400,11 +435,11 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   <div className="flex items-center">
                     <input
                       type="text"
-                      name={`primaryArtists[${index}].name`}
-                      id={`primaryArtists[${index}].name`}
+                      name={`primaryArtist[${index}].name`}
+                      id={`primaryArtist[${index}].name`}
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                       placeholder="Primary Artist"
-                      {...register(`primaryArtists.${index}.name`)}
+                      {...register(`primaryArtist.${index}.name`)}
                     />
 
                     {!index > 0 && (
@@ -424,14 +459,13 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
                   <p
                     className={`${
-                      errors.primaryArtists &&
-                      errors.primaryArtists[index]?.name
+                      errors.primaryArtist && errors.primaryArtist[index]?.name
                         ? "block"
                         : "hidden"
                     } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                   >
-                    {errors.primaryArtists &&
-                      errors.primaryArtists[index]?.name?.message}
+                    {errors.primaryArtist &&
+                      errors.primaryArtist[index]?.name?.message}
                   </p>
                 </div>
               ))}
@@ -450,11 +484,11 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   <div className="flex items-center">
                     <input
                       type="text"
-                      name={`composers[${index}].name`}
-                      id={`composers[${index}].name`}
+                      name={`composer[${index}].name`}
+                      id={`composer[${index}].name`}
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                       placeholder="Composer"
-                      {...register(`composers.${index}.name`)}
+                      {...register(`composer.${index}.name`)}
                     />
 
                     {!index > 0 && (
@@ -474,12 +508,12 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
                   <p
                     className={`${
-                      errors.composers && errors.composers[index]?.name
+                      errors.composer && errors.composer[index]?.name
                         ? "block"
                         : "hidden"
                     } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                   >
-                    {errors.composers && errors.composers[index]?.name?.message}
+                    {errors.composer && errors.composer[index]?.name?.message}
                   </p>
                 </div>
               ))}
@@ -498,11 +532,11 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   <div className="flex items-center">
                     <input
                       type="text"
-                      name={`lyricists[${index}].name`}
-                      id={`lyricists[${index}].name`}
+                      name={`lyricist[${index}].name`}
+                      id={`lyricist[${index}].name`}
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                       placeholder="Lyricist"
-                      {...register(`lyricists.${index}.name`)}
+                      {...register(`lyricist.${index}.name`)}
                     />
 
                     {!index > 0 && (
@@ -522,12 +556,12 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
                   <p
                     className={`${
-                      errors.lyricists && errors.lyricists[index]?.name
+                      errors.lyricist && errors.lyricist[index]?.name
                         ? "block"
                         : "hidden"
                     } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                   >
-                    {errors.lyricists && errors.lyricists[index]?.name?.message}
+                    {errors.lyricist && errors.lyricist[index]?.name?.message}
                   </p>
                 </div>
               ))}
@@ -543,11 +577,11 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   <div className="flex items-center">
                     <input
                       type="text"
-                      name={`producers[${index}].name`}
-                      id={`producers[${index}].name`}
+                      name={`producer[${index}].name`}
+                      id={`producer[${index}].name`}
                       className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                       placeholder="Producer"
-                      {...register(`producers.${index}.name`)}
+                      {...register(`producer.${index}.name`)}
                     />
 
                     {!index > 0 && (
@@ -567,12 +601,12 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
                   <p
                     className={`${
-                      errors.producers && errors.producers[index]?.name
+                      errors.producer && errors.producer[index]?.name
                         ? "block"
                         : "hidden"
                     } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                   >
-                    {errors.producers && errors.producers[index]?.name?.message}
+                    {errors.producer && errors.producer[index]?.name?.message}
                   </p>
                 </div>
               ))}
@@ -648,9 +682,13 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       {...register("audioLanguage")}
                     >
                       <option value="">Select Language</option>
-                      <option value="bangla">Bangla</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi</option>
+                      <option value="English">English</option>
+                      <option value="Spanish">Spanish</option>
+                      <option value="French">French</option>
+                      <option value="German">German</option>
+                      <option value="Chinese">Chinese</option>
+                      <option value="Japanese">Japanese</option>
+                      <option value="Other">Other</option>
                     </select>
 
                     <p
@@ -869,12 +907,12 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       <div className="input px-3 py-1" key={field.id}>
                         <input
                           type="checkbox"
-                          name={`genre[${index}].name`}
-                          id={`genre[${index}].name`}
-                          {...register(`genre.${index}.status`)}
+                          name={`trackGenre[${index}].name`}
+                          id={`trackGenre[${index}].name`}
+                          {...register(`trackGenre.${index}.status`)}
                         />
                         <label
-                          htmlFor={`genre[${index}].name`}
+                          htmlFor={`trackGenre[${index}].name`}
                           className="ml-1 cursor-pointer select-none"
                         >
                           {field.name}
