@@ -1,14 +1,14 @@
 "use client";
 
-import Footer from "@/components/artist/Footer";
-import Header from "@/components/artist/Header";
-import React from "react";
+import React, { useState } from "react";
 import { FaCirclePlus, FaUpload } from "react-icons/fa6";
 import { IoIosCloseCircle } from "react-icons/io";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import DatePicker from "react-datepicker";
+import "./AddTrack.css";
 
 const schema = yup
   .object({
@@ -67,36 +67,43 @@ const schema = yup
       .trim()
       .required("Audio language is required")
       .min(2, "Audio language must be at least 2 character"),
-    // genre: yup
-    //   .string()
-    //   .trim()
-    //   .required("Genre is required")
-    //   .oneOf(
-    //     [
-    //       "Indie",
-    //       "Singer",
-    //       "Artist",
-    //       "Lyricist",
-    //       "Composer",
-    //       "Producer",
-    //       "Band",
-    //       "Group",
-    //     ],
-    //     "Genre must be select between fields"
-    //   ),
-    // mood: yup
-    //   .string()
-    //   .trim()
-    //   .required("Mood is required")
-    //   .oneOf(
-    //     ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
-    //     "Mood must be select between fields"
-    //   ),
-    mix: yup
-      .string()
-      .trim()
-      .required("Mix is required")
-      .min(2, "Mix must be at least 2 character"),
+    mood: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .oneOf(
+            ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
+            "Mood must be select between fields"
+          ),
+        status: yup
+          .boolean()
+          .oneOf([true, false], "Status can only true or false"),
+      })
+    ),
+    genre: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .oneOf(
+            [
+              "Indie",
+              "Singer",
+              "Artist",
+              "Lyricist",
+              "Composer",
+              "Producer",
+              "Band",
+              "Group",
+            ],
+            "Genre must be select between fields"
+          ),
+        status: yup
+          .boolean()
+          .oneOf([true, false], "Status can only true or false"),
+      })
+    ),
     // instruments: yup
     //   .string()
     //   .trim()
@@ -105,18 +112,19 @@ const schema = yup
     //     ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
     //     "Instruments must be select between fields"
     //   ),
+    // bpm: yup.string().trim().required("BPM is required"),
+    // upc: yup
+    // .string()
+    // .trim()
+    // .required("UPC is required")
+    // .min(3, "UPC must be at least 3 character"),
+    mix: yup
+      .string()
+      .trim()
+      .required("Mix is required")
+      .min(2, "Mix must be at least 2 character"),
     minute: yup.string().trim().required("Minute is required"),
     second: yup.string().trim().required("Second is required"),
-    duration: yup.mixed().transform((originalValue, originalObject) => {
-      console.log(originalValue, "originalValue");
-      console.log(originalObject, "originalObject");
-
-      const minute = originalObject.minute || "00";
-      const second = originalObject.second || "00";
-
-      return `${minute}:${second}`;
-    }),
-    // bpm: yup.string().trim().required("BPM is required"),
     tags: yup.string().trim().required("Tags is required"),
     releaseDate: yup
       .string()
@@ -148,16 +156,24 @@ const schema = yup
       .trim()
       .required("P Line Year is required")
       .min(3, "P Line Year must be at least 3 character"),
-    upc: yup
-      .string()
-      .trim()
-      .required("UPC is required")
-      .min(3, "UPC must be at least 3 character"),
     isrc: yup
       .string()
       .trim()
       .required("ISRC is required")
       .min(3, "ISRC must be at least 3 character"),
+    lyrics: yup.string().trim().required("Lyrics is required"),
+  })
+  .transform((originalValue, originalObject) => {
+    const { minute, second } = originalObject;
+
+    if (minute && second) {
+      return {
+        ...originalObject,
+        duration: minute + ":" + second,
+      };
+    }
+
+    return originalObject;
   })
   .required();
 
@@ -182,14 +198,46 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     handleSubmit,
     control,
     formState: { errors },
-    setError,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      primaryArtists: [{ name: "" }],
-      composers: [{ name: "" }],
-      lyricists: [{ name: "" }],
-      producers: [{ name: "" }],
+      trackTitle: "This is track title",
+      metadataLanguage: "english",
+      primaryArtists: [{ name: "Kawsar Ahmed" }],
+      composers: [{ name: "Ramjan Ali" }],
+      lyricists: [{ name: "Abid Hasan" }],
+      producers: [{ name: "Iqbal Hasan" }],
+      trackType: "lyrical",
+      audioLanguage: "bangla",
+      mood: [
+        { name: "Sad", status: true },
+        { name: "Angry", status: false },
+        { name: "Emotional", status: false },
+        { name: "Peaceful", status: false },
+        { name: "Romantic", status: true },
+      ],
+      genre: [
+        { name: "Indie", status: true },
+        { name: "Singer", status: false },
+        { name: "Artist", status: false },
+        { name: "Lyricist", status: false },
+        { name: "Composer", status: false },
+        { name: "Producer", status: false },
+        { name: "Band", status: false },
+        { name: "Group", status: true },
+      ],
+      mix: "topHitMix",
+      minute: "10",
+      second: "50",
+      tags: "JS, React, Node.js",
+      releaseDate: new Date(),
+      label: "Blue Pie Records",
+      cLine: "cLineText",
+      cLineYear: new Date(),
+      pLine: "pLineText",
+      pLineYear: new Date(),
+      isrc: "this is isrc text",
+      lyrics: "Lorem Ipsum text",
     },
   });
 
@@ -225,24 +273,34 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     control,
   });
 
+  const {
+    fields: moodFields,
+    append: moodAppend,
+    remove: moodRemove,
+  } = useFieldArray({
+    name: "mood",
+    control,
+  });
+
+  const {
+    fields: genreFields,
+    append: genreAppend,
+    remove: genreRemove,
+  } = useFieldArray({
+    name: "genre",
+    control,
+  });
+
   const router = useRouter();
 
   const onSubmit = async (data) => {
-    console.log(data, "data");
+    // console.log(data, "track data");
+
     // submitted data to parent
-    // onSubmitTrack(data);
+    onSubmitTrack(data);
 
     // show album form
-    // setShow((prevShow) => !prevShow);
-  };
-
-  const defaultValues = {
-    trackTitle: "This track title one",
-    titleLanguage: "bangla",
-    primaryArtists: [{ name: "" }],
-    composers: [{ name: "Ramjan Ali" }],
-    lyricists: [{ name: "Abid Hasan" }],
-    producers: [{ name: "Iqbal Hasan" }],
+    setShow((prevShow) => !prevShow);
   };
 
   return (
@@ -575,32 +633,255 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-12 grid-rows-1 gap-x-6 gap-y-3">
-              <div className="input col-start-1 col-end-13 sm:col-end-7">
-                <label htmlFor="audioLanguage" className="select-none">
-                  Audio Language
-                </label>
+            <div className="flex flex-col lg:flex-row">
+              <div className="left lg:w-1/2">
+                <div className="input">
+                  <label htmlFor="audioLanguage" className="select-none">
+                    Audio Language
+                  </label>
 
-                <div className="">
-                  <select
-                    name="audioLanguage"
-                    id="audioLanguage"
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    {...register("audioLanguage")}
-                  >
-                    <option value="">Select Language</option>
-                    <option value="bangla">Bangla</option>
-                    <option value="english">English</option>
-                    <option value="hindi">Hindi</option>
-                  </select>
+                  <div className="">
+                    <select
+                      name="audioLanguage"
+                      id="audioLanguage"
+                      className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                      {...register("audioLanguage")}
+                    >
+                      <option value="">Select Language</option>
+                      <option value="bangla">Bangla</option>
+                      <option value="english">English</option>
+                      <option value="hindi">Hindi</option>
+                    </select>
 
-                  <p
-                    className={`${
-                      errors.audioLanguage?.message ? "block" : "hidden"
-                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                  >
-                    {errors.audioLanguage?.message}
-                  </p>
+                    <p
+                      className={`${
+                        errors.audioLanguage?.message ? "block" : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                    >
+                      {errors.audioLanguage?.message}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="input">
+                  <label htmlFor="mix" className="select-none">
+                    Mix
+                  </label>
+
+                  <div className="">
+                    <select
+                      name="mix"
+                      id="mix"
+                      className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                      {...register("mix")}
+                    >
+                      <option value="">Select Mix</option>
+                      <option value="indieRockMix">Indie Rock Mix</option>
+                      <option value="topHitMix">Top Hits Mix</option>
+                      <option value="chillMix">Chill Mix</option>
+                    </select>
+
+                    <p
+                      className={`${
+                        errors.mix?.message ? "block" : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                    >
+                      {errors.mix?.message}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="input">
+                  <label htmlFor="duration" className="select-none">
+                    Duration
+                  </label>
+
+                  <div className="flex">
+                    <div className="w-1/2">
+                      <select
+                        name="minute"
+                        id="minute"
+                        className="my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm w-full"
+                        {...register("minute")}
+                      >
+                        <option value="">Select minute</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                      </select>
+
+                      <p
+                        className={`${
+                          errors.minute?.message ? "block" : "hidden"
+                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                      >
+                        {errors.minute?.message}
+                      </p>
+                    </div>
+
+                    <div className="w-1/2">
+                      <select
+                        name="second"
+                        id="second"
+                        className="my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm w-full ml-3"
+                        {...register("second")}
+                      >
+                        <option value="">Select second</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                        <option value="28">28</option>
+                        <option value="29">29</option>
+                        <option value="30">30</option>
+                        <option value="31">31</option>
+                        <option value="32">32</option>
+                        <option value="33">33</option>
+                        <option value="34">34</option>
+                        <option value="35">35</option>
+                        <option value="36">36</option>
+                        <option value="37">37</option>
+                        <option value="38">38</option>
+                        <option value="39">39</option>
+                        <option value="40">40</option>
+                        <option value="41">41</option>
+                        <option value="42">42</option>
+                        <option value="43">43</option>
+                        <option value="44">44</option>
+                        <option value="45">45</option>
+                        <option value="46">46</option>
+                        <option value="47">47</option>
+                        <option value="48">48</option>
+                        <option value="49">49</option>
+                        <option value="50">50</option>
+                        <option value="51">51</option>
+                        <option value="52">52</option>
+                        <option value="53">53</option>
+                        <option value="54">54</option>
+                        <option value="55">55</option>
+                        <option value="56">56</option>
+                        <option value="57">57</option>
+                        <option value="58">58</option>
+                        <option value="59">59</option>
+                      </select>
+
+                      <p
+                        className={`${
+                          errors.second?.message ? "block" : "hidden"
+                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                      >
+                        {errors.second?.message}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="input">
+                  <label htmlFor="tags" className="select-none">
+                    Tags
+                  </label>
+
+                  <div className="">
+                    <input
+                      type="text"
+                      name="tags"
+                      id="tags"
+                      className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                      {...register("tags")}
+                    />
+
+                    <p
+                      className={`${
+                        errors.tags?.message ? "block" : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                    >
+                      {errors.tags?.message}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="right lg:w-1/2 ml-5">
+                <div className="moods">
+                  <h4>Moods</h4>
+                  <div className="inputs border border-gray-200 px-2 py-2 flex flex-wrap">
+                    {/* Here is all mod set */}
+
+                    {moodFields.map((field, index) => (
+                      <div className="input px-3 py-1" key={field.id}>
+                        <input
+                          type="checkbox"
+                          name={`mood[${index}].name`}
+                          id={`mood[${index}].name`}
+                          {...register(`mood.${index}.status`)}
+                        />
+                        <label
+                          htmlFor={`mood[${index}].name`}
+                          className="ml-1 cursor-pointer select-none"
+                        >
+                          {field.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="genre mt-5">
+                  <h4>Genre</h4>
+                  <div className="inputs border border-gray-200 px-2 py-2 flex flex-wrap">
+                    {genreFields.map((field, index) => (
+                      <div className="input px-3 py-1" key={field.id}>
+                        <input
+                          type="checkbox"
+                          name={`genre[${index}].name`}
+                          id={`genre[${index}].name`}
+                          {...register(`genre.${index}.status`)}
+                        />
+                        <label
+                          htmlFor={`genre[${index}].name`}
+                          className="ml-1 cursor-pointer select-none"
+                        >
+                          {field.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -723,105 +1004,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                     {errors.bpm?.message}
                   </p>
                 </div>
-              </div>  */}
-
-              <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                <label htmlFor="mix" className="select-none">
-                  Mix
-                </label>
-
-                <div className="">
-                  <select
-                    name="mix"
-                    id="mix"
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    {...register("mix")}
-                  >
-                    <option value="">Select Mix</option>
-                    <option value="indieRockMix">Indie Rock Mix</option>
-                    <option value="topHitMix">Top Hits Mix</option>
-                    <option value="chillMix">Chill Mix</option>
-                  </select>
-
-                  <p
-                    className={`${
-                      errors.mix?.message ? "block" : "hidden"
-                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                  >
-                    {errors.mix?.message}
-                  </p>
-                </div>
-              </div>
-
-              <div className="input col-start-1 col-end-13 sm:col-end-7">
-                <label htmlFor="duration" className="select-none">
-                  Duration
-                </label>
-
-                <div className="flex">
-                  <div className="w-1/2">
-                    <input
-                      type="text"
-                      name="minute"
-                      id="duration"
-                      className="my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm w-full"
-                      {...register("minute")}
-                      placeholder="Minute"
-                    />
-
-                    <p
-                      className={`${
-                        errors.minute?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.minute?.message}
-                    </p>
-                  </div>
-
-                  <div className="w-1/2">
-                    <input
-                      type="text"
-                      name="second"
-                      id="second"
-                      className="my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm w-full ml-3"
-                      {...register("second")}
-                      placeholder="Second"
-                    />
-
-                    <p
-                      className={`${
-                        errors.second?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.second?.message}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                <label htmlFor="tags" className="select-none">
-                  Tags
-                </label>
-
-                <div className="">
-                  <input
-                    type="text"
-                    name="tags"
-                    id="tags"
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    {...register("tags")}
-                  />
-
-                  <p
-                    className={`${
-                      errors.tags?.message ? "block" : "hidden"
-                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                  >
-                    {errors.tags?.message}
-                  </p>
-                </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -838,12 +1021,23 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                 Release date
               </label>
 
-              <input
-                type="text"
+              <Controller
+                control={control}
                 name="releaseDate"
-                id="releaseDate"
-                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                {...register("releaseDate")}
+                render={({ field }) => (
+                  <DatePicker
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                    }}
+                    peekNextMonth
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    dateFormat="dd-MMMM-yyyy"
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                )}
               />
 
               <p
@@ -860,13 +1054,29 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                 Label
               </label>
 
-              <input
-                type="text"
+              <select
                 name="label"
                 id="label"
                 className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                 {...register("label")}
-              />
+              >
+                <option value="">Select label</option>
+                <option value="Blue Pie Records">Blue Pie Records</option>
+                <option value="Planet Blue Pictures">
+                  Planet Blue Pictures
+                </option>
+                <option value="Latin Central Records">
+                  Latin Central Records
+                </option>
+                <option value="Dj Central Records">Dj Central Records</option>
+                <option value="Sweet peach Records">Sweet peach Records</option>
+                <option value="Indig Music">Indig Music</option>
+                <option value="The Music Factory">The Music Factory</option>
+                <option value="Jisland Records">Jisland Records</option>
+                <option value="The Great File Archives">
+                  The Great File Archives
+                </option>
+              </select>
 
               <p
                 className={`${
@@ -904,12 +1114,22 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                 C Line Year
               </label>
 
-              <input
-                type="text"
+              <Controller
+                control={control}
                 name="cLineYear"
-                id="cLineYear"
-                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                {...register("cLineYear")}
+                render={({ field }) => (
+                  <DatePicker
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                    }}
+                    showYearPicker
+                    dropdownMode="select"
+                    dateFormat="yyyy"
+                    yearItemNumber={16}
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                )}
               />
 
               <p
@@ -948,12 +1168,22 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                 P Line Year
               </label>
 
-              <input
-                type="text"
+              <Controller
+                control={control}
                 name="pLineYear"
-                id="pLineYear"
-                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                {...register("pLineYear")}
+                render={({ field }) => (
+                  <DatePicker
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                    }}
+                    showYearPicker
+                    dropdownMode="select"
+                    dateFormat="yyyy"
+                    yearItemNumber={16}
+                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                  />
+                )}
               />
 
               <p
@@ -965,7 +1195,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
               </p>
             </div>
 
-            <div className="input col-start-1 col-end-13 sm:col-end-7">
+            {/* <div className="input col-start-1 col-end-13 sm:col-end-7">
               <label htmlFor="upc" className="cursor-pointer select-none">
                 UPC
               </label>
@@ -985,9 +1215,9 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
               >
                 {errors.upc?.message}
               </p>
-            </div>
+            </div> */}
 
-            <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+            <div className="input col-start-1 col-end-13 sm:col-end-7">
               <label htmlFor="isrc" className="cursor-pointer select-none">
                 ISRC
               </label>
@@ -1163,15 +1393,19 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
             <div className="input-area border mt-1 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 flex flex-col xl:flex-row xl:items-center xl:justify-between">
               <div className="xl:w-2/3">
                 <div className="text">
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Consequatur dignissimos minus id praesentium dicta. Nisi
-                    sequi autem ea incidunt hic, laborum dolore necessitatibus
-                    modi cupiditate error quibusdam delectus at atque dicta
-                    earum quo neque eum nobis quae laboriosam. Corrupti neque
-                    architecto dolor harum itaque velit officia. Cupiditate iste
-                    ipsa reprehenderit porro minus, ex architecto amet rem
-                    officiis assumenda quos exercitationem
+                  <textarea
+                    name="lyrics"
+                    id="lyrics"
+                    cols="30"
+                    rows="10"
+                    {...register("lyrics")}
+                  ></textarea>
+                  <p
+                    className={`${
+                      errors.lyrics?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.lyrics?.message}
                   </p>
                 </div>
               </div>
@@ -1188,7 +1422,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
         <div className="submit mt-7">
           <input
             type="submit"
-            value="Add more track"
+            value="Add Track"
             className="px-10 py-2 rounded bg-gray-200 uppercase cursor-pointer"
           />
         </div>

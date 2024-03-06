@@ -50,9 +50,7 @@ const Main = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
-    getValues,
   } = useForm({
     resolver: yupResolver(schema),
   });

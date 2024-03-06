@@ -8,22 +8,23 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { MdCloudUpload } from "react-icons/md";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import { axiosPrivateInstance } from "@/config/axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import AddTrack from "@/components/albums/AddTrack";
+import ReactDatePicker from "react-datepicker";
 
 const schema = yup
   .object({
-    type: yup.string().trim().required("Album type is required"),
+    albumType: yup.string().trim().required("Album type is required"),
     albumTitle: yup
       .string()
       .trim()
       .required("Album title is required")
       .min(3, "Album title must be at least 3 character"),
-    titleLanguage: yup
+    metadataLanguage: yup
       .string()
       .trim()
       .required("Album title language is required")
@@ -59,23 +60,29 @@ const schema = yup
       .trim()
       .required("Audio language is required")
       .min(2, "Audio language must be at least 2 character"),
-    genre: yup
-      .string()
-      .trim()
-      .required("Genre is required")
-      .oneOf(
-        [
-          "Indie",
-          "Singer",
-          "Artist",
-          "Lyricist",
-          "Composer",
-          "Producer",
-          "Band",
-          "Group",
-        ],
-        "Genre must be select between fields"
-      ),
+    genre: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .oneOf(
+            [
+              "Indie",
+              "Singer",
+              "Artist",
+              "Lyricist",
+              "Composer",
+              "Producer",
+              "Band",
+              "Group",
+            ],
+            "Genre must be select between fields"
+          ),
+        status: yup
+          .boolean()
+          .oneOf([true, false], "Status can only true or false"),
+      })
+    ),
     releaseDate: yup
       .string()
       .trim()
@@ -111,11 +118,6 @@ const schema = yup
       .trim()
       .required("UPC is required")
       .min(3, "UPC must be at least 3 character"),
-    isrc: yup
-      .string()
-      .trim()
-      .required("ISRC is required")
-      .min(3, "ISRC must be at least 3 character"),
   })
   .required();
 
@@ -144,8 +146,29 @@ const AddAlbumPage = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      primaryArtists: [{ artistName: "" }],
-      featuringArtists: [{ artistName: "" }],
+      albumTitle: "This is album title",
+      metadataLanguage: "english",
+      primaryArtists: [{ artistName: "Kawsar Ahmed" }],
+      featuringArtists: [{ artistName: "Ramjan Ali" }],
+      genre: [
+        { name: "Indie", status: true },
+        { name: "Singer", status: false },
+        { name: "Artist", status: false },
+        { name: "Lyricist", status: false },
+        { name: "Composer", status: false },
+        { name: "Producer", status: false },
+        { name: "Band", status: false },
+        { name: "Group", status: true },
+      ],
+      audioLanguage: "bangla",
+      releaseDate: new Date(),
+      label: "Blue Pie Records",
+      cLine: "This is cLine text",
+      cLineYear: new Date(),
+      pLine: "This is p Line text",
+      pLineYear: new Date(),
+      upc: "This is upc text",
+      tracks: [],
     },
   });
 
@@ -163,6 +186,15 @@ const AddAlbumPage = () => {
     control,
   });
 
+  const {
+    fields: genreFields,
+    append: genreAppend,
+    remove: genreRemove,
+  } = useFieldArray({
+    name: "genre",
+    control,
+  });
+
   const session = useSession();
   const router = useRouter();
   const [show, setShow] = useState(false);
@@ -177,23 +209,24 @@ const AddAlbumPage = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data, "data");
     setValue("tracks", tracks);
 
-    // try {
-    //   await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+    console.log(data, "data");
 
-    //   // show success message
-    //   toast.success("Album added successfully");
+    try {
+      await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
 
-    //   // redirect to another route
-    //   router.push("/albums");
-    // } catch (error) {
-    //   console.log(error, "error in add album page");
+      // show success message
+      toast.success("Album added successfully");
 
-    //   // show error message
-    //   toast.error("Something went wrong");
-    // }
+      // redirect to another route
+      router.push("/albums");
+    } catch (error) {
+      console.log(error, "error in add album page");
+
+      // show error message
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -218,11 +251,11 @@ const AddAlbumPage = () => {
                         <div className="left">
                           <input
                             type="radio"
-                            name="type"
+                            name="albumType"
                             id="albumEpisode"
                             className="mr-1"
                             value="albumOrEpisode"
-                            {...register("type")}
+                            {...register("albumType")}
                             defaultChecked
                           />
                           <label
@@ -236,11 +269,11 @@ const AddAlbumPage = () => {
                         <div className="right flex items-center">
                           <input
                             type="radio"
-                            name="type"
+                            name="albumType"
                             id="single"
                             className="ml-5 mr-1"
                             value="single"
-                            {...register("type")}
+                            {...register("albumType")}
                           />
                           <label
                             htmlFor="single"
@@ -288,17 +321,17 @@ const AddAlbumPage = () => {
 
                     <div className="input mt-3">
                       <label
-                        htmlFor="titleLanguage"
+                        htmlFor="metadataLanguage"
                         className="cursor-pointer select-none"
                       >
                         Title Language
                       </label>
 
                       <select
-                        name="titleLanguage"
-                        id="titleLanguage"
+                        name="metadataLanguage"
+                        id="metadataLanguage"
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("titleLanguage")}
+                        {...register("metadataLanguage")}
                       >
                         <option value="">Select Title Language</option>
                         <option value="bangla">Bangla</option>
@@ -308,17 +341,26 @@ const AddAlbumPage = () => {
 
                       <p
                         className={`${
-                          errors.titleLanguage?.message ? "block" : "hidden"
+                          errors.metadataLanguage?.message ? "block" : "hidden"
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
-                        {errors.titleLanguage?.message}
+                        {errors.metadataLanguage?.message}
                       </p>
                     </div>
                   </div>
 
                   <div className="right lg:w-1/2 text-center lg:flex lg:justify-end mt-5 lg:mt-0">
-                    <div className="file bg-gray-200 lg:w-[220px] h-[220px] flex items-center justify-center cursor-pointer rounded">
-                      <MdCloudUpload className="text-[40px]" />
+                    <div className="file bg-gray-200 lg:w-[220px] h-[220px] flex items-center justify-center rounded">
+                      <label htmlFor="upload">
+                        <MdCloudUpload className="text-[40px] cursor-pointer" />
+                      </label>
+
+                      <input
+                        className="hidden"
+                        type="file"
+                        name="upload"
+                        id="upload"
+                      />
                     </div>
                   </div>
                 </div>
@@ -486,24 +528,49 @@ const AddAlbumPage = () => {
                   </div>
 
                   <div className="grid grid-cols-12 grid-rows-2 gap-3">
+                    <div className="input col-start-1 col-end-13">
+                      <label htmlFor="audioLanguage" className="select-none">
+                        Genre
+                      </label>
+
+                      <div className="genre mt-2">
+                        <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
+                          {genreFields.map((field, index) => (
+                            <div className="input px-3 py-1" key={field.id}>
+                              <input
+                                type="checkbox"
+                                name={`genre[${index}].name`}
+                                id={`genre[${index}].name`}
+                                {...register(`genre.${index}.status`)}
+                              />
+                              <label
+                                htmlFor={`genre[${index}].name`}
+                                className="ml-1 cursor-pointer select-none"
+                              >
+                                {field.name}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="input col-start-1 col-end-13 sm:col-end-7">
                       <label htmlFor="audioLanguage" className="select-none">
                         Audio Language
                       </label>
 
-                      <div>
-                        <select
-                          name="audioLanguage"
-                          id="audioLanguage"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("audioLanguage")}
-                        >
-                          <option value="">Select Audio Language</option>
-                          <option value="bangla">Bangla</option>
-                          <option value="english">English</option>
-                          <option value="hindi">Hindi</option>
-                        </select>
-                      </div>
+                      <select
+                        name="audioLanguage"
+                        id="audioLanguage"
+                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                        {...register("audioLanguage")}
+                      >
+                        <option value="">Select Audio Language</option>
+                        <option value="bangla">Bangla</option>
+                        <option value="english">English</option>
+                        <option value="hindi">Hindi</option>
+                      </select>
 
                       <p
                         className={`${
@@ -514,7 +581,7 @@ const AddAlbumPage = () => {
                       </p>
                     </div>
 
-                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                    {/* <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                       <label htmlFor="genre" className="select-none">
                         Genre
                       </label>
@@ -544,9 +611,9 @@ const AddAlbumPage = () => {
                       >
                         {errors.genre?.message}
                       </p>
-                    </div>
+                    </div> */}
 
-                    <div className="input col-start-1 col-end-13 sm:col-end-7">
+                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                       <label
                         htmlFor="releaseDate"
                         className="cursor-pointer select-none"
@@ -554,12 +621,23 @@ const AddAlbumPage = () => {
                         Release date
                       </label>
 
-                      <input
-                        type="text"
+                      <Controller
+                        control={control}
                         name="releaseDate"
-                        id="releaseDate"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("releaseDate")}
+                        render={({ field }) => (
+                          <ReactDatePicker
+                            selected={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            peekNextMonth
+                            showMonthDropdown
+                            showYearDropdown
+                            dropdownMode="select"
+                            dateFormat="dd-MMMM-yyyy"
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          />
+                        )}
                       />
 
                       <p
@@ -571,7 +649,7 @@ const AddAlbumPage = () => {
                       </p>
                     </div>
 
-                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                    <div className="input col-start-1 col-end-13 sm:col-end-7">
                       <label
                         htmlFor="label"
                         className="cursor-pointer select-none"
@@ -579,13 +657,37 @@ const AddAlbumPage = () => {
                         Label
                       </label>
 
-                      <input
-                        type="text"
+                      <select
                         name="label"
                         id="label"
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                         {...register("label")}
-                      />
+                      >
+                        <option value="">Select label</option>
+                        <option value="Blue Pie Records">
+                          Blue Pie Records
+                        </option>
+                        <option value="Planet Blue Pictures">
+                          Planet Blue Pictures
+                        </option>
+                        <option value="Latin Central Records">
+                          Latin Central Records
+                        </option>
+                        <option value="Dj Central Records">
+                          Dj Central Records
+                        </option>
+                        <option value="Sweet peach Records">
+                          Sweet peach Records
+                        </option>
+                        <option value="Indig Music">Indig Music</option>
+                        <option value="The Music Factory">
+                          The Music Factory
+                        </option>
+                        <option value="Jisland Records">Jisland Records</option>
+                        <option value="The Great File Archives">
+                          The Great File Archives
+                        </option>
+                      </select>
 
                       <p
                         className={`${
@@ -593,6 +695,31 @@ const AddAlbumPage = () => {
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
                         {errors.label?.message}
+                      </p>
+                    </div>
+
+                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                      <label
+                        htmlFor="upc"
+                        className="cursor-pointer select-none"
+                      >
+                        UPC
+                      </label>
+
+                      <input
+                        type="text"
+                        name="upc"
+                        id="upc"
+                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                        {...register("upc")}
+                      />
+
+                      <p
+                        className={`${
+                          errors.upc?.message ? "block" : "hidden"
+                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                      >
+                        {errors.upc?.message}
                       </p>
                     </div>
 
@@ -629,12 +756,22 @@ const AddAlbumPage = () => {
                         C Line Year
                       </label>
 
-                      <input
-                        type="text"
+                      <Controller
+                        control={control}
                         name="cLineYear"
-                        id="cLineYear"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("cLineYear")}
+                        render={({ field }) => (
+                          <ReactDatePicker
+                            selected={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            showYearPicker
+                            dropdownMode="select"
+                            dateFormat="yyyy"
+                            yearItemNumber={16}
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          />
+                        )}
                       />
 
                       <p
@@ -679,12 +816,22 @@ const AddAlbumPage = () => {
                         P Line Year
                       </label>
 
-                      <input
-                        type="text"
+                      <Controller
+                        control={control}
                         name="pLineYear"
-                        id="pLineYear"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("pLineYear")}
+                        render={({ field }) => (
+                          <ReactDatePicker
+                            selected={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            showYearPicker
+                            dropdownMode="select"
+                            dateFormat="yyyy"
+                            yearItemNumber={16}
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          />
+                        )}
                       />
 
                       <p
@@ -693,56 +840,6 @@ const AddAlbumPage = () => {
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
                         {errors.pLineYear?.message}
-                      </p>
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-end-7">
-                      <label
-                        htmlFor="upc"
-                        className="cursor-pointer select-none"
-                      >
-                        UPC
-                      </label>
-
-                      <input
-                        type="text"
-                        name="upc"
-                        id="upc"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("upc")}
-                      />
-
-                      <p
-                        className={`${
-                          errors.upc?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.upc?.message}
-                      </p>
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                      <label
-                        htmlFor="isrc"
-                        className="cursor-pointer select-none"
-                      >
-                        ISRC
-                      </label>
-
-                      <input
-                        type="text"
-                        name="isrc"
-                        id="isrc"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("isrc")}
-                      />
-
-                      <p
-                        className={`${
-                          errors.isrc?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.isrc?.message}
                       </p>
                     </div>
                   </div>
