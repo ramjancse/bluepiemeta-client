@@ -50,9 +50,7 @@ const Main = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
-    getValues,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -655,6 +653,7 @@ const Main = () => {
                           id="group"
                           value="Group"
                           {...register("multiTypes")}
+                          defaultChecked
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"

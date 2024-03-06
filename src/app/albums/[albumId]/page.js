@@ -49,7 +49,7 @@ const page = async ({ params: { albumId } }) => {
                 <div className="one w-1/2 mr-3">
                   <div className="info border-b py-2">
                     <p className="font-semibold">Artist</p>
-                    <p className="text-sm">{primaryArtist}</p>
+                    <p className="text-sm">{primaryArtist[0]?.name}</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -78,7 +78,7 @@ const page = async ({ params: { albumId } }) => {
                 <div className="two w-1/2 ml-3">
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
-                    <p className="text-sm">{albumGenre}</p>
+                    <p className="text-sm">Genre</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -145,7 +145,7 @@ const page = async ({ params: { albumId } }) => {
                           <td className="border p-2">
                             <Link
                               href={`/albums/${albumId}/tracks/${_id}`}
-                              className="block"
+                              className="block text-blue-600"
                             >
                               {titleOfTrack}
                             </Link>
@@ -156,7 +156,7 @@ const page = async ({ params: { albumId } }) => {
                               href={`/albums/${albumId}/tracks/${_id}`}
                               className="block"
                             >
-                              {primaryArtist}
+                              {primaryArtist[0]?.name}
                             </Link>
                           </td>
 

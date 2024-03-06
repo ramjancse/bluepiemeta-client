@@ -43,10 +43,6 @@ const Header = () => {
                   Albums
                 </Link>
               </li>
-
-              <li className="text-center">
-                <LogOut />
-              </li>
             </ul>
           </nav>
 
