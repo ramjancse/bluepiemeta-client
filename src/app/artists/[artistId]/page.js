@@ -96,24 +96,32 @@ const page = async ({ params: { artistId } }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {artistLinks.map((artistLink) => {
-                      const { _id, name, link } = artistLink;
-                      return (
-                        <tr className="even:bg-gray-100" key={_id}>
-                          <td className="border p-2">{name}</td>
-                          <td className="border p-2">
-                            <a
-                              className="text-sm text-blue-700"
-                              href={`${link}`}
-                              target="_blank"
-                            >
-                              {link}
-                            </a>
-                          </td>
-                          <td className="border p-2 text-center">Edit</td>
-                        </tr>
-                      );
-                    })}
+                    {artistLinks.length ? (
+                      artistLinks.map((artistLink) => {
+                        const { _id, name, link } = artistLink;
+                        return (
+                          <tr className="even:bg-gray-100" key={_id}>
+                            <td className="border p-2">{name}</td>
+                            <td className="border p-2">
+                              <a
+                                className="text-sm text-blue-700"
+                                href={`${link}`}
+                                target="_blank"
+                              >
+                                {link}
+                              </a>
+                            </td>
+                            <td className="border p-2 text-center">Edit</td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr className="even:bg-gray-100">
+                        <td className="border p-2 text-center" colspan="3">
+                          Artist links are not available
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

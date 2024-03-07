@@ -1,6 +1,7 @@
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAllAlbums } from "@/lib/albums";
+import { format } from "date-fns";
 import Link from "next/link";
 import React from "react";
 
@@ -29,7 +30,6 @@ const page = async () => {
                 <th className="border p-2 text-left">Type</th>
                 <th className="border p-2 text-left">Release date</th>
                 <th className="border p-2 text-left">Total tracks</th>
-                <th className="border p-2 text-left">Updated At</th>
                 <th className="border p-2 text-left">Action</th>
               </tr>
             </thead>
@@ -77,71 +77,44 @@ const page = async () => {
                         </Link>
                       </td>
 
-                      <td className="border p-2">
-                        <Link
-                          className="block text-blue-600"
-                          href={`/albums/${_id}`}
-                        >
-                          {upcean}
-                        </Link>
-                      </td>
+                      <td className="border p-2">{upcean}</td>
 
                       <td className="border p-2">
                         <Link
                           className="block text-blue-600"
-                          href={`/albums/${_id}`}
+                          href={`/artists/${artistId}`}
                         >
                           {primaryArtist[0]?.name}
                         </Link>
                       </td>
 
-                      <td className="border p-2">
-                        <Link
-                          className="block text-blue-600"
-                          href={`/albums/${_id}`}
-                        >
-                          Genre
-                        </Link>
+                      <td className="border p-2 space-x-1">
+                        {albumGenre
+                          .filter((genre) => genre.status)
+                          .map((genre, index, array) => (
+                            <span
+                              key={genre._id}
+                              className={
+                                index !== array.length - 1
+                                  ? 'after:content-[","]'
+                                  : ""
+                              }
+                            >
+                              {genre.name}
+                            </span>
+                          ))}
                       </td>
 
-                      <td className="border p-2">
-                        <Link
-                          className="block text-blue-600"
-                          href={`/albums/${_id}`}
-                        >
-                          {albumType}
-                        </Link>
-                      </td>
+                      <td className="border p-2">{albumType}</td>
 
                       <td className="border p-2">
-                        <Link
-                          className="block text-blue-600"
-                          href={`/albums/${_id}`}
-                        >
-                          {originalReleaseDate}
-                        </Link>
+                        {format(originalReleaseDate, "dd-MMMM-yyyy")}
                       </td>
 
-                      <td className="border p-2">
-                        <Link
-                          className="block text-blue-600"
-                          href={`/albums/${_id}`}
-                        >
-                          {tracks.length}
-                        </Link>
-                      </td>
+                      <td className="border p-2">{tracks.length}</td>
 
                       <td className="border p-2">
-                        <Link
-                          className="block text-blue-600"
-                          href={`/albums/${_id}`}
-                        >
-                          {updatedAt}
-                        </Link>
-                      </td>
-
-                      <td className="border p-2">
-                        <Link href="/albums" className="text-blue-600">
+                        <Link href={`/albums/${_id}`} className="text-blue-600">
                           Edit
                         </Link>
                       </td>
@@ -153,7 +126,9 @@ const page = async () => {
                   <td className="border p-2"></td>
                   <td className="border p-2"></td>
                   <td className="border p-2"></td>
+                  <td className="border p-2"></td>
                   <td className="border p-2 text-center">Albums not found</td>
+                  <td className="border p-2"></td>
                   <td className="border p-2"></td>
                   <td className="border p-2"></td>
                   <td className="border p-2"></td>

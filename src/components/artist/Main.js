@@ -80,14 +80,14 @@ const Main = () => {
 
   const onSubmit = async (data) => {
     // update artist type field
-    setValue("artistType", "Single");
+    setValue("artistType", artistType);
 
     // updated array in this field
     setValue("nameOfType", getNameOfTypesArr(data));
 
     // update some field need to be database
     setValue("artistImage", "");
-    setValue("artistDiscription", "This is artist description");
+    setValue("artistDiscription", "");
     setValue("artistLinks", []);
     setValue("socialMedia", []);
 
@@ -496,9 +496,9 @@ const Main = () => {
                       <div className="flex">
                         <input
                           type="checkbox"
-                          name="indie"
-                          id="indie"
-                          {...register("indie")}
+                          name="Indie"
+                          id="Indie"
+                          {...register("Indie")}
                           onChange={(e) =>
                             setSingleTypes({
                               ...singleTypes,
@@ -508,7 +508,7 @@ const Main = () => {
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
-                          htmlFor="indie"
+                          htmlFor="Indie"
                         >
                           Indie
                         </label>
@@ -517,9 +517,9 @@ const Main = () => {
                       <div className="flex ml-5">
                         <input
                           type="checkbox"
-                          name="singer"
-                          id="singer"
-                          {...register("singer")}
+                          name="Singer"
+                          id="Singer"
+                          {...register("Singer")}
                           onChange={(e) =>
                             setSingleTypes({
                               ...singleTypes,
@@ -529,7 +529,7 @@ const Main = () => {
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
-                          htmlFor="singer"
+                          htmlFor="Singer"
                         >
                           Singer
                         </label>
@@ -538,9 +538,9 @@ const Main = () => {
                       <div className="flex ml-5">
                         <input
                           type="checkbox"
-                          name="artist"
-                          id="artist"
-                          {...register("artist")}
+                          name="Artist"
+                          id="Artist"
+                          {...register("Artist")}
                           onChange={(e) =>
                             setSingleTypes({
                               ...singleTypes,
@@ -550,7 +550,7 @@ const Main = () => {
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
-                          htmlFor="artist"
+                          htmlFor="Artist"
                         >
                           Artist
                         </label>
@@ -561,9 +561,9 @@ const Main = () => {
                       <div className="flex">
                         <input
                           type="checkbox"
-                          name="lyricist"
-                          id="lyricist"
-                          {...register("lyricist")}
+                          name="Lyricist"
+                          id="Lyricist"
+                          {...register("Lyricist")}
                           onChange={(e) =>
                             setSingleTypes({
                               ...singleTypes,
@@ -573,7 +573,7 @@ const Main = () => {
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
-                          htmlFor="lyricist"
+                          htmlFor="Lyricist"
                         >
                           Lyricist
                         </label>
@@ -582,9 +582,9 @@ const Main = () => {
                       <div className="flex ml-5">
                         <input
                           type="checkbox"
-                          name="composer"
-                          id="composer"
-                          {...register("composer")}
+                          name="Composer"
+                          id="Composer"
+                          {...register("Composer")}
                           onChange={(e) =>
                             setSingleTypes({
                               ...singleTypes,
@@ -594,7 +594,7 @@ const Main = () => {
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
-                          htmlFor="composer"
+                          htmlFor="Composer"
                         >
                           Composer
                         </label>
@@ -603,9 +603,9 @@ const Main = () => {
                       <div className="flex ml-5">
                         <input
                           type="checkbox"
-                          name="producer"
-                          id="producer"
-                          {...register("producer")}
+                          name="Producer"
+                          id="Producer"
+                          {...register("Producer")}
                           onChange={(e) =>
                             setSingleTypes({
                               ...singleTypes,
@@ -615,7 +615,7 @@ const Main = () => {
                         />
                         <label
                           className="ml-1 cursor-pointer select-none"
-                          htmlFor="producer"
+                          htmlFor="Producer"
                         >
                           Producer
                         </label>

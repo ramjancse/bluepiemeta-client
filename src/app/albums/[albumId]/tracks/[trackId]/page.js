@@ -1,6 +1,7 @@
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAlbumById } from "@/lib/albums";
+import { format } from "date-fns";
 import Link from "next/link";
 import React from "react";
 
@@ -12,15 +13,12 @@ const page = async ({ params: { albumId, trackId } }) => {
     albumName,
     albumType,
     artistId,
-    cline,
-    clineYear,
-    distributionDate,
-    featuringArtist,
+    cLine,
+    cLineYear,
     metadataLanguage,
     originalReleaseDate,
-    pline,
-    plineYear,
-    primaryArtist,
+    pLine,
+    pLineYear,
     recordLabel,
     tracks,
     userId,
@@ -29,13 +27,18 @@ const page = async ({ params: { albumId, trackId } }) => {
     createdAt,
   } = await getAlbumById(albumId);
 
-  const foundTrack = tracks?.find((track) => track._id === trackId);
+  const foundTrack = tracks.find((track) => track._id === trackId);
 
   const {
+    primaryArtist,
+    featuringArtist,
+    trackType,
     titleOfTrack,
     trackGenre,
     explicitContent,
-    version,
+    lyricist,
+    composer,
+    producer,
     isrc,
     audioLanguage,
     catalogNumber,
@@ -55,7 +58,7 @@ const page = async ({ params: { albumId, trackId } }) => {
             </div>
 
             <div className="text ml-3 flex flex-col justify-between">
-              <h2 className="text-xl font-bold">{primaryArtist}</h2>
+              <h2 className="text-xl font-bold">{primaryArtist[0].name}</h2>
               <h4>
                 Album:{" "}
                 <Link
@@ -66,7 +69,8 @@ const page = async ({ params: { albumId, trackId } }) => {
                 </Link>
               </h4>
               <p>
-                Created time: {createdAt} | Updated time: {updatedAt}
+                Created time: {format(createdAt, "dd-MMMM-yyyy")} | Updated
+                time: {format(updatedAt, "dd-MMMM-yyyy")}
               </p>
             </div>
           </div>
@@ -85,27 +89,42 @@ const page = async ({ params: { albumId, trackId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Type</p>
-                    <p className="text-sm">-</p>
+                    <p className="text-sm">{trackType ?? "-"}</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
-                    <p className="text-sm">{trackGenre}</p>
+                    <p className="text-sm space-x-1">
+                      {trackGenre
+                        .filter((genre) => genre.status)
+                        .map((genre, index, array) => (
+                          <span
+                            key={genre._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {genre.name}
+                          </span>
+                        ))}
+                    </p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Performer</p>
-                    <p className="text-sm">-</p>
+                    <p className="text-sm">{primaryArtist[0]?.name}</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Composer</p>
-                    <p className="text-sm">-</p>
+                    <p className="text-sm">{composer[0]?.name}</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Featuring</p>
-                    <p className="text-sm">-</p>
+                    <p className="text-sm">{featuringArtist[0]?.name}</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -117,7 +136,7 @@ const page = async ({ params: { albumId, trackId } }) => {
                 <div className="two w-1/2 ml-3">
                   <div className="info border-b py-2">
                     <p className="font-semibold">Version</p>
-                    <p className="text-sm">{version}</p>
+                    <p className="text-sm">-</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -132,7 +151,7 @@ const page = async ({ params: { albumId, trackId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Lyricist</p>
-                    <p className="text-sm">-</p>
+                    <p className="text-sm">{lyricist[0]?.name}</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -142,7 +161,7 @@ const page = async ({ params: { albumId, trackId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Producer</p>
-                    <p className="text-sm">-</p>
+                    <p className="text-sm">{producer[0]?.name}</p>
                   </div>
 
                   <div className="info border-b py-2">
