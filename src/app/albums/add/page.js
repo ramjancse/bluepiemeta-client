@@ -15,15 +15,15 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import AddTrack from "@/components/albums/AddTrack";
 import ReactDatePicker from "react-datepicker";
+import { getAllArtists } from "@/lib/artist";
 
 const schema = yup
   .object({
-    albumCover: yup
-      .mixed()
-      .required("Album cover picture is require")
-      .test("fileSize", "The file size is too large", (value) => {
-        return value && value[0].size <= 1000000;
-      }),
+    // albumCover: yup.mixed(),
+    // .required("Album cover picture is require")
+    // .test("fileSize", "The file size is too large", (value) => {
+    //   return value && value[0].size <= 1000000;
+    // }),
     albumType: yup.string().trim().required("Album type is required"),
     albumName: yup
       .string()
@@ -136,6 +136,7 @@ const schema = yup
       .trim()
       .required("UPC is required")
       .min(3, "UPC must be at least 3 character"),
+    tracks: yup.array().required("Tracks is required"),
   })
   .required();
 
@@ -169,10 +170,11 @@ const AddAlbumPage = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      albumCover: "",
+      albumCover:
+        "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg",
       recordLabel: "",
-      artistId: "65dacec3be5e2d629d0d5c70",
-      userId: session?.data?.userId,
+      artistId: "",
+      userId: session?.data?.user?.id,
       albumType: "Single",
       albumName: "This is album title",
       metadataLanguage: "English",
@@ -228,20 +230,23 @@ const AddAlbumPage = () => {
   };
 
   const onSubmitTrack = (data) => {
-    setTracks([...tracks, data]);
+    setTracks((prevTracks) => {
+      const updatedTracks = [...prevTracks, data];
+
+      setValue("tracks", updatedTracks);
+      return updatedTracks;
+    });
   };
 
   const onSubmit = async (data) => {
-    setValue("tracks", tracks);
-
     console.log(data, "data");
 
-    const formData = new FormData();
-    formData.append("file", data.albumCover);
-    formData.append("data", data);
+    // const formData = new FormData();
+    // formData.append("file", data.albumCover[0]);
+    // formData.append("data", data);
 
     try {
-      await axiosPrivateInstance(session?.data?.jwt).post("/albums", formData);
+      await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
 
       // show success message
       toast.success("Album added successfully");
@@ -392,7 +397,6 @@ const AddAlbumPage = () => {
                           type="file"
                           name="upload"
                           id="upload"
-                          {...register("albumCover")}
                         />
                       </div>
                     </div>
@@ -565,7 +569,7 @@ const AddAlbumPage = () => {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-12 grid-rows-2 gap-3">
+                  <div className="grid grid-cols-12 grid-rows-1 gap-3">
                     <div className="input col-start-1 col-end-13">
                       <label htmlFor="audioLanguage" className="select-none">
                         Genre
@@ -622,38 +626,6 @@ const AddAlbumPage = () => {
                         {errors.audioLanguage?.message}
                       </p>
                     </div>
-
-                    {/* <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                      <label htmlFor="genre" className="select-none">
-                        Genre
-                      </label>
-
-                      <div className="">
-                        <select
-                          name="genre"
-                          id="genre"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("genre")}
-                        >
-                          <option value="">Select Genre</option>
-                          <option value="Indie">Indie</option>
-                          <option value="Singer">Singer</option>
-                          <option value="Artist">Artist</option>
-                          <option value="Lyricist">Lyricist</option>
-                          <option value="Composer">Composer</option>
-                          <option value="Producer">Producer</option>
-                          <option value="Band">Band</option>
-                          <option value="Group">Group</option>
-                        </select>
-                      </div>
-                      <p
-                        className={`${
-                          errors.genre?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.genre?.message}
-                      </p>
-                    </div> */}
 
                     <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                       <label
@@ -890,7 +862,7 @@ const AddAlbumPage = () => {
                 </div>
               </div>
 
-              <div className="tracks">
+              <div className="tracks mt-5">
                 <h2 className="text-2xl">Tracks</h2>
 
                 <div className="input-area mt-2 px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 xl:py-10 border-2">

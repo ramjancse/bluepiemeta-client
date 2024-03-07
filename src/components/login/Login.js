@@ -46,7 +46,7 @@ const Login = () => {
       if (!result.error) {
         // show success message
         toast.success("Login success!");
-        router.push(callbackUrl);
+        router.push(callbackUrl ? callbackUrl : "/");
       } else {
         // show error message
         toast.error("Something went wrong!");
