@@ -1,3 +1,4 @@
+
 "use client";
 
 import Footer from "@/components/artist/Footer";
@@ -900,4 +901,8 @@ const AddAlbumPage = () => {
   );
 };
 
+
 export default AddAlbumPage;
+
+
+
