@@ -62,25 +62,13 @@ const page = async ({ params: { albumId } }) => {
                   </div>
 
                   <div className="info border-b py-2">
-                    <p className="font-semibold">Language</p>
-                    <p className="text-sm">{metadataLanguage}</p>
+                    <p className="font-semibold">Type</p>
+                    <p className="text-sm">{albumType}</p>
                   </div>
 
                   <div className="info border-b py-2">
-                    <p className="font-semibold">Area</p>
-                    <p className="text-sm">-</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Songs</p>
+                    <p className="font-semibold">Total tracks</p>
                     <p className="text-sm">{tracks.length}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">C Line</p>
-                    <p className="text-sm">
-                      {format(cLineYear, "yyyy") ?? "-"} - {cLine}
-                    </p>
                   </div>
                 </div>
 
@@ -109,18 +97,6 @@ const page = async ({ params: { albumId } }) => {
                     <p className="font-semibold">Release Date</p>
                     <p className="text-sm">
                       {format(originalReleaseDate, "dd-MMMM-yyyy")}
-                    </p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Distribution Date</p>
-                    <p className="text-sm">{distributionDate ?? "-"}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">P Line</p>
-                    <p className="text-sm">
-                      {format(pLineYear, "yyyy") ?? "-"} - {pLine ?? "-"}
                     </p>
                   </div>
 

@@ -30,7 +30,6 @@ const page = async () => {
                 <th className="border p-2 text-left">Type</th>
                 <th className="border p-2 text-left">Release date</th>
                 <th className="border p-2 text-left">Total tracks</th>
-                <th className="border p-2 text-left">Updated At</th>
                 <th className="border p-2 text-left">Action</th>
               </tr>
             </thead>
@@ -113,10 +112,6 @@ const page = async () => {
                       </td>
 
                       <td className="border p-2">{tracks.length}</td>
-
-                      <td className="border p-2">
-                        {format(updatedAt, "dd-MMMM-yyyy")}
-                      </td>
 
                       <td className="border p-2">
                         <Link href={`/albums/${_id}`} className="text-blue-600">
