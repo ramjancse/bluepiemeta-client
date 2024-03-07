@@ -13,12 +13,13 @@ const page = async () => {
       <main className="px-3 py-2 xs:px-5 xs:py-3 md:px-20 md:py-10">
         <div className="top flex items-center justify-between">
           <h2 className="text-xl mb-3">All Artists</h2>
+
           <Link href="/artists/add" className="px-10 py-2 rounded bg-gray-200">
             Add artist
           </Link>
         </div>
 
-        <div className="overflow-x-auto mt-2">
+        <div className="overflow-x-auto mt-5">
           <table className="w-full border-collapse">
             <thead className="bg-gray-700 text-white">
               <tr>
@@ -27,6 +28,7 @@ const page = async () => {
                 <th className="border p-2 text-left">Type</th>
                 <th className="border p-2 text-left">Gender</th>
                 <th className="border p-2 text-left">Region</th>
+                <th className="border p-2 text-left">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -52,24 +54,28 @@ const page = async () => {
                           />
                         </Link>
                       </td>
+
                       <td className="border p-2">
-                        <Link className="block" href={`/artists/${_id}`}>
+                        <Link
+                          className="block text-blue-600"
+                          href={`/artists/${_id}`}
+                        >
                           {artistName}
                         </Link>
                       </td>
+
+                      <td className="border p-2">{artistType}</td>
+
+                      <td className="border p-2">{sex}</td>
+
+                      <td className="border p-2">{region}</td>
+
                       <td className="border p-2">
-                        <Link className="block" href={`/artists/${_id}`}>
-                          {artistType}
-                        </Link>
-                      </td>
-                      <td className="border p-2">
-                        <Link className="block" href={`/artists/${_id}`}>
-                          {sex}
-                        </Link>
-                      </td>
-                      <td className="border p-2">
-                        <Link className="block" href={`/artists/${_id}`}>
-                          {region}
+                        <Link
+                          className="block text-blue-600"
+                          href={`/artists/${_id}`}
+                        >
+                          Edit
                         </Link>
                       </td>
                     </tr>

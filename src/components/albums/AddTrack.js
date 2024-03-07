@@ -325,7 +325,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
   const router = useRouter();
 
   const onSubmit = async (data) => {
-    // console.log(data, "track data");
+    console.log(data, "track data");
 
     // submitted data to parent
     onSubmitTrack(data);
@@ -1461,7 +1461,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
           <input
             type="submit"
             value="Add Track"
-            className="px-10 py-2 rounded bg-gray-200 uppercase cursor-pointer"
+            className="px-10 py-2 rounded bg-green-600 uppercase cursor-pointer text-white"
           />
         </div>
       </form>

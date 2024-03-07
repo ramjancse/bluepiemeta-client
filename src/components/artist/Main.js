@@ -80,14 +80,14 @@ const Main = () => {
 
   const onSubmit = async (data) => {
     // update artist type field
-    setValue("artistType", "Single");
+    setValue("artistType", artistType);
 
     // updated array in this field
     setValue("nameOfType", getNameOfTypesArr(data));
 
     // update some field need to be database
     setValue("artistImage", "");
-    setValue("artistDiscription", "This is artist description");
+    setValue("artistDiscription", "");
     setValue("artistLinks", []);
     setValue("socialMedia", []);
 
