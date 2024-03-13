@@ -1,5 +1,5 @@
-import Footer from "@/components/artist/Footer";
-import Header from "@/components/artist/Header";
+import Header from "@/components/dashboard/Header";
+import Layout from "@/components/dashboard/Layout";
 import { getAllAlbums } from "@/lib/albums";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -9,11 +9,11 @@ const page = async () => {
   const { data: albums = [] } = await getAllAlbums();
 
   return (
-    <>
-      <Header />
-      <main className="px-3 py-2 xs:px-5 xs:py-3 md:px-20 md:py-10">
+    <Layout>
+      <Header name="All Albums" />
+      <main className="px-4 py-3">
         <div className="top flex items-center justify-between">
-          <h2 className="text-xl mb-3">All Albums</h2>
+          <h2 className="text-xl mb-3">Album table</h2>
           <Link href="/albums/add" className="px-10 py-2 rounded bg-gray-200">
             Add album
           </Link>
@@ -138,8 +138,7 @@ const page = async () => {
           </table>
         </div>
       </main>
-      <Footer />
-    </>
+    </Layout>
   );
 };
 
