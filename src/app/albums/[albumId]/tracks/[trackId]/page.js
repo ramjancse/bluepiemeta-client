@@ -43,6 +43,9 @@ const page = async ({ params: { albumId, trackId } }) => {
     audioLanguage,
     catalogNumber,
   } = foundTrack || {};
+
+  const filteredGenre = trackGenre.filter((genre) => genre.status);
+
   return (
     <>
       <Header />
@@ -95,36 +98,36 @@ const page = async ({ params: { albumId, trackId } }) => {
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
                     <p className="text-sm space-x-1">
-                      {trackGenre
-                        .filter((genre) => genre.status)
-                        .map((genre, index, array) => (
-                          <span
-                            key={genre._id}
-                            className={
-                              index !== array.length - 1
-                                ? 'after:content-[","]'
-                                : ""
-                            }
-                          >
-                            {genre.name}
-                          </span>
-                        ))}
+                      {filteredGenre.length
+                        ? filteredGenre.map((genre, index, array) => (
+                            <span
+                              key={genre._id}
+                              className={
+                                index !== array.length - 1
+                                  ? 'after:content-[","]'
+                                  : ""
+                              }
+                            >
+                              {genre.name}
+                            </span>
+                          ))
+                        : "-"}
                     </p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Performer</p>
-                    <p className="text-sm">{primaryArtist[0]?.name}</p>
+                    <p className="text-sm">{primaryArtist[0]?.name || "-"}</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Composer</p>
-                    <p className="text-sm">{composer[0]?.name}</p>
+                    <p className="text-sm">{composer[0]?.name || "-"}</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Featuring</p>
-                    <p className="text-sm">{featuringArtist[0]?.name}</p>
+                    <p className="text-sm">{featuringArtist[0]?.name || "-"}</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -151,7 +154,7 @@ const page = async ({ params: { albumId, trackId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Lyricist</p>
-                    <p className="text-sm">{lyricist[0]?.name}</p>
+                    <p className="text-sm">{lyricist[0]?.name || "-"}</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -161,7 +164,7 @@ const page = async ({ params: { albumId, trackId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Producer</p>
-                    <p className="text-sm">{producer[0]?.name}</p>
+                    <p className="text-sm">{producer[0]?.name || "-"}</p>
                   </div>
 
                   <div className="info border-b py-2">

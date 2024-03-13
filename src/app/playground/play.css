@@ -1,18 +1,19 @@
-div {
-  width: 100px;
-  height: 20px;
+.box {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transform-origin: top;
+  transition: height 3s ease-out, opacity 3s ease-out, transform 3s ease-out;
 }
-.menu {
-  visibility: hidden;
-  transition: visibility 2s linear, opacity 2s linear;
 
-  background: red;
-  width: 300px;
-  height: 300px;
-  margin: 0;
-  padding: 5px;
-  list-style: none;
+.show {
+  opacity: 1;
+  height: auto;
+  transform: scaleY(1);
 }
-div:hover > .menu {
-  visibility: visible;
+
+.hide {
+  opacity: 0;
+  height: 0;
+  transform: scaleY(0);
 }
