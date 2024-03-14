@@ -58,7 +58,7 @@ const MenuItem = ({ menu }) => {
         <Link
           href={menu.link}
           className={`pl-10 pr-3 py-2 flex items-center border-l-4 duration-500 select-none ${
-            path === "/dashboard"
+            path === menu.link
               ? "border-blue-500 bg-[#FAFAFC]"
               : "border-transparent hover:border-blue-500 hover:bg-[#FAFAFC]"
           }`}
