@@ -6,11 +6,11 @@ const Layout = ({ children }) => {
     <>
       <div className="dashboard">
         <div className="top flex">
-          <div className="left w-1/4">
+          <div className="left w-1/5">
             <Sidebar />
           </div>
 
-          <div className="right w-3/4">{children}</div>
+          <div className="right w-4/5">{children}</div>
         </div>
       </div>
     </>

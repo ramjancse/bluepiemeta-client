@@ -33,7 +33,7 @@ const menus = [
       {
         id: 2,
         name: "Add Track",
-        link: "/albums/add/track",
+        link: "/albums/add",
         icon: DashboardIcon,
         children: [],
       },
@@ -41,28 +41,6 @@ const menus = [
   },
   {
     id: 3,
-    name: "Albums new",
-    link: "/albums",
-    icon: DashboardIcon,
-    children: [
-      {
-        id: 1,
-        name: "Add Album new",
-        link: "/albums/add/new",
-        icon: DashboardIcon,
-        children: [],
-      },
-      {
-        id: 2,
-        name: "Add Track new",
-        link: "/albums/add/track/new",
-        icon: DashboardIcon,
-        children: [],
-      },
-    ],
-  },
-  {
-    id: 4,
     name: "Artists",
     link: "/artists",
     icon: ArtistIcon,
