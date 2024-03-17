@@ -20,10 +20,11 @@ import albumImage6 from "@/assets/images/dashboard/dashboard-asset-images/albums
 import albumImage7 from "@/assets/images/dashboard/dashboard-asset-images/albums-cover/album-cover-07.jpg";
 import albumImage8 from "@/assets/images/dashboard/dashboard-asset-images/albums-cover/album-cover-08.jpg";
 import albumImage9 from "@/assets/images/dashboard/dashboard-asset-images/albums-cover/album-cover-09.jpg";
-import { IoDownloadSharp } from "react-icons/io5";
+import { MdDownloadForOffline } from "react-icons/md";
 import { SlOptionsVertical } from "react-icons/sl";
 import albumImage from "@/assets/images/poster/poster-13.jpg";
 import musicIcon from "@/assets/images/play_music.png";
+import ChainIcon from "@/assets/images/dashboard/Chain-icon.svg";
 
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
@@ -138,11 +139,11 @@ const page = () => {
       </div>
 
       <div className="bottom bg-[#F5F6FA] flex justify-between">
-        <div className="recent-list w-1/3 pr-5 py-3">
-          <h3 className="font-medium text-xl mb-2">Recently Added</h3>
+        <div className="recent-list w-1/3 px-5 py-3 border-2 overflow-hidden">
+          <div className="tracks h-[calc(100%-80px)]">
+            <h3 className="font-medium text-xl mb-2">Recently Added</h3>
 
-          <div className="tracks">
-            <div className="track flex border-b-2 py-1">
+            <div className="track flex border-b-2 py-2">
               <div className="image mr-2">
                 <Image
                   className="w-[60px]"
@@ -153,19 +154,28 @@ const page = () => {
 
               <div className="info w-full flex justify-between">
                 <div className="text">
-                  <h5 className="text-sm">The Four Corners Of Hell</h5>
+                  <h5 className="text-sm">
+                    <Link href="/" className="hover:text-fill">
+                      The Four Corners Of Hell
+                    </Link>
+                  </h5>
                   <h6 className="text-xs">Eleanor MacEoy</h6>
                 </div>
 
                 <div className="link flex justify-between space-x-2">
-                  <FaPaperclip className="text-xl text-blue-600" />
-                  <IoDownloadSharp className="text-xl text-blue-600" />
-                  <SlOptionsVertical className="text-xl text-blue-600" />
+                  <Image
+                    src={ChainIcon}
+                    alt="Chain Icon"
+                    className="text-[#0070D6] w-[15px] h-[20px]"
+                  />
+
+                  <MdDownloadForOffline className="text-xl text-[#0070D6]" />
+                  <SlOptionsVertical className="text-xl text-[#0070D6]" />
                 </div>
               </div>
             </div>
 
-            <div className="track flex border-b-2 mt-3 py-1">
+            <div className="track flex border-b-2 mt-4 py-2">
               <div className="image mr-2">
                 <Image
                   className="w-[60px]"
@@ -176,19 +186,27 @@ const page = () => {
 
               <div className="info w-full flex justify-between">
                 <div className="text">
-                  <h5 className="text-sm">The Four Corners Of Hell</h5>
+                  <h5 className="text-sm">
+                    <Link href="/" className="hover:text-fill">
+                      The Four Corners Of Hell
+                    </Link>
+                  </h5>
                   <h6 className="text-xs">Eleanor MacEoy</h6>
                 </div>
 
                 <div className="link flex justify-between space-x-2">
-                  <FaPaperclip className="text-xl text-blue-600" />
-                  <IoDownloadSharp className="text-xl text-blue-600" />
-                  <SlOptionsVertical className="text-xl text-blue-600" />
+                  <Image
+                    src={ChainIcon}
+                    alt="Chain Icon"
+                    className="text-[#0070D6] w-[15px] h-[20px]"
+                  />
+                  <MdDownloadForOffline className="text-xl text-[#0070D6]" />
+                  <SlOptionsVertical className="text-xl text-[#0070D6]" />
                 </div>
               </div>
             </div>
 
-            <div className="track flex border-b-2 mt-3 py-1">
+            <div className="track flex border-b-2 mt-4 py-2">
               <div className="image mr-2">
                 <Image
                   className="w-[60px]"
@@ -199,104 +217,43 @@ const page = () => {
 
               <div className="info w-full flex justify-between">
                 <div className="text">
-                  <h5 className="text-sm">The Four Corners Of Hell</h5>
+                  <h5 className="text-sm">
+                    <Link href="/" className="hover:text-fill">
+                      The Four Corners Of Hell
+                    </Link>
+                  </h5>
                   <h6 className="text-xs">Eleanor MacEoy</h6>
                 </div>
 
                 <div className="link flex justify-between space-x-2">
-                  <FaPaperclip className="text-xl text-blue-600" />
-                  <IoDownloadSharp className="text-xl text-blue-600" />
-                  <SlOptionsVertical className="text-xl text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="track flex border-b-2 mt-3 py-1">
-              <div className="image mr-2">
-                <Image
-                  className="w-[60px]"
-                  src={albumImage2}
-                  alt="Track Image"
-                />
-              </div>
-
-              <div className="info w-full flex justify-between">
-                <div className="text">
-                  <h5 className="text-sm">The Four Corners Of Hell</h5>
-                  <h6 className="text-xs">Eleanor MacEoy</h6>
-                </div>
-
-                <div className="link flex justify-between space-x-2">
-                  <FaPaperclip className="text-xl text-blue-600" />
-                  <IoDownloadSharp className="text-xl text-blue-600" />
-                  <SlOptionsVertical className="text-xl text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="track flex border-b-2 mt-3 py-1">
-              <div className="image mr-2">
-                <Image
-                  className="w-[60px]"
-                  src={albumImage2}
-                  alt="Track Image"
-                />
-              </div>
-
-              <div className="info w-full flex justify-between">
-                <div className="text">
-                  <h5 className="text-sm">The Four Corners Of Hell</h5>
-                  <h6 className="text-xs">Eleanor MacEoy</h6>
-                </div>
-
-                <div className="link flex justify-between space-x-2">
-                  <FaPaperclip className="text-xl text-blue-600" />
-                  <IoDownloadSharp className="text-xl text-blue-600" />
-                  <SlOptionsVertical className="text-xl text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="track flex border-b-2 mt-3 py-1">
-              <div className="image mr-2">
-                <Image
-                  className="w-[60px]"
-                  src={albumImage2}
-                  alt="Track Image"
-                />
-              </div>
-
-              <div className="info w-full flex justify-between">
-                <div className="text">
-                  <h5 className="text-sm">The Four Corners Of Hell</h5>
-                  <h6 className="text-xs">Eleanor MacEoy</h6>
-                </div>
-
-                <div className="link flex justify-between space-x-2">
-                  <FaPaperclip className="text-xl text-blue-600" />
-                  <IoDownloadSharp className="text-xl text-blue-600" />
-                  <SlOptionsVertical className="text-xl text-blue-600" />
+                  <Image
+                    src={ChainIcon}
+                    alt="Chain Icon"
+                    className="text-[#0070D6] w-[15px] h-[20px]"
+                  />
+                  <MdDownloadForOffline className="text-xl text-[#0070D6]" />
+                  <SlOptionsVertical className="text-xl text-[#0070D6]" />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="button mt-5 text-right">
+          <div className="button h-[80px] flex justify-end items-center">
             <button
               type="button"
-              className="px-5 py-2 bg-black text-white rounded-full"
+              className="px-5 py-1 bg-[#424242] text-white rounded-full"
             >
               View All
             </button>
           </div>
         </div>
 
-        <div className="track-list w-2/3 border-l-2 px-5 py-3">
+        <div className="track-list w-2/3 px-5 py-3">
           <h3 className="font-medium text-xl mb-2">Track List</h3>
 
           <div className="songs">
-            <div className="song bg-white p-3 flex">
-              <div className="cover mr-2 xs:mr-3 w-[50px]">
+            <div className="song bg-white flex">
+              <div className="cover w-[50px]">
                 <Image
                   src={albumImage}
                   className="w-full"
@@ -306,20 +263,20 @@ const page = () => {
                 />
               </div>
 
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between">
+              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
                 <div className="name">
                   <h6 className="text-sm font-medium">
                     <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You
+                      Can I Have Forever with You{" "}
+                    </a>
+
+                    <a className="text-xs italic hover:text-fill" href="/">
+                      - Graham Cotton
                     </a>
                   </h6>
 
-                  <p className="text-[11px] hidden sm:flex sm:justify-between italic">
+                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
                     Folk, Indie, Song-Songwriter
-                  </p>
-
-                  <p className="text-[11px] text-[#686868] block">
-                    Graham Cotton
                   </p>
                 </div>
 
@@ -339,8 +296,8 @@ const page = () => {
               </div>
             </div>
 
-            <div className="song bg-white p-3 mt-2 flex">
-              <div className="cover mr-2 xs:mr-3 w-[50px]">
+            <div className="song bg-white flex mt-2">
+              <div className="cover w-[50px]">
                 <Image
                   src={albumImage}
                   className="w-full"
@@ -350,20 +307,20 @@ const page = () => {
                 />
               </div>
 
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between">
+              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
                 <div className="name">
                   <h6 className="text-sm font-medium">
                     <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You
+                      Can I Have Forever with You{" "}
+                    </a>
+
+                    <a className="text-xs italic hover:text-fill" href="/">
+                      - Graham Cotton
                     </a>
                   </h6>
 
-                  <p className="text-[11px] hidden sm:flex sm:justify-between italic">
+                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
                     Folk, Indie, Song-Songwriter
-                  </p>
-
-                  <p className="text-[11px] text-[#686868] block">
-                    Graham Cotton
                   </p>
                 </div>
 
@@ -383,8 +340,8 @@ const page = () => {
               </div>
             </div>
 
-            <div className="song bg-white p-3 mt-2 flex">
-              <div className="cover mr-2 xs:mr-3 w-[50px]">
+            <div className="song bg-white flex mt-2">
+              <div className="cover w-[50px]">
                 <Image
                   src={albumImage}
                   className="w-full"
@@ -394,20 +351,20 @@ const page = () => {
                 />
               </div>
 
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between">
+              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
                 <div className="name">
                   <h6 className="text-sm font-medium">
                     <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You
+                      Can I Have Forever with You{" "}
+                    </a>
+
+                    <a className="text-xs italic hover:text-fill" href="/">
+                      - Graham Cotton
                     </a>
                   </h6>
 
-                  <p className="text-[11px] hidden sm:flex sm:justify-between italic">
+                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
                     Folk, Indie, Song-Songwriter
-                  </p>
-
-                  <p className="text-[11px] text-[#686868] block">
-                    Graham Cotton
                   </p>
                 </div>
 
@@ -427,8 +384,8 @@ const page = () => {
               </div>
             </div>
 
-            <div className="song bg-white p-3 mt-2 flex">
-              <div className="cover mr-2 xs:mr-3 w-[50px]">
+            <div className="song bg-white flex mt-2">
+              <div className="cover w-[50px]">
                 <Image
                   src={albumImage}
                   className="w-full"
@@ -438,20 +395,20 @@ const page = () => {
                 />
               </div>
 
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between">
+              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
                 <div className="name">
                   <h6 className="text-sm font-medium">
                     <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You
+                      Can I Have Forever with You{" "}
+                    </a>
+
+                    <a className="text-xs italic hover:text-fill" href="/">
+                      - Graham Cotton
                     </a>
                   </h6>
 
-                  <p className="text-[11px] hidden sm:flex sm:justify-between italic">
+                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
                     Folk, Indie, Song-Songwriter
-                  </p>
-
-                  <p className="text-[11px] text-[#686868] block">
-                    Graham Cotton
                   </p>
                 </div>
 
@@ -471,8 +428,8 @@ const page = () => {
               </div>
             </div>
 
-            <div className="song bg-white p-3 mt-2 flex">
-              <div className="cover mr-2 xs:mr-3 w-[50px]">
+            <div className="song bg-white flex mt-2">
+              <div className="cover w-[50px]">
                 <Image
                   src={albumImage}
                   className="w-full"
@@ -482,20 +439,20 @@ const page = () => {
                 />
               </div>
 
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between">
+              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
                 <div className="name">
                   <h6 className="text-sm font-medium">
                     <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You
+                      Can I Have Forever with You{" "}
+                    </a>
+
+                    <a className="text-xs italic hover:text-fill" href="/">
+                      - Graham Cotton
                     </a>
                   </h6>
 
-                  <p className="text-[11px] hidden sm:flex sm:justify-between italic">
+                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
                     Folk, Indie, Song-Songwriter
-                  </p>
-
-                  <p className="text-[11px] text-[#686868] block">
-                    Graham Cotton
                   </p>
                 </div>
 
@@ -516,10 +473,10 @@ const page = () => {
             </div>
           </div>
 
-          <div className="button mt-5 text-right">
+          <div className="button h-[80px] flex justify-end items-center">
             <button
               type="button"
-              className="px-5 py-2 bg-black text-white rounded-full"
+              className="px-5 py-1 bg-[#424242] text-white rounded-full"
             >
               View All
             </button>
