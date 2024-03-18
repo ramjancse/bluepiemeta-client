@@ -6,6 +6,7 @@ import Link from "next/link";
 import Footer from "./Footer";
 import MenuItem from "./MenuItem";
 import DashboardIcon from "@/assets/images/dashboard/Dashboard.svg";
+import ReleaseIcon from "@/assets/images/dashboard/Releases.svg";
 import AlbumIcon from "@/assets/images/dashboard/Albums.svg";
 import ArtistIcon from "@/assets/images/dashboard/Artist.svg";
 
@@ -19,28 +20,36 @@ const menus = [
   },
   {
     id: 2,
-    name: "Albums",
-    link: "/albums",
-    icon: AlbumIcon,
+    name: "Releases",
+    link: "/releases",
+    icon: ReleaseIcon,
     children: [
       {
         id: 1,
-        name: "Add Album",
-        link: "/albums/add",
+        name: "New Releases",
+        link: "/releases/new",
         icon: DashboardIcon,
         children: [],
       },
       {
         id: 2,
-        name: "Add Track",
-        link: "/albums/add",
+        name: "New Compilations",
+        link: "/compilations/new",
         icon: DashboardIcon,
         children: [],
       },
     ],
   },
+
   {
     id: 3,
+    name: "Albums",
+    link: "/albums",
+    icon: AlbumIcon,
+    children: [],
+  },
+  {
+    id: 4,
     name: "Artists",
     link: "/artists",
     icon: ArtistIcon,
