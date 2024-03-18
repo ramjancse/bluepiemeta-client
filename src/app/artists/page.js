@@ -1,6 +1,7 @@
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAllArtists } from "@/lib/artist";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -47,10 +48,15 @@ const page = async () => {
                     <tr className="even:bg-gray-100" key={_id}>
                       <td className="border p-2">
                         <Link className="block" href={`/artists/${_id}`}>
-                          <img
-                            src="https://avatars.githubusercontent.com/u/110802852?v=4"
+                          <Image
+                            src={
+                              artistImage ||
+                              "https://avatars.githubusercontent.com/u/110802852?v=4"
+                            }
                             alt="Image"
                             className="w-[40px] h-[40px]"
+                            width={40}
+                            height={40}
                           />
                         </Link>
                       </td>

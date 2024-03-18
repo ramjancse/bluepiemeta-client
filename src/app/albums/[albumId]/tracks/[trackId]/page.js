@@ -2,6 +2,7 @@ import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAlbumById } from "@/lib/albums";
 import { format } from "date-fns";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -53,10 +54,14 @@ const page = async ({ params: { albumId, trackId } }) => {
         <div className="">
           <div className="left flex">
             <div className="img">
-              <img
+              <Image
                 className="w-[100px] h-[100px]"
-                src="https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
+                src={
+                  "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
+                }
                 alt="Profile"
+                width={100}
+                height={100}
               />
             </div>
 

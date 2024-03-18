@@ -2,6 +2,7 @@ import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAllAlbums } from "@/lib/albums";
 import { format } from "date-fns";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -66,10 +67,15 @@ const page = async () => {
                           className="flex items-center flex-col xl:flex-row"
                           href={`/albums/${_id}`}
                         >
-                          <img
-                            src="https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
+                          <Image
+                            src={
+                              albumCover ||
+                              "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
+                            }
                             alt="Image"
                             className="w-[40px] h-[40px]"
+                            width={40}
+                            height={40}
                           />
                           <span className="ml-2 text-blue-600">
                             {albumName}
