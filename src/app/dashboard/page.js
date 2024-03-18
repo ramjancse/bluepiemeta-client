@@ -4,7 +4,12 @@ import Layout from "@/components/dashboard/Layout";
 import Image from "next/image";
 import mainBanner from "@/assets/images/main_banner.jpg";
 import Menu from "@/components/shared/Menu";
-import { FaBars, FaPaperclip } from "react-icons/fa6";
+import {
+  FaAngleLeft,
+  FaAngleRight,
+  FaBars,
+  FaPaperclip,
+} from "react-icons/fa6";
 import dashboardImage from "@/assets/images/dashboard/dashboard-asset-images/dashboard-cover/dashboard-cover-01.jpg";
 // Import css files
 import "slick-carousel/slick/slick.css";
@@ -25,50 +30,125 @@ import { SlOptionsVertical } from "react-icons/sl";
 import albumImage from "@/assets/images/poster/poster-13.jpg";
 import musicIcon from "@/assets/images/play_music.png";
 import ChainIcon from "@/assets/images/dashboard/Chain-icon.svg";
+import { useRef, useState } from "react";
 
-function SampleNextArrow(props) {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{ ...style, display: "block", background: "transparent" }}
-      onClick={onClick}
-    />
-  );
-}
+const Dashboard = () => {
+  const [slides, setSlides] = useState([
+    {
+      id: 1,
+      name: "Slide 1",
+      image: albumImage1,
+      link: "/albums/1",
+      text: "Dear Ladies and Gentleman, We are floating in space",
+    },
+    {
+      id: 2,
+      name: "Slide 2",
+      image: albumImage2,
+      link: "/albums/2",
+      status: true,
+    },
+    {
+      id: 3,
+      name: "Slide 3",
+      image: albumImage3,
+      link: "/albums/3",
+      status: true,
+    },
+    {
+      id: 4,
+      name: "Slide 4",
+      image: albumImage4,
+      link: "/albums/4",
+      status: true,
+    },
+    {
+      id: 5,
+      name: "Slide 5",
+      image: albumImage5,
+      link: "/albums/5",
+      status: true,
+    },
+    {
+      id: 6,
+      name: "Slide 6",
+      image: albumImage6,
+      link: "/albums/6",
+      status: true,
+    },
+    {
+      id: 7,
+      name: "Slide 7",
+      image: albumImage7,
+      link: "/albums/7",
+      status: true,
+    },
+    {
+      id: 8,
+      name: "Slide 8",
+      image: albumImage8,
+      link: "/albums/8",
+      status: true,
+    },
+    {
+      id: 9,
+      name: "Slide 9",
+      image: albumImage9,
+      link: "/albums/9",
+      status: true,
+    },
+    {
+      id: 10,
+      name: "Slide 10",
+      image: albumImage1,
+      link: "/albums/10",
+      status: false,
+    },
+    {
+      id: 11,
+      name: "Slide 11",
+      image: albumImage1,
+      link: "/albums/11",
+      status: false,
+    },
+  ]);
 
-function SamplePrevArrow(props) {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{ ...style, display: "block", background: "green" }}
-      onClick={onClick}
-    />
-  );
-}
-
-const page = () => {
-  const settings = {
-    dots: false,
-    infinite: true,
-    slidesToShow: 9,
-    slidesToScroll: 1,
-    // nextArrow: <SampleNextArrow />,
-    // prevArrow: <SamplePrevArrow />,
+  const calculateImageSize = (index) => {
+    switch (index) {
+      case 0:
+      case 8:
+        return { width: 100, height: 100 };
+      case 1:
+      case 7:
+        return { width: 120, height: 120 };
+      case 2:
+      case 6:
+        return { width: 140, height: 140 };
+      case 3:
+      case 5:
+        return { width: 160, height: 160 };
+      case 4:
+        return { width: 200, height: 200 };
+      default:
+        return { width: 100, height: 100 }; // Default size
+    }
   };
 
-  const slides = [
-    { id: 1, name: "Slide 1", image: albumImage1, link: "/albums/1" },
-    { id: 2, name: "Slide 2", image: albumImage2, link: "/albums/2" },
-    { id: 3, name: "Slide 3", image: albumImage3, link: "/albums/3" },
-    { id: 4, name: "Slide 4", image: albumImage4, link: "/albums/4" },
-    { id: 5, name: "Slide 5", image: albumImage5, link: "/albums/5" },
-    { id: 6, name: "Slide 6", image: albumImage6, link: "/albums/6" },
-    { id: 7, name: "Slide 7", image: albumImage7, link: "/albums/7" },
-    { id: 8, name: "Slide 8", image: albumImage8, link: "/albums/8" },
-    { id: 9, name: "Slide 9", image: albumImage9, link: "/albums/9" },
-  ];
+  const handlePrevClick = () => {
+    const newSlides = [...slides];
+    const lastSlide = newSlides.pop(); // Remove the last slide
+    newSlides.unshift(lastSlide); // Add the removed last slide to the beginning
+    setSlides(newSlides);
+  };
+
+  const handleNextClick = () => {
+    const newSlides = [...slides];
+    const firstSlide = newSlides.shift(); // Remove the first slide
+    newSlides.push(firstSlide); // Add the removed first slide to the end
+    setSlides(newSlides);
+  };
+
+  const startIndex = 0;
 
   return (
     <Layout>
@@ -121,20 +201,36 @@ const page = () => {
       <div className="albums px-10 py-3 overflow-hidden bg-[#36045D]">
         <h4 className="text-white tracking-wider text-xl">Albums</h4>
 
-        <div className="slider-container py-10">
-          <Slider {...settings}>
-            {slides.map((slide) => (
-              <div className="single" key={slide.id}>
-                <Link href="/">
-                  <Image
-                    src={slide.image}
-                    alt="Album image"
-                    className="w-[100px] h-[100px] rounded-full"
-                  />
-                </Link>
-              </div>
-            ))}
-          </Slider>
+        <div className="py-10 flex items-center">
+          <div
+            className="prev text-white rounded-full ring-1 ring-offset-1 flex items-center justify-center cursor-pointer select-none mr-3 w-11 h-8"
+            onClick={handlePrevClick}
+          >
+            <FaAngleLeft className="text-lg" />
+          </div>
+
+          {slides.slice(startIndex, startIndex + 9).map((slide, index) => (
+            <div className="single duration-500" key={slide.id}>
+              <Link href={slide.link} className="">
+                <Image
+                  src={slide.image}
+                  alt="Album image"
+                  width={calculateImageSize(index).width}
+                  height={calculateImageSize(index).height}
+                  className="rounded-full"
+                />
+              </Link>
+
+              {/* <div className="text text-white">{slide?.text}</div> */}
+            </div>
+          ))}
+
+          <div
+            className="next text-white rounded-full ring-1 ring-offset-1 flex items-center justify-center cursor-pointer select-none ml-3 w-11 h-8"
+            onClick={handleNextClick}
+          >
+            <FaAngleRight className="text-xl" />
+          </div>
         </div>
       </div>
 
@@ -489,4 +585,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Dashboard;
