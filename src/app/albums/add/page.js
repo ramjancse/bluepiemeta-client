@@ -174,8 +174,7 @@ const AddAlbumPage = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      albumCover:
-        "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg",
+      albumCover: "",
       recordLabel: "",
       artistId: "",
       userId: session?.data?.user?.id,

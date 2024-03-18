@@ -12,6 +12,10 @@ const Layout = ({ children }) => {
 
           <div className="right w-4/5">{children}</div>
         </div>
+
+        <footer className="footer flex items-center justify-center">
+          <Footer />
+        </footer>
       </div>
     </>
   );

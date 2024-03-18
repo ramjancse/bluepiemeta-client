@@ -37,7 +37,7 @@ const page = async ({ params: { albumId } }) => {
           <div className="left md:w-1/4 flex flex-col">
             <Image
               src={
-                albumCover ??
+                albumCover ||
                 "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
               }
               className="w-[200px] h-[200px]"
