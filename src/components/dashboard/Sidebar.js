@@ -66,7 +66,7 @@ const Sidebar = () => {
         </Link>
       </div>
 
-      <section className="navigation h-full bg-[#F5F6FA]">
+      <section className="navigation h-full">
         <nav className="menu py-10">
           <ul className="space-y-1">
             {menus.map((menu) => (
@@ -75,10 +75,6 @@ const Sidebar = () => {
           </ul>
         </nav>
       </section>
-
-      <footer className="footer flex items-center justify-center h-[99px]">
-        <Footer />
-      </footer>
     </div>
   );
 };

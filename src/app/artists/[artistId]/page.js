@@ -1,6 +1,7 @@
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAllArtists, getArtistById } from "@/lib/artist";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -29,10 +30,12 @@ const page = async ({ params: { artistId } }) => {
       <div className="px-3 py-2 md:py-5 xl:px-20 xl:py-10">
         <div className="flex flex-col md:flex-row">
           <div className="left flex justify-center md:w-1/4">
-            <img
+            <Image
               className="w-[200px] h-[200px]"
-              src="https://media.istockphoto.com/id/1327592506/vector/default-avatar-photo-placeholder-icon-grey-profile-picture-business-man.jpg?s=612x612&w=0&k=20&c=BpR0FVaEa5F24GIw7K8nMWiiGmbb8qmhfkpXcp1dhQg="
+              src={artistImage}
               alt="Profile"
+              width={200}
+              height={200}
             />
           </div>
 
@@ -117,7 +120,7 @@ const page = async ({ params: { artistId } }) => {
                       })
                     ) : (
                       <tr className="even:bg-gray-100">
-                        <td className="border p-2 text-center" colspan="3">
+                        <td className="border p-2 text-center" colSpan="3">
                           Artist links are not available
                         </td>
                       </tr>

@@ -1,7 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["images.othoba.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.dropbox.com",
+        // port: "",
+        // pathname: "/account123/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.othoba.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "media.istockphoto.com",
+      },
+    ],
   },
 };
 
