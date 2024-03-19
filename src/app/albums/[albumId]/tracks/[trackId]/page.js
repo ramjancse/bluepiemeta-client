@@ -1,5 +1,6 @@
 import Footer from "@/components/artist/Footer";
-import Header from "@/components/artist/Header";
+import Header from "@/components/dashboard/Header";
+import Layout from "@/components/dashboard/Layout";
 import { getAlbumById } from "@/lib/albums";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -28,163 +29,351 @@ const page = async ({ params: { albumId, trackId } }) => {
     createdAt,
   } = await getAlbumById(albumId);
 
-  const foundTrack = tracks.find((track) => track._id === trackId);
+  const foundTrack = tracks?.find((track) => track._id === trackId);
 
   const {
-    primaryArtist,
-    featuringArtist,
-    trackType,
+    audioFile,
     titleOfTrack,
+    version,
+    duration,
+    explicit,
     trackGenre,
-    explicitContent,
-    lyricist,
-    composer,
-    producer,
-    isrc,
+    trackMood,
+    mix,
+    tags,
     audioLanguage,
+    primaryArtist,
+    composer,
+    lyricist,
+    arranger,
+    featuringArtist,
+    producer,
+    mixer,
+    trackLinks,
+    rating,
+    contract,
+    isrc,
     catalogNumber,
   } = foundTrack || {};
+
+  // const data = await getAlbumById(albumId);
+  // console.log(data, "data");
 
   const filteredGenre = trackGenre.filter((genre) => genre.status);
 
   return (
-    <>
-      <Header />
-      <div className="px-3 py-2 md:py-5 xl:px-20 xl:py-10">
-        <div className="">
-          <div className="left flex">
-            <div className="img">
-              <Image
-                className="w-[100px] h-[100px]"
-                src={
-                  "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
-                }
-                alt="Profile"
-                width={100}
-                height={100}
-              />
+    <Layout>
+      <Header name="Track Basic Info" />
+      <div className="px-4 py-3 border-l">
+        <div className="new space-y-7">
+          <div className="assets flex items-center">
+            <div className="name px-5 w-1/6">
+              <h4 className="text-right">Assets</h4>
             </div>
 
-            <div className="text ml-3 flex flex-col justify-between">
-              <h2 className="text-xl font-bold">{primaryArtist[0].name}</h2>
-              <h4>
-                Album:{" "}
-                <Link
-                  href={`/albums/${_id}`}
-                  className="text-blue-700 font-semibold"
-                >
-                  {albumName}
-                </Link>
-              </h4>
-              <p>
-                Created time: {format(createdAt, "dd-MMMM-yyyy")} | Updated
-                time: {format(updatedAt, "dd-MMMM-yyyy")}
-              </p>
+            <div className="information flex border-l-2 border-gray-400 px-3 w-full">
+              <div className="one w-1/2 mr-3">
+                <div className="info border-b py-2 ">
+                  <p className="font-semibold">Title</p>
+                  <p className="text-sm">{titleOfTrack}</p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Primary Artist</p>
+                  <p className="text-sm">
+                    {primaryArtist.length
+                      ? primaryArtist.map((artist, index, array) => (
+                          <span
+                            key={artist._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {artist.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="two w-1/2 ml-3">
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Language</p>
+                  <p className="text-sm">{audioLanguage}</p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Composer</p>
+                  <p className="text-sm">
+                    {composer.length
+                      ? composer.map((artist, index, array) => (
+                          <span
+                            key={artist._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {artist.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="right mt-5">
-            <div className="">
-              <h2 className="text-2xl">Basic Information</h2>
-              <hr />
+          <div className="contributors flex items-center">
+            <div className="name px-5 w-1/6">
+              <h4 className="text-right">Contributors</h4>
+            </div>
 
-              <div className="information flex mt-5">
-                <div className="one w-1/2 mr-3">
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Title</p>
-                    <p className="text-sm">{titleOfTrack}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Type</p>
-                    <p className="text-sm">{trackType ?? "-"}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Genre</p>
-                    <p className="text-sm space-x-1">
-                      {filteredGenre.length
-                        ? filteredGenre.map((genre, index, array) => (
-                            <span
-                              key={genre._id}
-                              className={
-                                index !== array.length - 1
-                                  ? 'after:content-[","]'
-                                  : ""
-                              }
-                            >
-                              {genre.name}
-                            </span>
-                          ))
-                        : "-"}
-                    </p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Performer</p>
-                    <p className="text-sm">{primaryArtist[0]?.name || "-"}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Composer</p>
-                    <p className="text-sm">{composer[0]?.name || "-"}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Featuring</p>
-                    <p className="text-sm">{featuringArtist[0]?.name || "-"}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Explicit</p>
-                    <p className="text-sm">{explicitContent || "-"}</p>
-                  </div>
+            <div className="information flex border-l-2 border-gray-400 px-3 w-full">
+              <div className="one w-1/2 mr-3">
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Lyricist</p>
+                  <p className="text-sm">
+                    {lyricist.length
+                      ? lyricist.map((artist, index, array) => (
+                          <span
+                            key={artist._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {artist.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
                 </div>
 
-                <div className="two w-1/2 ml-3">
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Version</p>
-                    <p className="text-sm">-</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">ISRC</p>
-                    <p className="text-sm">{isrc}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Language</p>
-                    <p className="text-sm">{audioLanguage}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Lyricist</p>
-                    <p className="text-sm">{lyricist[0]?.name || "-"}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Arranger</p>
-                    <p className="text-sm">-</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Producer</p>
-                    <p className="text-sm">{producer[0]?.name || "-"}</p>
-                  </div>
-
-                  <div className="info border-b py-2">
-                    <p className="font-semibold">Catalogue Number</p>
-                    <p className="text-sm">{catalogNumber}</p>
-                  </div>
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Producer</p>
+                  <p className="text-sm">
+                    {producer.length
+                      ? producer.map((artist, index, array) => (
+                          <span
+                            key={artist._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {artist.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
                 </div>
+              </div>
+
+              <div className="two w-1/2 ml-3">
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Mixer</p>
+                  <p className="text-sm">
+                    {mixer.length
+                      ? mixer.map((artist, index, array) => (
+                          <span
+                            key={artist._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {artist.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Arranger</p>
+                  <p className="text-sm">
+                    {arranger.length
+                      ? arranger.map((artist, index, array) => (
+                          <span
+                            key={artist._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {artist.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="technical flex items-center">
+            <div className="name px-5 w-1/6">
+              <h4 className="text-right">Technical</h4>
+            </div>
+
+            <div className="information flex border-l-2 border-gray-400 px-3 w-full">
+              <div className="one w-1/2 mr-3">
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Genre</p>
+                  <p className="text-sm space-x-1">
+                    {filteredGenre.length
+                      ? filteredGenre.map((genre, index, array) => (
+                          <span
+                            key={genre._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {genre.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Mix</p>
+                  <p className="text-sm">-</p>
+                </div>
+              </div>
+
+              <div className="two w-1/2 ml-3">
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Mood</p>
+                  <p className="text-sm">
+                    {trackMood.length
+                      ? trackMood.map((artist, index, array) => (
+                          <span
+                            key={artist._id}
+                            className={
+                              index !== array.length - 1
+                                ? 'after:content-[","]'
+                                : ""
+                            }
+                          >
+                            {artist.name}
+                          </span>
+                        ))
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Duration</p>
+                  <p className="text-sm">{duration}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="metadata flex items-center">
+            <div className="name px-5 w-1/6">
+              <h4 className="text-right">Metadata</h4>
+            </div>
+
+            <div className="information flex border-l-2 border-gray-400 px-3 w-full">
+              <div className="one w-1/2 mr-3">
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Release Date</p>
+                  <p className="text-sm">
+                    {format(originalReleaseDate, "dd-MMMM-yyyy")}
+                  </p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Version</p>
+                  <p className="text-sm">{version ?? "-"}</p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">P Line</p>
+                  <p className="text-sm">
+                    {pLine}, {pLineYear}
+                  </p>
+                </div>
+              </div>
+
+              <div className="two w-1/2 ml-3">
+                <div className="info border-b py-2">
+                  <p className="font-semibold">Label</p>
+                  <p className="text-sm">{recordLabel}</p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">ISRC</p>
+                  <p className="text-sm">{isrc}</p>
+                </div>
+
+                <div className="info border-b py-2">
+                  <p className="font-semibold">C Line</p>
+                  <p className="text-sm">
+                    {cLine}, {cLineYear}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="others flex items-center">
+            <div className="name px-5 w-1/6">
+              <h4 className="text-right">Others</h4>
+            </div>
+
+            <div className="information border-l-2 border-gray-400 px-3 w-full">
+              <div className="lyrics flex">
+                <p className="font-semibold w-[100px]">Lyrics</p>
+                <button
+                  type="button"
+                  className="bg-gray-400 rounded-full px-3 text-white mx-3"
+                >
+                  View
+                </button>
+
+                <button
+                  type="button"
+                  className="bg-gray-400 rounded-full px-3 text-white"
+                >
+                  Download
+                </button>
+              </div>
+
+              <div className="contracts flex mt-5">
+                <p className="font-semibold w-[100px]">Contracts</p>
+                <button
+                  type="button"
+                  className="bg-gray-400 rounded-full px-3 text-white mx-3"
+                >
+                  View
+                </button>
+
+                <button
+                  type="button"
+                  className="bg-gray-400 rounded-full px-3 text-white"
+                >
+                  Download
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <Footer />
-    </>
+    </Layout>
   );
 };
 
