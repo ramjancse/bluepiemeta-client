@@ -96,6 +96,15 @@ const schema = yup
           })
         ),
     }),
+    mixer: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .required("Mixer name is required")
+          .min(3, "Mixer name must be at least 3 characters"),
+      })
+    ),
     audioLanguage: yup
       .string()
       .trim()
@@ -113,7 +122,7 @@ const schema = yup
         ],
         "Language must be select between fields"
       ),
-    mood: yup.array().of(
+    trackMood: yup.array().of(
       yup.object({
         name: yup
           .string()
@@ -127,6 +136,17 @@ const schema = yup
           .oneOf([true, false], "Status can only true or false"),
       })
     ),
+    mix: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .required("Mix is required")
+          .min(2, "Mix must be at least 2 character"),
+      })
+    ),
+    minute: yup.string().trim().required("Minute is required"),
+    second: yup.string().trim().required("Second is required"),
     trackGenre: yup.array().of(
       yup.object({
         name: yup
@@ -150,6 +170,11 @@ const schema = yup
           .oneOf([true, false], "Status can only true or false"),
       })
     ),
+    tags: yup.array().of(
+      yup.object({
+        name: yup.string().trim().required("Tags is required"),
+      })
+    ),
     // instruments: yup
     //   .string()
     //   .trim()
@@ -164,52 +189,45 @@ const schema = yup
     // .trim()
     // .required("UPC is required")
     // .min(3, "UPC must be at least 3 character"),
-    mix: yup
-      .string()
-      .trim()
-      .required("Mix is required")
-      .min(2, "Mix must be at least 2 character"),
-    minute: yup.string().trim().required("Minute is required"),
-    second: yup.string().trim().required("Second is required"),
-    tags: yup.string().trim().required("Tags is required"),
-    releaseDate: yup
-      .string()
-      .trim()
-      .required("Release date is required")
-      .min(3, "Release date must be at least 3 character"),
-    label: yup
-      .string()
-      .trim()
-      .required("Label is required")
-      .min(3, "Label must be at least 3 character"),
-    cLine: yup
-      .string()
-      .trim()
-      .required("C Line is required")
-      .min(3, "C Line must be at least 3 character"),
-    cLineYear: yup
-      .string()
-      .trim()
-      .required("C Line Year is required")
-      .min(3, "C Line Year must be at least 3 character"),
-    pLine: yup
-      .string()
-      .trim()
-      .required("P Line is required")
-      .min(3, "P Line must be at least 3 character"),
-    pLineYear: yup
-      .string()
-      .trim()
-      .required("P Line Year is required")
-      .min(3, "P Line Year must be at least 3 character"),
+
+    // releaseDate: yup
+    //   .string()
+    //   .trim()
+    //   .required("Release date is required")
+    //   .min(3, "Release date must be at least 3 character"),
+    // label: yup
+    //   .string()
+    //   .trim()
+    //   .required("Label is required")
+    //   .min(3, "Label must be at least 3 character"),
+    // cLine: yup
+    //   .string()
+    //   .trim()
+    //   .required("C Line is required")
+    //   .min(3, "C Line must be at least 3 character"),
+    // cLineYear: yup
+    //   .string()
+    //   .trim()
+    //   .required("C Line Year is required")
+    //   .min(3, "C Line Year must be at least 3 character"),
+    // pLine: yup
+    //   .string()
+    //   .trim()
+    //   .required("P Line is required")
+    //   .min(3, "P Line must be at least 3 character"),
+    // pLineYear: yup
+    //   .string()
+    //   .trim()
+    //   .required("P Line Year is required")
+    //   .min(3, "P Line Year must be at least 3 character"),
+
+    version: yup.string().trim().required("Track version is required"),
     isrc: yup
       .string()
       .trim()
       .required("ISRC is required")
       .min(3, "ISRC must be at least 3 character"),
     lyrics: yup.string().trim().required("Lyrics is required"),
-    mixer: yup.string().trim().required("Mixer is required"),
-    trackVersion: yup.string().trim().required("Track version is required"),
   })
   .transform((originalValue, originalObject) => {
     const { minute, second } = originalObject;
@@ -253,28 +271,43 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     resolver: yupResolver(schema),
     defaultValues: {
       audioFile: "",
-      version: "",
       arranger: [{ name: "" }],
       featuringArtist: [{ name: "" }],
+      trackLinks: [{ name: "", link: "" }],
+      rating: 5,
+      contract: "",
       explicit: "Not explicit",
-      catalogNumber: "CDTRAX210",
-      titleOfTrack: "This is track title",
-      metadataLanguage: "English",
-      primaryArtist: [{ name: "webkawsar" }],
-      composer: [{ name: "Kawsar Ahmed" }],
-      lyricist: [{ name: "Kawsar Ahmed" }],
-      producer: [{ name: "Ramjan Ali" }],
-      trackType: "lyrical",
-      audioLanguage: "English",
-      mood: [
-        { name: "Sad", status: false },
+      complianceRight: true,
+      videoRights: true,
+      audioRights: true,
+      promoRights: true,
+      catalogNumber: "ABC-123-456",
+
+      titleOfTrack: "",
+      metadataLanguage: "",
+      primaryArtist: [{ name: "" }],
+      composer: [{ name: "" }],
+      trackType: "",
+      lyricist: [{ name: "" }],
+      producer: [{ name: "" }],
+      mixer: [{ name: "" }],
+      audioLanguage: "",
+      trackMood: [
+        { name: "Sad", status: true },
         { name: "Angry", status: false },
         { name: "Emotional", status: false },
         { name: "Peaceful", status: false },
         { name: "Romantic", status: false },
       ],
+      mix: [
+        {
+          name: "",
+        },
+      ],
+      minute: "",
+      second: "",
       trackGenre: [
-        { name: "Indie", status: false },
+        { name: "Indie", status: true },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
@@ -283,20 +316,10 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
         { name: "Band", status: false },
         { name: "Group", status: false },
       ],
-      mix: "topHitMix",
-      minute: "10",
-      second: "50",
-      tags: "JS,React, Node.js",
-      releaseDate: new Date(),
-      label: "Blue Pie Records",
-      cLine: "123",
-      cLineYear: new Date(),
-      pLine: "456",
-      pLineYear: new Date(),
-      isrc: "123456",
-      lyrics: "lorem ipsum dummy text lyrics",
-      trackVersion: "v1",
-      mixer: "topHitMix",
+      tags: [{ name: "" }],
+      version: "",
+      isrc: "",
+      lyrics: "",
     },
   });
 
@@ -337,7 +360,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     append: moodAppend,
     remove: moodRemove,
   } = useFieldArray({
-    name: "mood",
+    name: "trackMood",
     control,
   });
 
@@ -350,7 +373,36 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     control,
   });
 
+  const {
+    fields: mixerFields,
+    append: mixerAppend,
+    remove: mixerRemove,
+  } = useFieldArray({
+    name: "mixer",
+    control,
+  });
+
+  const {
+    fields: tagsFields,
+    append: tagsAppend,
+    remove: tagsRemove,
+  } = useFieldArray({
+    name: "tags",
+    control,
+  });
+
+  const {
+    fields: mixFields,
+    append: mixAppend,
+    remove: mixRemove,
+  } = useFieldArray({
+    name: "mix",
+    control,
+  });
+
   const onSubmit = async (data) => {
+    console.log(data, "track submitted data");
+
     // submitted data to parent
     onSubmitTrack(data);
 
@@ -372,15 +424,13 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
   return (
     <>
       <Header name="Add Track" />
-      {/* px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 xl:px-20 xl:py-10 */}
-      <main className="px-4 py-2">
+      <main className="px-4 py-2 border-l border-b">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="asset mt-4">
             <h2 className="text-2xl">Asset</h2>
 
-            {/* px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 xl:py-10 */}
             <div className="input-area mt-2 border-2 px-4 py-3">
-              <div className="input flex flex-col">
+              {/* <div className="input flex flex-col">
                 <label htmlFor="music" className="cursor-pointer">
                   File Upload
                 </label>
@@ -400,15 +450,18 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   <span className="text-red-600 font-bold">***</span>Please
                   upload audio file in WAV format.
                 </p>
-              </div>
+              </div> */}
 
-              <div className="input mt-4">
-                <label htmlFor="title" className="cursor-pointer">
-                  Title
-                </label>
-
+              <div className="input">
                 <div className="flex flex-col sm:flex-row">
                   <div className="w-full sm:w-1/2 sm:mr-3">
+                    <label
+                      htmlFor="title"
+                      className="cursor-pointer select-none"
+                    >
+                      Title
+                    </label>
+
                     <input
                       type="text"
                       name="title"
@@ -428,6 +481,13 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   </div>
 
                   <div className="w-full sm:w-1/2">
+                    <label
+                      htmlFor="metadataLanguage"
+                      className="cursor-pointer select-none"
+                    >
+                      Metadata language
+                    </label>
+
                     <select
                       name="metadataLanguage"
                       id="metadataLanguage"
@@ -543,7 +603,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                           name={`composer[${index}].name`}
                           id={`composer[${index}].name`}
                           className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          placeholder="Composer"
+                          placeholder="Type composer name"
                           {...register(`composer.${index}.name`)}
                         />
 
@@ -577,7 +637,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                 </div>
               </div>
 
-              <div className="top mt-2">
+              <div className="bottom mt-2">
                 <div className="flex">
                   <div className="left">
                     <div className="">
@@ -588,6 +648,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                         className="mr-1"
                         value="lyrical"
                         {...register("trackType")}
+                        defaultChecked
                       />
                       <label
                         htmlFor="lyrical"
@@ -647,7 +708,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                         name={`lyricist[${index}].name`}
                         id={`lyricist[${index}].name`}
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        placeholder="Lyricist"
+                        placeholder="Type lyricist name"
                         {...register(`lyricist.${index}.name`)}
                       />
 
@@ -692,7 +753,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                         name={`producer[${index}].name`}
                         id={`producer[${index}].name`}
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        placeholder="Producer"
+                        placeholder="Type producer name"
                         {...register(`producer.${index}.name`)}
                       />
 
@@ -730,25 +791,44 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                 </label>
 
                 <div className="">
-                  <select
-                    name="mixer"
-                    id="mixer"
-                    className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                    {...register("mixer")}
-                  >
-                    <option value="">Select Mixer</option>
-                    <option value="indieRockMix">Indie Rock Mix</option>
-                    <option value="topHitMix">Top Hits Mix</option>
-                    <option value="chillMix">Chill Mix</option>
-                  </select>
+                  {mixerFields.map((field, index) => (
+                    <div key={field.id}>
+                      <div className="flex items-center">
+                        <input
+                          type="text"
+                          name={`mixer[${index}].name`}
+                          id={`mixer[${index}].name`}
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register(`mixer.${index}.name`)}
+                          placeholder="Type mixer name"
+                        />
 
-                  <p
-                    className={`${
-                      errors.mixer?.message ? "block" : "hidden"
-                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                  >
-                    {errors.mixer?.message}
-                  </p>
+                        {index < 1 && (
+                          <FaCirclePlus
+                            onClick={() => mixerAppend({ name: "" })}
+                            className="ml-2 text-blue-700 text-xl cursor-pointer"
+                          />
+                        )}
+
+                        {index > 0 && (
+                          <IoIosCloseCircle
+                            onClick={() => mixerRemove(index)}
+                            className="ml-1 text-red-500 text-2xl cursor-pointer"
+                          />
+                        )}
+                      </div>
+
+                      <p
+                        className={`${
+                          errors.mixer && errors.mixer[index]?.name
+                            ? "block"
+                            : "hidden"
+                        } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                      >
+                        {errors.mixer && errors.mixer[index]?.name?.message}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -798,25 +878,44 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                     </label>
 
                     <div className="">
-                      <select
-                        name="mix"
-                        id="mix"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("mix")}
-                      >
-                        <option value="">Select Mix</option>
-                        <option value="indieRockMix">Indie Rock Mix</option>
-                        <option value="topHitMix">Top Hits Mix</option>
-                        <option value="chillMix">Chill Mix</option>
-                      </select>
+                      {mixFields.map((field, index) => (
+                        <div key={field.id}>
+                          <div className="flex items-center">
+                            <input
+                              type="text"
+                              name={`mix[${index}].name`}
+                              id={`mix[${index}].name`}
+                              className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                              {...register(`mix.${index}.name`)}
+                              placeholder="Type here"
+                            />
 
-                      <p
-                        className={`${
-                          errors.mix?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.mix?.message}
-                      </p>
+                            {index < 1 && (
+                              <FaCirclePlus
+                                onClick={() => mixAppend({ name: "" })}
+                                className="ml-2 text-blue-700 text-xl cursor-pointer"
+                              />
+                            )}
+
+                            {index > 0 && (
+                              <IoIosCloseCircle
+                                onClick={() => mixRemove(index)}
+                                className="ml-1 text-red-500 text-2xl cursor-pointer"
+                              />
+                            )}
+                          </div>
+
+                          <p
+                            className={`${
+                              errors.mix && errors.mix[index]?.name
+                                ? "block"
+                                : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                          >
+                            {errors.mix && errors.mix[index]?.name?.message}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -893,24 +992,44 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       Tags
                     </label>
 
-                    <div className="">
-                      <input
-                        type="text"
-                        name="tags"
-                        id="tags"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("tags")}
-                        placeholder="Tags"
-                      />
+                    {tagsFields.map((field, index) => (
+                      <div key={field.id}>
+                        <div className="flex items-center">
+                          <input
+                            type="text"
+                            name={`tags[${index}].name`}
+                            id={`tags[${index}].name`}
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            {...register(`tags.${index}.name`)}
+                            placeholder="Type tag"
+                          />
 
-                      <p
-                        className={`${
-                          errors.tags?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.tags?.message}
-                      </p>
-                    </div>
+                          {index < 1 && (
+                            <FaCirclePlus
+                              onClick={() => tagsAppend({ name: "" })}
+                              className="ml-2 text-blue-700 text-xl cursor-pointer"
+                            />
+                          )}
+
+                          {index > 0 && (
+                            <IoIosCloseCircle
+                              onClick={() => tagsRemove(index)}
+                              className="ml-1 text-red-500 text-2xl cursor-pointer"
+                            />
+                          )}
+                        </div>
+
+                        <p
+                          className={`${
+                            errors.tags && errors.tags[index]?.name
+                              ? "block"
+                              : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                        >
+                          {errors.tags && errors.tags[index]?.name?.message}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -924,14 +1043,14 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                         <div className="pl-3 py-1 w-1/4" key={field.id}>
                           <input
                             type="checkbox"
-                            name={`mood[${index}].name`}
-                            id={`mood[${index}].name`}
-                            {...register(`mood.${index}.status`)}
+                            name={`trackMood[${index}].name`}
+                            id={`trackMood[${index}].name`}
+                            {...register(`trackMood.${index}.status`)}
                             className="cursor-pointer"
                           />
 
                           <label
-                            htmlFor={`mood[${index}].name`}
+                            htmlFor={`trackMood[${index}].name`}
                             className="ml-1 cursor-pointer select-none text-sm"
                           >
                             {field.name}
@@ -1094,8 +1213,8 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
           <div className="metadata mt-5">
             <h2 className="text-2xl">Metadata</h2>
 
-            <div className="input-area border-2 mt-1 grid grid-cols-12 grid-rows-2 gap-3 px-4 py-3">
-              <div className="input col-start-1 col-end-13 sm:col-end-7">
+            <div className="input-area border-2 mt-1 grid grid-cols-12 grid-rows-1 gap-3 px-4 py-3">
+              {/* <div className="input col-start-1 col-end-13 sm:col-end-7">
                 <label
                   htmlFor="releaseDate"
                   className="cursor-pointer select-none inline-block mb-1"
@@ -1287,7 +1406,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                 >
                   {errors.pLineYear?.message}
                 </p>
-              </div>
+              </div> */}
 
               {/* <div className="input col-start-1 col-end-13 sm:col-end-7">
               <label htmlFor="upc" className="cursor-pointer select-none">
@@ -1318,19 +1437,19 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
                 <input
                   type="text"
-                  name="trackVersion"
-                  id="trackVersion"
+                  name="version"
+                  id="version"
                   className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                  {...register("trackVersion")}
+                  {...register("version")}
                   placeholder="Track version"
                 />
 
                 <p
                   className={`${
-                    errors.trackVersion?.message ? "block" : "hidden"
+                    errors.version?.message ? "block" : "hidden"
                   } text-sm text-red-500 font-semibold mt-1 ml-5`}
                 >
-                  {errors.trackVersion?.message}
+                  {errors.version?.message}
                 </p>
               </div>
 

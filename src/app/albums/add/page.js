@@ -17,15 +17,10 @@ import { getAllArtists } from "@/lib/artist";
 import { getAllLabel } from "@/lib/albums";
 import Layout from "@/components/dashboard/Layout";
 import Header from "@/components/dashboard/Header";
-import Footer from "@/components/dashboard/Footer";
+import { revalidatePath } from "next/cache";
 
 const schema = yup
   .object({
-    // albumCover: yup.mixed(),
-    // .required("Album cover picture is require")
-    // .test("fileSize", "The file size is too large", (value) => {
-    //   return value && value[0].size <= 1000000;
-    // }),
     albumType: yup.string().trim().required("Album type is required"),
     albumName: yup
       .string()
@@ -35,8 +30,8 @@ const schema = yup
     metadataLanguage: yup
       .string()
       .trim()
-      .required("Album title language is required")
-      .min(2, "Album title language must be at least 2 character")
+      .required("Metadata language is required")
+      .min(2, "Metadata language must be at least 2 character")
       .oneOf(
         [
           "English",
@@ -49,6 +44,7 @@ const schema = yup
         ],
         "Language must be select between fields"
       ),
+    albumCover: yup.string().required("Album cover picture link is required"),
     primaryArtist: yup.array().of(
       yup.object({
         name: yup
@@ -108,7 +104,7 @@ const schema = yup
       .trim()
       .required("Release date is required")
       .min(3, "Release date must be at least 3 character"),
-    label: yup
+    recordLabel: yup
       .string()
       .trim()
       .required("Label is required")
@@ -174,16 +170,16 @@ const AddAlbumPage = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      albumCover: "",
-      recordLabel: "",
+      status: "Draft",
       artistId: "",
       userId: session?.data?.user?.id,
-      status: "draft",
-      albumType: "Single",
-      albumName: "This is album title",
-      metadataLanguage: "English",
+      albumType: "",
+      albumName: "",
+      metadataLanguage: "",
+      albumCover: "",
       primaryArtist: [{ name: "" }],
       featuringArtist: [{ name: "" }],
+      trackType: "",
       albumGenre: [
         { name: "Indie", status: true },
         { name: "Singer", status: false },
@@ -194,14 +190,14 @@ const AddAlbumPage = () => {
         { name: "Band", status: false },
         { name: "Group", status: false },
       ],
-      audioLanguage: "English",
+      audioLanguage: "",
       originalReleaseDate: new Date(),
-      label: "Blue Pie Records",
-      cLine: "This is cLine text",
+      recordLabel: "",
+      upcean: "",
+      cLine: "",
       cLineYear: new Date(),
-      pLine: "This is p Line text",
+      pLine: "",
       pLineYear: new Date(),
-      upcean: "This is upc text",
       tracks: [],
     },
   });
@@ -270,9 +266,7 @@ const AddAlbumPage = () => {
   };
 
   const onSubmit = async (data) => {
-    // const formData = new FormData();
-    // formData.append("file", data.albumCover[0]);
-    // formData.append("data", data);
+    console.log(data, "album submitted data");
 
     try {
       await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
@@ -299,8 +293,7 @@ const AddAlbumPage = () => {
 
   const loadData = async () => {
     const { data } = await getAllArtists();
-    // const res = await getAllLabel();
-    // console.log(res, "res");
+    const { data: allLabels } = await getAllLabel();
 
     // get local storage data
     const savedTracks = JSON.parse(localStorage.getItem("tracks"));
@@ -311,6 +304,7 @@ const AddAlbumPage = () => {
     }
 
     setPrimaryArtists(data);
+    setLabels(allLabels);
   };
 
   const handleDelete = (trackId) => {
@@ -337,14 +331,13 @@ const AddAlbumPage = () => {
       ) : (
         <>
           <Header name="Add Album" />
-          {/* px-3 py-2 xs:px-5 xs:py-3 md:px-10 md:py-5 lg:px-14 lg:py-7 xl:px-20 xl:py-10 */}
-          <main className="px-4 py-3">
+          <main className="px-4 py-3 border-l border-b">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="album">
                 <div className="asset">
                   <h2 className="text-2xl">Album</h2>
 
-                  <div className="input-area mt-2 border-2 flex flex-col lg:flex-row lg:justify-between lg:items-center px-4 py-3">
+                  {/* <div className="input-area mt-2 border-2 flex flex-col lg:flex-row lg:justify-between lg:items-center px-4 py-3">
                     <div className="left lg:w-1/2">
                       <h3>Type</h3>
                       <hr />
@@ -481,6 +474,149 @@ const AddAlbumPage = () => {
                       >
                         {errors.albumCover?.message}
                       </p>
+                    </div>
+                  </div> */}
+
+                  <div className="input-section mt-2 border-2 px-4 py-3">
+                    <div className="top">
+                      <h3>Type</h3>
+                      <hr />
+
+                      <div className="top mt-2 mb-4">
+                        <div className="flex">
+                          <div className="left">
+                            <input
+                              type="radio"
+                              name="albumType"
+                              id="albumEpisode"
+                              className="mr-1"
+                              value="Album"
+                              {...register("albumType")}
+                              defaultChecked
+                            />
+                            <label
+                              htmlFor="albumEpisode"
+                              className="cursor-pointer select-none"
+                            >
+                              Album/Episode
+                            </label>
+                          </div>
+
+                          <div className="right flex items-center">
+                            <input
+                              type="radio"
+                              name="albumType"
+                              id="single"
+                              className="ml-5 mr-1"
+                              value="Single"
+                              {...register("albumType")}
+                            />
+                            <label
+                              htmlFor="single"
+                              className="cursor-pointer select-none"
+                            >
+                              Single
+                            </label>
+                          </div>
+                        </div>
+
+                        <p
+                          className={`${
+                            errors.type?.message ? "block" : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.type?.message}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="input-area flex flex-wrap">
+                      <div className="input w-1/2 pr-2">
+                        <label
+                          htmlFor="albumName"
+                          className="cursor-pointer select-none"
+                        >
+                          Album Name
+                        </label>
+
+                        <input
+                          type="text"
+                          name="albumName"
+                          id="albumName"
+                          placeholder="Album name"
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register("albumName")}
+                        />
+
+                        <p
+                          className={`${
+                            errors.albumName?.message ? "block" : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.albumName?.message}
+                        </p>
+                      </div>
+
+                      <div className="input w-1/2 pl-2">
+                        <label
+                          htmlFor="metadataLanguage"
+                          className="cursor-pointer select-none"
+                        >
+                          Metadata Language
+                        </label>
+
+                        <select
+                          name="metadataLanguage"
+                          id="metadataLanguage"
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register("metadataLanguage")}
+                        >
+                          <option value="">Select language</option>
+                          <option value="English">English</option>
+                          <option value="Spanish">Spanish</option>
+                          <option value="French">French</option>
+                          <option value="German">German</option>
+                          <option value="Chinese">Chinese</option>
+                          <option value="Japanese">Japanese</option>
+                          <option value="Other">Other</option>
+                        </select>
+
+                        <p
+                          className={`${
+                            errors.metadataLanguage?.message
+                              ? "block"
+                              : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.metadataLanguage?.message}
+                        </p>
+                      </div>
+
+                      <div className="input w-1/2 pr-2 mt-3">
+                        <label
+                          htmlFor="albumCover"
+                          className="cursor-pointer select-none"
+                        >
+                          Cover image link
+                        </label>
+
+                        <input
+                          type="text"
+                          name="albumCover"
+                          id="albumCover"
+                          placeholder="Album cover image link"
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register("albumCover")}
+                        />
+
+                        <p
+                          className={`${
+                            errors.albumCover?.message ? "block" : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.albumCover?.message}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -784,33 +920,32 @@ const AddAlbumPage = () => {
 
                       <div className="input col-start-1 col-end-13 sm:col-end-7">
                         <label
-                          htmlFor="label"
+                          htmlFor="recordLabel"
                           className="cursor-pointer select-none"
                         >
                           Label
                         </label>
 
                         <select
-                          name="label"
-                          id="label"
+                          name="recordLabel"
+                          id="recordLabel"
                           className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("label")}
+                          {...register("recordLabel")}
                         >
                           <option value="">Select label</option>
-                          <option value="bpr">Blue Pie Records</option>
                           {labels.map((label) => (
-                            <option value="" key={label.id}>
-                              Blue Pie Records
+                            <option value={label.labelName} key={label.id}>
+                              {label.labelName}
                             </option>
                           ))}
                         </select>
 
                         <p
                           className={`${
-                            errors.label?.message ? "block" : "hidden"
+                            errors.recordLabel?.message ? "block" : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5`}
                         >
-                          {errors.label?.message}
+                          {errors.recordLabel?.message}
                         </p>
                       </div>
 
