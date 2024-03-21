@@ -266,10 +266,12 @@ const AddAlbumPage = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data, "album submitted data");
-
     try {
-      await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+      const {
+        data: {
+          links: { self },
+        },
+      } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
 
       // show success message
       toast.success("Album added successfully");
@@ -278,7 +280,7 @@ const AddAlbumPage = () => {
       localStorage.removeItem("tracks");
 
       // redirect to another route
-      router.push("/albums");
+      router.push(self);
     } catch (error) {
       console.log(error, "error in add album page");
 

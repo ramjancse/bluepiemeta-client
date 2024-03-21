@@ -401,8 +401,6 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
   });
 
   const onSubmit = async (data) => {
-    console.log(data, "track submitted data");
-
     // submitted data to parent
     onSubmitTrack(data);
 
