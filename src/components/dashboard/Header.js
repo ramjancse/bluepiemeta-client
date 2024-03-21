@@ -7,11 +7,11 @@ import Link from "next/link";
 
 const Header = ({ name = "Dashboard" }) => {
   return (
-    <div className="flex justify-between border-b px-4 py-6">
+    <div className="flex justify-between border-b pr-4 py-6">
       <div className="left">
         <div className="flex items-center">
           <Link href="/">
-            <HiBars3BottomLeft className="text-blue-600 text-[40px]" />
+            <HiBars3BottomLeft className="text-blue-600 text-[40px] -ml-[5px]" />
           </Link>
 
           <h3 className="font-semibold ml-2">{name}</h3>
