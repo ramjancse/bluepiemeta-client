@@ -55,6 +55,20 @@ const menus = [
     icon: ArtistIcon,
     children: [],
   },
+  {
+    id: 5,
+    name: "Label",
+    link: "/label",
+    icon: DashboardIcon,
+    children: [],
+  },
+  {
+    id: 6,
+    name: "Logs",
+    link: "/logs",
+    icon: DashboardIcon,
+    children: [],
+  },
 ];
 
 const Sidebar = () => {

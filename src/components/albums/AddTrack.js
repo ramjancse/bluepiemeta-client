@@ -228,6 +228,18 @@ const schema = yup
       .required("ISRC is required")
       .min(3, "ISRC must be at least 3 character"),
     lyrics: yup.string().trim().required("Lyrics is required"),
+    complianceRight: yup
+      .boolean()
+      .oneOf([true, false], "Compilation Rights can only true or false"),
+    videoRights: yup
+      .boolean()
+      .oneOf([true, false], "Video Rights can only true or false"),
+    audioRights: yup
+      .boolean()
+      .oneOf([true, false], "Audio Rights can only true or false"),
+    promoRights: yup
+      .boolean()
+      .oneOf([true, false], "Promo Rights can only true or false"),
   })
   .transform((originalValue, originalObject) => {
     const { minute, second } = originalObject;
@@ -1536,88 +1548,80 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   />
                 </div>
 
-                <div className="compilationRights flex flex-col mt-5 lg:flex-row">
-                  <button className="border-2 py-1 text-center text-sm my-2 lg:w-[200px]">
-                    Compilation Rights
-                  </button>
+                <div className="legals mt-5">
+                  <div className="inputs border border-gray-200 px-2 py-2 flex flex-wrap items-center">
+                    <div className="pl-3 py-1 w-1/2">
+                      <input
+                        type="checkbox"
+                        name="complianceRight"
+                        id="complianceRight"
+                        {...register(`complianceRight`)}
+                        className="cursor-pointer"
+                        defaultChecked
+                      />
 
-                  <label
-                    className="bg-gray-200 py-[6px] items-center rounded-full cursor-pointer flex justify-center lg:m-auto lg:w-[250px]"
-                    htmlFor="compilationRights"
-                  >
-                    <FaUpload className="text-blue-700" />
-                    <span className="ml-3 text-sm ">Click to upload</span>
-                  </label>
+                      <label
+                        htmlFor="complianceRight"
+                        className="ml-1 cursor-pointer select-none text-sm"
+                      >
+                        Compilation Rights
+                      </label>
+                    </div>
 
-                  <input
-                    className="hidden"
-                    type="file"
-                    name="compilationRights"
-                    id="compilationRights"
-                  />
-                </div>
+                    <div className="pl-3 py-1 w-1/2">
+                      <input
+                        type="checkbox"
+                        name="videoRights"
+                        id="videoRights"
+                        {...register(`videoRights`)}
+                        className="cursor-pointer"
+                        defaultChecked
+                      />
 
-                <div className="videoRights flex flex-col mt-5 lg:flex-row">
-                  <button className="border-2 py-1 text-center text-sm my-2 lg:w-[200px]">
-                    Video Rights
-                  </button>
+                      <label
+                        htmlFor="videoRights"
+                        className="ml-1 cursor-pointer select-none text-sm"
+                      >
+                        Video Rights
+                      </label>
+                    </div>
 
-                  <label
-                    className="bg-gray-200 py-[6px] items-center rounded-full cursor-pointer flex justify-center lg:m-auto lg:w-[250px]"
-                    htmlFor="videoRights"
-                  >
-                    <FaUpload className="text-blue-700" />
-                    <span className="ml-3 text-sm ">Click to upload</span>
-                  </label>
+                    <div className="pl-3 py-1 w-1/2">
+                      <input
+                        type="checkbox"
+                        name="audioRights"
+                        id="audioRights"
+                        {...register(`audioRights`)}
+                        className="cursor-pointer"
+                        defaultChecked
+                      />
 
-                  <input
-                    className="hidden"
-                    type="file"
-                    name="videoRights"
-                    id="videoRights"
-                  />
-                </div>
+                      <label
+                        htmlFor="audioRights"
+                        className="ml-1 cursor-pointer select-none text-sm"
+                      >
+                        Audio Rights
+                      </label>
+                    </div>
 
-                <div className="audioRights flex flex-col mt-5 lg:flex-row">
-                  <button className="border-2 py-1 text-center text-sm my-2 lg:w-[200px]">
-                    Audio Rights
-                  </button>
+                    <div className="pl-3 py-1 w-1/2">
+                      <input
+                        type="checkbox"
+                        name="promoRights"
+                        id="promoRights"
+                        {...register(`promoRights`)}
+                        className="cursor-pointer"
+                        defaultChecked
+                      />
 
-                  <label
-                    className="bg-gray-200 py-[6px] items-center rounded-full cursor-pointer flex justify-center lg:m-auto lg:w-[250px]"
-                    htmlFor="audioRights"
-                  >
-                    <FaUpload className="text-blue-700" />
-                    <span className="ml-3 text-sm ">Click to upload</span>
-                  </label>
-
-                  <input
-                    className="hidden"
-                    type="file"
-                    name="audioRights"
-                    id="audioRights"
-                  />
-                </div>
-
-                <div className="promoRights flex flex-col mt-5 lg:flex-row">
-                  <button className="border-2 py-1 text-center text-sm my-2 lg:w-[200px]">
-                    Promo Rights
-                  </button>
-
-                  <label
-                    className="bg-gray-200 py-[6px] items-center rounded-full cursor-pointer flex justify-center lg:m-auto lg:w-[250px]"
-                    htmlFor="promoRights"
-                  >
-                    <FaUpload className="text-blue-700" />
-                    <span className="ml-3 text-sm ">Click to upload</span>
-                  </label>
-
-                  <input
-                    className="hidden"
-                    type="file"
-                    name="promoRights"
-                    id="promoRights"
-                  />
+                      <label
+                        htmlFor="promoRights"
+                        className="ml-1 cursor-pointer select-none text-sm"
+                      >
+                        Promo Rights
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

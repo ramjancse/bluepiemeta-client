@@ -266,6 +266,7 @@ const AddAlbumPage = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log(data, "data");
     try {
       const {
         data: {
