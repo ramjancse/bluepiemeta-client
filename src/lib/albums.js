@@ -32,7 +32,7 @@ export const getAllLabel = async () => {
     const res = await fetch(`${BASE_URL}/api/v1/labels`, {
       cache: "no-store",
     });
-    // console.log(res, "res in api");
+
     const data = await res.json();
     return data;
   } catch (error) {
