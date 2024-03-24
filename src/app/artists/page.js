@@ -2,12 +2,15 @@ import Footer from "@/components/artist/Footer";
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAllArtists } from "@/lib/artist";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 
 const page = async () => {
-  const { data: artists = [] } = await getAllArtists();
+  const session = await getServerSession(authOptions);
+  const { data: artists = [] } = await getAllArtists(session?.jwt);
 
   return (
     <Layout>
