@@ -1,13 +1,16 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAlbumById } from "@/lib/albums";
 import { format } from "date-fns";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const page = async ({ params: { albumId, trackId } }) => {
+  const session = await getServerSession(authOptions);
   const {
     _id,
     albumCover,
@@ -27,7 +30,7 @@ const page = async ({ params: { albumId, trackId } }) => {
     upcean,
     updatedAt,
     createdAt,
-  } = await getAlbumById(albumId);
+  } = await getAlbumById({ token: session?.jwt, albumId });
 
   const foundTrack = tracks?.find((track) => track._id === trackId);
 

@@ -15,11 +15,13 @@ const Label = () => {
   const session = useSession();
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (session?.data?.jwt) {
+      loadData(session?.data?.jwt);
+    }
+  }, [session]);
 
-  const loadData = async () => {
-    const { data } = await getAllLabel();
+  const loadData = async (token) => {
+    const { data } = await getAllLabel(token);
     setLabels(data);
   };
 
@@ -39,6 +41,7 @@ const Label = () => {
       toast.error("Something went wrong");
     }
   };
+
   return (
     <Layout>
       <Header name="Label" />

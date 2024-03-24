@@ -1,6 +1,8 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAllArtists, getArtistById } from "@/lib/artist";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -11,6 +13,7 @@ import React from "react";
 // };
 
 const page = async ({ params: { artistId } }) => {
+  const session = await getServerSession(authOptions);
   const {
     artistLinks,
     socialMedia,
@@ -21,7 +24,7 @@ const page = async ({ params: { artistId } }) => {
     nameOfType,
     sex,
     region,
-  } = await getArtistById(artistId);
+  } = await getArtistById({ token: session?.jwt, artistId });
 
   return (
     <>

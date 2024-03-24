@@ -1,12 +1,15 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAlbumById } from "@/lib/albums";
 import { format } from "date-fns";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const page = async ({ params: { albumId } }) => {
+  const session = await getServerSession(authOptions);
   const {
     primaryArtist,
     recordLabel,
@@ -27,7 +30,7 @@ const page = async ({ params: { albumId } }) => {
     cLineYear,
     upcean,
     updatedAt,
-  } = await getAlbumById(albumId);
+  } = await getAlbumById({ token: session?.jwt, albumId });
 
   return (
     <>
@@ -68,7 +71,7 @@ const page = async ({ params: { albumId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Total tracks</p>
-                    <p className="text-sm">{tracks.length}</p>
+                    <p className="text-sm">{tracks?.length}</p>
                   </div>
                 </div>
 

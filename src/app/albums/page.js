@@ -2,12 +2,15 @@ import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAllAlbums } from "@/lib/albums";
 import { format } from "date-fns";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 
 const page = async () => {
-  const { data: albums = [] } = await getAllAlbums();
+  const session = await getServerSession(authOptions);
+  const { data: albums = [] } = await getAllAlbums(session?.jwt);
 
   return (
     <Layout>
