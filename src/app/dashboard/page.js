@@ -13,11 +13,12 @@ import albumImage from "@/assets/images/poster/poster-13.jpg";
 import ChainIcon from "@/assets/images/dashboard/Chain-icon.svg";
 import { getAllAlbums } from "@/lib/albums";
 import DashboardIntro from "@/components/dashboard/DashboardIntro";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 
 const Dashboard = async () => {
-  const { data: albums } = await getAllAlbums();
-
-  // console.log(data, "data");
+  const session = await getServerSession(authOptions);
+  const { data: albums } = await getAllAlbums(session?.jwt);
 
   return (
     <Layout>
