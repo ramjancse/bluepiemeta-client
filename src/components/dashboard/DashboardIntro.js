@@ -256,7 +256,12 @@ const DashboardIntro = ({ albums }) => {
         </Slider>
       </div>
 
-      <div className="albums px-10 py-2 overflow-hidden bg-[#36045D]">
+      <div
+        className="albums px-10 py-2 overflow-hidden bg-[#36045D]"
+        // style={{
+        //   backgroundImage: "radial-gradient(transparent, #36045D)",
+        // }}
+      >
         <h4 className="text-white tracking-wider">Albums</h4>
 
         <div className="py-3 flex items-center justify-center h-[220px]">
@@ -268,8 +273,11 @@ const DashboardIntro = ({ albums }) => {
           </div>
 
           {slides.slice(startIndex, startIndex + 9).map((album, index) => (
-            <div className="single" key={album.id}>
-              <Link href={`/albums/${album.id}`} className="">
+            <div
+              className="single overflow-hidden flex flex-col justify-end"
+              key={album.id}
+            >
+              <Link href={`/albums/${album.id}`} className="block mb-3">
                 <Image
                   src={album.albumCover}
                   alt="Album image"
@@ -279,7 +287,13 @@ const DashboardIntro = ({ albums }) => {
                 />
               </Link>
 
-              {/* <div className="text text-white">{slide?.text}</div> */}
+              <div
+                className={`text text-white text-center duration-700 ${
+                  index === 4 ? "block" : "hidden"
+                }`}
+              >
+                <p>{album.albumName}</p>
+              </div>
             </div>
           ))}
 
