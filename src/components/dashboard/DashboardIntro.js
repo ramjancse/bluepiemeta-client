@@ -259,7 +259,7 @@ const DashboardIntro = ({ albums }) => {
       <div className="albums px-10 py-2 overflow-hidden bg-[#36045D]">
         <h4 className="text-white tracking-wider">Albums</h4>
 
-        <div className="py-3 flex items-center justify-center">
+        <div className="py-3 flex items-center justify-center h-[220px]">
           <div
             className="prev text-white rounded-full ring-1 ring-offset-1 flex items-center justify-center cursor-pointer select-none mr-3 w-7 h-7 p-[10px]"
             onClick={handlePrevClick}
@@ -268,14 +268,14 @@ const DashboardIntro = ({ albums }) => {
           </div>
 
           {slides.slice(startIndex, startIndex + 9).map((album, index) => (
-            <div className="single duration-500" key={album.id}>
+            <div className="single" key={album.id}>
               <Link href={`/albums/${album.id}`} className="">
                 <Image
                   src={album.albumCover}
                   alt="Album image"
                   width={calculateImageSize(index).width}
                   height={calculateImageSize(index).height}
-                  className="rounded-full"
+                  className="rounded-full duration-700"
                 />
               </Link>
 
