@@ -14,16 +14,26 @@ import { toast } from "react-toastify";
 const Label = () => {
   const [labels, setLabels] = useState([]);
   const session = useSession();
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   useEffect(() => {
     if (session?.data?.jwt) {
-      loadData(session?.data?.jwt);
+      loadData(session?.data?.jwt, page);
     }
-  }, [session]);
+  }, [session, page]);
 
-  const loadData = async (token) => {
-    const { data } = await getAllLabel(token);
+  const loadData = async (token, page) => {
+    const result = await getAllLabel({ token, page });
+
+    const {
+      data,
+      pagination: { page: currentPage, totalPage: total },
+    } = result;
+
     setLabels(data);
+    setPage(currentPage);
+    setTotalPage(total);
   };
 
   const handleDelete = async (deleteId) => {
@@ -41,6 +51,10 @@ const Label = () => {
       console.log(error, "error");
       toast.error("Something went wrong");
     }
+  };
+
+  const handlePage = (number) => {
+    setPage(number);
   };
 
   return (
@@ -103,6 +117,21 @@ const Label = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            <div className="pagination mt-5 text-center">
+              {[...Array(3)].map((p, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={`px-5 rounded-full text-white mx-1 ${
+                    page === index + 1 ? "bg-blue-600" : "bg-blue-400"
+                  }`}
+                  onClick={() => handlePage(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              ))}
             </div>
           </div>
         </div>

@@ -42,16 +42,19 @@ export const getAlbumById = async ({ token, albumId }) => {
   }
 };
 
-export const getAllLabel = async (token) => {
+export const getAllLabel = async ({ token, page }) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/labels`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${BASE_URL}/api/v1/labels?page=${page}&limit=${process.env.LABEL_PER_PAGE}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
     const data = await res.json();
     return data;
