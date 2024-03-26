@@ -31,14 +31,14 @@ const page = async ({ params: { artistId } }) => {
       <Header />
 
       <div className="px-3 py-2 md:py-5 xl:px-20 xl:py-10">
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col md:flex-row md:items-start">
           <div className="left flex justify-center md:w-1/4">
             <Image
-              className="w-[200px] h-[200px]"
+              className="w-full"
               src={artistImage}
               alt="Profile"
-              width={200}
-              height={200}
+              width={1000}
+              height={800}
             />
           </div>
 
@@ -117,7 +117,14 @@ const page = async ({ params: { artistId } }) => {
                                 {link}
                               </a>
                             </td>
-                            <td className="border p-2 text-center">Edit</td>
+                            <td className="border p-2 text-center">
+                              <Link
+                                className="px-5 py-1 bg-yellow-300 rounded"
+                                href="/artists"
+                              >
+                                Edit
+                              </Link>
+                            </td>
                           </tr>
                         );
                       })

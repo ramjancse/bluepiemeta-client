@@ -43,10 +43,12 @@ const page = async ({ params: { albumId } }) => {
                 albumCover ||
                 "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
               }
-              className="w-[200px] h-[200px]"
+              className="w-full"
               alt="Album Cover Picture"
-              width={200}
-              height={200}
+              width={1000}
+              height={1000}
+              placeholder="blur"
+              blurDataURL="https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
             />
 
             <h2 className="text-xl mt-3">{albumName}</h2>

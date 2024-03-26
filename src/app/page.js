@@ -25,156 +25,68 @@ const Dashboard = async () => {
       <DashboardIntro albums={albums} />
 
       <div className="bottom bg-[#F5F6FA] flex justify-between">
-        <div className="recent-list w-1/3 px-5 py-3 overflow-hidden shadow-md">
+        <div className="recent-list w-1/3 px-5 pt-3 overflow-hidden shadow-md">
           <div className="tracks">
             <h3 className="font-medium text-base mb-2 border-b-2 border-gray-400">
               Recently Added
             </h3>
 
-            {albums.slice(0, 5).map((album) => {
-              // console.log(album, "album");
-
-              const { _id, albumName, albumCover, author } = album;
-              return (
-                <div className="track flex border-b-2 py-2" key={_id}>
-                  <div className="image mr-2">
-                    <Image
-                      className="w-[60px]"
-                      src={albumCover}
-                      alt="Track Image"
-                      width={60}
-                      height={60}
-                    />
-                  </div>
-
-                  <div className="info w-full flex justify-between">
-                    <div className="text">
-                      <h5 className="text-sm">
-                        <Link
-                          href={`/albums/${_id}`}
-                          className="hover:text-fill"
-                        >
-                          {albumName}
-                        </Link>
-                      </h5>
-
-                      <h6 className="text-xs">
-                        <Link
-                          href={`/artists/${_id}`}
-                          className="hover:text-fill"
-                        >
-                          Eleanor MacEoy
-                        </Link>
-                      </h6>
-                    </div>
-
-                    <div className="link flex justify-between space-x-2">
+            {albums
+              .slice(0, process.env.RECENTLY_ADDED_ALBUMS_SHOW)
+              .map((album, index) => {
+                const { _id, albumName, albumCover, author } = album;
+                return (
+                  <div
+                    key={_id}
+                    className={`track flex border-b-2 py-1 ${
+                      index === 0 ? "mt-4" : "mt-2"
+                    }`}
+                  >
+                    <div className="image mr-2">
                       <Image
-                        src={ChainIcon}
-                        alt="Chain Icon"
-                        className="text-[#0070D6] w-[15px] h-[20px]"
+                        className="w-[60px]"
+                        src={albumCover}
+                        alt="Track Image"
+                        width={60}
+                        height={60}
                       />
+                    </div>
 
-                      <MdDownloadForOffline className="text-xl text-[#0070D6]" />
-                      <SlOptionsVertical className="text-xl text-[#0070D6]" />
+                    <div className="info w-full flex justify-between">
+                      <div className="text">
+                        <h5 className="text-sm">
+                          <Link
+                            href={`/albums/${_id}`}
+                            className="hover:text-fill"
+                          >
+                            {albumName}
+                          </Link>
+                        </h5>
+
+                        <h6 className="text-xs">
+                          <Link
+                            href={`/albums/${_id}`}
+                            className="hover:text-fill"
+                          >
+                            Eleanor MacEoy
+                          </Link>
+                        </h6>
+                      </div>
+
+                      <div className="link flex justify-between space-x-2">
+                        <Image
+                          src={ChainIcon}
+                          alt="Chain Icon"
+                          className="text-[#0070D6] w-[15px] h-[20px]"
+                        />
+
+                        <MdDownloadForOffline className="text-xl text-[#0070D6]" />
+                        <SlOptionsVertical className="text-xl text-[#0070D6]" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-
-            {/* <div className="track flex border-b-2 mt-4 py-2">
-              <div className="image mr-2">
-                <Image
-                  className="w-[60px]"
-                  src={albumImage2}
-                  alt="Track Image"
-                />
-              </div>
-
-              <div className="info w-full flex justify-between">
-                <div className="text">
-                  <h5 className="text-sm">
-                    <Link href="/" className="hover:text-fill">
-                      The Four Corners Of Hell
-                    </Link>
-                  </h5>
-                  <h6 className="text-xs">Eleanor MacEoy</h6>
-                </div>
-
-                <div className="link flex justify-between space-x-2">
-                  <Image
-                    src={ChainIcon}
-                    alt="Chain Icon"
-                    className="text-[#0070D6] w-[15px] h-[20px]"
-                  />
-                  <MdDownloadForOffline className="text-xl text-[#0070D6]" />
-                  <SlOptionsVertical className="text-xl text-[#0070D6]" />
-                </div>
-              </div>
-            </div>
-
-            <div className="track flex border-b-2 mt-4 py-2">
-              <div className="image mr-2">
-                <Image
-                  className="w-[60px]"
-                  src={albumImage2}
-                  alt="Track Image"
-                />
-              </div>
-
-              <div className="info w-full flex justify-between">
-                <div className="text">
-                  <h5 className="text-sm">
-                    <Link href="/" className="hover:text-fill">
-                      The Four Corners Of Hell
-                    </Link>
-                  </h5>
-                  <h6 className="text-xs">Eleanor MacEoy</h6>
-                </div>
-
-                <div className="link flex justify-between space-x-2">
-                  <Image
-                    src={ChainIcon}
-                    alt="Chain Icon"
-                    className="text-[#0070D6] w-[15px] h-[20px]"
-                  />
-                  <MdDownloadForOffline className="text-xl text-[#0070D6]" />
-                  <SlOptionsVertical className="text-xl text-[#0070D6]" />
-                </div>
-              </div>
-            </div>
-
-            <div className="track flex border-b-2 mt-4 py-2">
-              <div className="image mr-2">
-                <Image
-                  className="w-[60px]"
-                  src={albumImage2}
-                  alt="Track Image"
-                />
-              </div>
-
-              <div className="info w-full flex justify-between">
-                <div className="text">
-                  <h5 className="text-sm">
-                    <Link href="/" className="hover:text-fill">
-                      The Four Corners Of Hell
-                    </Link>
-                  </h5>
-                  <h6 className="text-xs">Eleanor MacEoy</h6>
-                </div>
-
-                <div className="link flex justify-between space-x-2">
-                  <Image
-                    src={ChainIcon}
-                    alt="Chain Icon"
-                    className="text-[#0070D6] w-[15px] h-[20px]"
-                  />
-                  <MdDownloadForOffline className="text-xl text-[#0070D6]" />
-                  <SlOptionsVertical className="text-xl text-[#0070D6]" />
-                </div>
-              </div>
-            </div> */}
+                );
+              })}
           </div>
         </div>
 
@@ -184,7 +96,7 @@ const Dashboard = async () => {
           </h3>
 
           <div className="songs">
-            <div className="song bg-white flex mt-4">
+            {/* <div className="song bg-white flex mt-4">
               <div className="cover w-[50px]">
                 <Image
                   src={albumImage}
@@ -226,192 +138,81 @@ const Dashboard = async () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
 
-            <div className="song bg-white flex mt-2">
-              <div className="cover w-[50px]">
-                <Image
-                  src={albumImage}
-                  className="w-full"
-                  alt="Album"
-                  width={50}
-                  height={50}
-                />
-              </div>
+            {albums
+              .slice(0, process.env.TRACK_LIST_SHOW)
+              .map((album, index) => {
+                const { _id, albumName, albumCover, tracks } = album;
+                if (tracks && tracks.length > 0) {
+                  const firstTrack = tracks[0];
+                  return (
+                    <div
+                      className={`song bg-white flex  ${
+                        index === 0 ? "mt-5" : "mt-4"
+                      }`}
+                      key={firstTrack._id}
+                    >
+                      <div className="cover w-[50px]">
+                        <Image
+                          src={albumCover}
+                          className="w-full"
+                          alt="Album"
+                          width={50}
+                          height={50}
+                        />
+                      </div>
 
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
-                <div className="name">
-                  <h6 className="text-sm font-medium">
-                    <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You{" "}
-                    </a>
+                      <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
+                        <div className="name">
+                          <h6 className="text-sm font-medium">
+                            <a
+                              href={`/albums/${_id}/tracks/${firstTrack._id}`}
+                              className="hover:text-fill"
+                            >
+                              {firstTrack.titleOfTrack}{" "}
+                            </a>
 
-                    <a className="text-xs italic hover:text-fill" href="/">
-                      - Graham Cotton
-                    </a>
-                  </h6>
+                            <a
+                              className="text-xs italic hover:text-fill"
+                              href={`/albums/${_id}/tracks/${firstTrack._id}`}
+                            >
+                              - {firstTrack?.primaryArtist[0]?.name}
+                            </a>
+                          </h6>
 
-                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
-                    Folk, Indie, Song-Songwriter
-                  </p>
-                </div>
+                          <p className="text-[11px] hidden sm:flex sm:justify-between">
+                            {firstTrack.trackGenre
+                              ?.map((genre) => genre.name)
+                              .join(", ")}
+                          </p>
+                        </div>
 
-                <div className="count h-4 w-4 items-center justify-center rounded border border-slate-400 text-center text-[10px] font-bold hidden lg:block mx-5">
-                  +1
-                </div>
+                        <div className="action flex">
+                          <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                            <a href="/">Edit</a>
+                          </button>
 
-                <div className="action flex">
-                  <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">Edit</a>
-                  </button>
-
-                  <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">License</a>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="song bg-white flex mt-2">
-              <div className="cover w-[50px]">
-                <Image
-                  src={albumImage}
-                  className="w-full"
-                  alt="Album"
-                  width={50}
-                  height={50}
-                />
-              </div>
-
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
-                <div className="name">
-                  <h6 className="text-sm font-medium">
-                    <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You{" "}
-                    </a>
-
-                    <a className="text-xs italic hover:text-fill" href="/">
-                      - Graham Cotton
-                    </a>
-                  </h6>
-
-                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
-                    Folk, Indie, Song-Songwriter
-                  </p>
-                </div>
-
-                <div className="count h-4 w-4 items-center justify-center rounded border border-slate-400 text-center text-[10px] font-bold hidden lg:block mx-5">
-                  +1
-                </div>
-
-                <div className="action flex">
-                  <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">Edit</a>
-                  </button>
-
-                  <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">License</a>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="song bg-white flex mt-2">
-              <div className="cover w-[50px]">
-                <Image
-                  src={albumImage}
-                  className="w-full"
-                  alt="Album"
-                  width={50}
-                  height={50}
-                />
-              </div>
-
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
-                <div className="name">
-                  <h6 className="text-sm font-medium">
-                    <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You{" "}
-                    </a>
-
-                    <a className="text-xs italic hover:text-fill" href="/">
-                      - Graham Cotton
-                    </a>
-                  </h6>
-
-                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
-                    Folk, Indie, Song-Songwriter
-                  </p>
-                </div>
-
-                <div className="count h-4 w-4 items-center justify-center rounded border border-slate-400 text-center text-[10px] font-bold hidden lg:block mx-5">
-                  +1
-                </div>
-
-                <div className="action flex">
-                  <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">Edit</a>
-                  </button>
-
-                  <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">License</a>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="song bg-white flex mt-2">
-              <div className="cover w-[50px]">
-                <Image
-                  src={albumImage}
-                  className="w-full"
-                  alt="Album"
-                  width={50}
-                  height={50}
-                />
-              </div>
-
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
-                <div className="name">
-                  <h6 className="text-sm font-medium">
-                    <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You{" "}
-                    </a>
-
-                    <a className="text-xs italic hover:text-fill" href="/">
-                      - Graham Cotton
-                    </a>
-                  </h6>
-
-                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
-                    Folk, Indie, Song-Songwriter
-                  </p>
-                </div>
-
-                <div className="count h-4 w-4 items-center justify-center rounded border border-slate-400 text-center text-[10px] font-bold hidden lg:block mx-5">
-                  +1
-                </div>
-
-                <div className="action flex">
-                  <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">Edit</a>
-                  </button>
-
-                  <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">License</a>
-                  </button>
-                </div>
-              </div>
-            </div>
+                          <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
+                            <a href="/">License</a>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  return null;
+                }
+              })}
           </div>
 
           <div className="button py-4 flex justify-end items-center">
-            <button
-              type="button"
+            <Link
+              href="/albums"
               className="px-5 py-1 bg-[#424242] text-white rounded-full text-sm font-medium"
             >
               View All
-            </button>
+            </Link>
           </div>
         </div>
       </div>
