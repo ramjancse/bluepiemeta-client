@@ -3,16 +3,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { FaAngleDown } from "react-icons/fa6";
-import DashboardIcon from "@/assets/images/dashboard/Dashboard.svg";
-import AlbumIcon from "@/assets/images/dashboard/Albums.svg";
-import ArtistIcon from "@/assets/images/dashboard/Artist.svg";
 import "./MenuItem.css";
 
 const MenuItem = ({ menu }) => {
   const path = usePathname();
   const [show, setShow] = useState(false);
 
-  const handleClick = (menuId) => {
+  const handleClick = () => {
     setShow((prev) => !prev);
   };
 
@@ -26,7 +23,7 @@ const MenuItem = ({ menu }) => {
                 ? "border-blue-500 bg-[#FAFAFC]"
                 : "border-transparent hover:border-blue-500 hover:bg-[#FAFAFC]"
             }`}
-            onClick={() => handleClick(menu.id)}
+            onClick={handleClick}
           >
             <span className={`flex items-center`}>
               <Image

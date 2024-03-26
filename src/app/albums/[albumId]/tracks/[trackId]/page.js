@@ -60,7 +60,6 @@ const page = async ({ params: { albumId, trackId } }) => {
   } = foundTrack || {};
 
   // const data = await getAlbumById(albumId);
-  // console.log(data, "data");
 
   const filteredGenre = trackGenre.filter((genre) => genre.status);
 

@@ -7,6 +7,7 @@ import { axiosPrivateInstance } from "@/config/axios";
 import { getAllLabel } from "@/lib/albums";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -47,13 +48,18 @@ const Label = () => {
       <Header name="Label" />
 
       <section className="px-4 py-3 border-l border-b">
-        <div className="flex">
-          <div className="left w-1/2">
-            <AddLabel />
-          </div>
+        <div className="labels">
+          <div className="right">
+            <div className="flex justify-between">
+              <h1 className="mb-3 text-xl">All Labels</h1>
 
-          <div className="right w-1/2">
-            <h1 className="mb-3 text-xl">All Labels</h1>
+              <Link
+                href="/labels/add"
+                className="px-10 py-2 rounded bg-gray-200"
+              >
+                Add label
+              </Link>
+            </div>
 
             <div className="overflow-x-auto mt-5">
               <table className="w-full border-collapse">

@@ -1,0 +1,19 @@
+.children {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transform-origin: top;
+  transition: height 0.5s ease, opacity 0.5s ease;
+}
+
+.children.show {
+  opacity: 1;
+  height: auto;
+  transform: scaleY(1);
+}
+
+.children.hide {
+  opacity: 0;
+  height: 0;
+  transform: scaleY(0);
+}

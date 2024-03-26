@@ -29,11 +29,11 @@ const page = async () => {
               <tr>
                 <th className="border p-2 text-left">Title</th>
                 <th className="border p-2 text-left">UPC</th>
-                <th className="border p-2 text-left">Artist name</th>
+                <th className="border p-2 text-left">Artist Name</th>
                 <th className="border p-2 text-left">Genre</th>
                 <th className="border p-2 text-left">Type</th>
-                <th className="border p-2 text-left">Release date</th>
-                <th className="border p-2 text-left">Total tracks</th>
+                <th className="border p-2 text-left">Release Date</th>
+                <th className="border p-2 text-left">Total Tracks</th>
                 <th className="border p-2 text-left">Action</th>
               </tr>
             </thead>
@@ -117,7 +117,7 @@ const page = async () => {
                       <td className="border p-2">{albumType}</td>
 
                       <td className="border p-2">
-                        {format(originalReleaseDate, "dd-MMMM-yyyy")}
+                        {format(originalReleaseDate, "dd-MMM-yyyy")}
                       </td>
 
                       <td className="border p-2">{tracks.length}</td>

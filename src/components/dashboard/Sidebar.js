@@ -58,7 +58,7 @@ const menus = [
   {
     id: 5,
     name: "Label",
-    link: "/label",
+    link: "/labels",
     icon: DashboardIcon,
     children: [],
   },
