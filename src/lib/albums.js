@@ -45,7 +45,7 @@ export const getAlbumById = async ({ token, albumId }) => {
 export const getAllLabel = async ({ token, page }) => {
   try {
     const res = await fetch(
-      `${BASE_URL}/api/v1/labels?page=${page}&limit=${process.env.LABEL_PER_PAGE}`,
+      `${BASE_URL}/api/v1/labels?page=${page}&limit=${process.env.NEXT_PUBLIC_LABELS_PER_PAGE}`,
       {
         method: "GET",
         headers: {

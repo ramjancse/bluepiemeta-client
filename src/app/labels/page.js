@@ -53,8 +53,8 @@ const Label = () => {
     }
   };
 
-  const handlePage = (number) => {
-    setPage(number);
+  const handlePage = (pageNumber) => {
+    setPage(pageNumber);
   };
 
   return (
@@ -86,7 +86,7 @@ const Label = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {labels.length ? (
+                  {labels?.length ? (
                     labels.map((label, index) => {
                       const { _id, labelName, createdAt } = label;
                       return (
@@ -120,7 +120,7 @@ const Label = () => {
             </div>
 
             <div className="pagination mt-5 text-center">
-              {[...Array(3)].map((p, index) => (
+              {[...Array(totalPage)].map((p, index) => (
                 <button
                   key={index}
                   type="button"
