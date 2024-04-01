@@ -6,7 +6,7 @@ import mainBanner from "@/assets/images/main_banner.jpg";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { axiosPrivateInstance } from "@/config/axios";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
@@ -39,60 +39,177 @@ const schema = yup
     phoneNumber: yup.string().trim().required("Phone number is required"),
     address: yup.string().trim().required("Address is required"),
     region: yup.string().trim().required("Region is required"),
+    artistImage: yup.string().trim().required("Artist image link is required"),
+    artistType: yup
+      .string()
+      .trim()
+      .required("Artist type is required")
+      .oneOf(
+        ["Single", "Multiple"],
+        "Artist type must be select Single or Multiple"
+      ),
+
+    singleTypes: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .required("Single types name is required")
+          .oneOf(
+            ["Indie", "Singer", "Artist", "Lyricist", "Composer", "Producer"],
+            "Artist single type must be select between fields"
+          ),
+        status: yup
+          .boolean()
+          .oneOf([true, false], "Status can only true or false"),
+      })
+    ),
+    multiTypes: yup.string().trim(),
+    artistLinks: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .required(" Artist link name is required")
+          .min(3, "Artist name must be at least 3 characters"),
+        link: yup.string().trim().required("Artist link is required"),
+      })
+    ),
+    socialMedia: yup.array().of(
+      yup.object({
+        name: yup
+          .string()
+          .trim()
+          .required(" Artist social link name is required")
+          .min(3, "Artist social link name must be at least 3 characters"),
+        link: yup.string().trim().required("Artist social link is required"),
+      })
+    ),
+  })
+  .transform((originalValue, originalObject) => {
+    const { artistType, singleTypes, multiTypes } = originalObject;
+
+    if (artistType === "Single") {
+      return {
+        ...originalObject,
+        nameOfType: singleTypes,
+      };
+    } else {
+      return {
+        ...originalObject,
+        nameOfType: [{ name: multiTypes, status: true }],
+      };
+    }
   })
   .required();
 
 const Main = () => {
-  const [artistType, setArtistType] = useState("Multiple");
-  const [singleTypes, setSingleTypes] = useState({});
+  const session = useSession();
+  const router = useRouter();
+  const [artistType, setArtistType] = useState("Single");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      artistName: "K. Ahmed",
+      fullName: "Kawsar Ahmed",
+      sex: "male",
+      email: "web.kawsarahmed@gmail.com",
+      areaCode: "+880",
+      phoneNumber: "1733920943",
+      address: "abc 123 Dhaka",
+      region: "Bangladesh",
+      coverPhoto: "https://www.example.com/image",
+      artistType: "Single",
+      singleTypes: [
+        { name: "Indie", status: true },
+        { name: "Singer", status: false },
+        { name: "Artist", status: false },
+        { name: "Lyricist", status: false },
+        { name: "Composer", status: false },
+        { name: "Producer", status: false },
+      ],
+      artistLinks: [
+        {
+          name: "qq music",
+          link: "https://qqmusic.com",
+        },
+        {
+          name: "music",
+          link: "https://qqmusic.com",
+        },
+      ],
+      socialMedia: [
+        { name: "website", link: "website.com" },
+        { name: "facebook", link: "facebook.com" },
+        { name: "youtube", link: "youtube.com" },
+        { name: "instagram", link: "instagram.com" },
+        { name: "twitter", link: "twitter.com" },
+        { name: "tiktok", link: "tiktok.com" },
+        { name: "iTunes", link: "iTunes.com" },
+        { name: "vimeo", link: "vimeo.com" },
+        { name: "deezer", link: "deezer.com" },
+        { name: "spotify", link: "spotify.com" },
+        { name: "dailyMotion", link: "dailyMotion.com" },
+      ],
+    },
   });
 
-  const session = useSession();
-  const router = useRouter();
+  const { fields, append, remove } = useFieldArray({
+    name: "singleTypes",
+    control,
+  });
 
-  const getNameOfTypesArr = (data) => {
-    let types = [];
-    let filteredTypes = [];
+  const {
+    fields: artistLinksFields,
+    append: artistAppend,
+    remove: artistRemove,
+  } = useFieldArray({
+    name: "artistLinks",
+    control,
+  });
 
-    // artists type single selected checkbox make an array here for need DB
-    if (artistType === "Single") {
-      types = Object.keys(singleTypes);
+  const {
+    fields: socialMediaFields,
+    append: socialMediaAppend,
+    remove: socialMediaRemove,
+  } = useFieldArray({
+    name: "socialMedia",
+    control,
+  });
 
-      types.forEach((type) => {
-        if (singleTypes[type]) {
-          filteredTypes.push({ name: type });
-        }
-      });
-    } else {
-      filteredTypes.push({ name: data.multiTypes });
-    }
+  // const getNameOfTypesArr = (data) => {
+  //   let types = [];
+  //   let filteredTypes = [];
 
-    return filteredTypes;
-  };
+  //   // artists type single selected checkbox make an array here for need DB
+  //   if (artistType === "Single") {
+  //     types = Object.keys(singleTypes);
+
+  //     types.forEach((type) => {
+  //       if (singleTypes[type]) {
+  //         filteredTypes.push({ name: type });
+  //       }
+  //     });
+  //   } else {
+  //     filteredTypes.push({ name: data.multiTypes });
+  //   }
+
+  //   return filteredTypes;
+  // };
 
   const onSubmit = async (data) => {
-    // update artist type field
-    setValue("artistType", artistType);
-
-    // updated array in this field
-    setValue("nameOfType", getNameOfTypesArr(data));
+    console.log(data, "add artist data");
 
     // update some field need to be database
-    setValue(
-      "artistImage",
-      "https://media.istockphoto.com/id/1327592506/vector/default-avatar-photo-placeholder-icon-grey-profile-picture-business-man.jpg?s=612x612&w=0&k=20&c=BpR0FVaEa5F24GIw7K8nMWiiGmbb8qmhfkpXcp1dhQg="
-    );
-    setValue("artistDiscription", "");
-    setValue("artistLinks", []);
-    setValue("socialMedia", []);
+    setValue("artistDescription", "");
 
     try {
       await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
@@ -101,13 +218,18 @@ const Main = () => {
       toast.success("Artist added successfully");
 
       // redirect to another route
-      router.push("/artists");
+      // router.push("/artists");
     } catch (error) {
       console.log(error, "error in add artist page");
 
       // show error message
       toast.error("Something went wrong");
     }
+  };
+
+  const handleChangeArtistsType = (aType) => {
+    setArtistType(aType);
+    setValue("artistType", aType);
   };
 
   return (
@@ -126,8 +248,8 @@ const Main = () => {
         <h3 className="py-2 text-center text-xl font-bold">Artist Info</h3>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="artist mx-10 flex flex-col-reverse items-center bg-gray-200 px-3 py-3 lg:flex-row lg:justify-between lg:p-10 xl:p-16 2xl:px-24 2xl:py-20">
-            <div className="input-area mt-5 lg:mt-0">
+          <div className="artist mx-10 flex flex-col-reverse items-center bg-gray-200 px-3 py-3 lg:flex-row lg:justify-center lg:p-10 xl:p-16 2xl:px-24 2xl:py-20">
+            <div className="input-area">
               <div className="sm:flex">
                 <div className="label hidden sm:block sm:w-1/3">
                   <label
@@ -157,7 +279,6 @@ const Main = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -187,7 +308,6 @@ const Main = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -219,7 +339,6 @@ const Main = () => {
                   </p>
                 </div>
               </div>
-
               {/* <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -267,7 +386,6 @@ const Main = () => {
                   </select>
                 </div>
               </div> */}
-
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -297,7 +415,6 @@ const Main = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -344,7 +461,6 @@ const Main = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -373,7 +489,6 @@ const Main = () => {
                   </p>
                 </div>
               </div>
-
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
@@ -402,9 +517,37 @@ const Main = () => {
                   </p>
                 </div>
               </div>
-
-              {/* cover photo upload input */}
               <div className="mt-6 sm:flex">
+                <div className="label hidden w-1/3 sm:block">
+                  <label
+                    htmlFor="artistImage"
+                    className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold"
+                  >
+                    Artist Image
+                  </label>
+                </div>
+
+                <div className="input sm:ml-2 sm:w-2/3">
+                  <input
+                    type="text"
+                    name="artistImage"
+                    id="artistImage"
+                    placeholder="Enter cover photo link"
+                    className="w-full rounded border-none px-5 py-2 focus:outline-none"
+                    {...register("artistImage")}
+                  />
+
+                  <p
+                    className={`${
+                      errors.artistImage?.message ? "block" : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                  >
+                    {errors.artistImage?.message}
+                  </p>
+                </div>
+              </div>
+              {/* cover photo upload input */}
+              {/* <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label
                     htmlFor="coverPic"
@@ -437,8 +580,7 @@ const Main = () => {
                     accept="image/png, image/gif, image/jpeg, image/svg, image/jpg"
                   />
                 </div>
-              </div>
-
+              </div> */}
               <div className="mt-6 sm:flex">
                 <div className="label hidden w-1/3 sm:block">
                   <label className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold">
@@ -455,10 +597,7 @@ const Main = () => {
                         id="Single"
                         value="Single"
                         defaultChecked={artistType === "Single"}
-                        onChange={() => {
-                          setArtistType("Single");
-                          setValue("artistType", "Single");
-                        }}
+                        onChange={() => handleChangeArtistsType("Single")}
                       />
                       <label
                         htmlFor="Single"
@@ -475,10 +614,7 @@ const Main = () => {
                         id="Multiple"
                         value="Multiple"
                         defaultChecked={artistType === "Multiple"}
-                        onChange={() => {
-                          setArtistType("Multiple");
-                          setValue("artistType", "Multiple");
-                        }}
+                        onChange={() => handleChangeArtistsType("Multiple")}
                       />
                       <label
                         htmlFor="Multiple"
@@ -489,8 +625,67 @@ const Main = () => {
                     </div>
                   </div>
 
-                  {/* By default selected single and show children */}
-                  <div
+                  {artistType === "Single" ? (
+                    <div
+                      className={`inputs border border-white py-2 flex flex-wrap mt-3`}
+                    >
+                      {fields.map((field, index) => (
+                        <div className="input pl-3 py-1 w-1/3" key={field.id}>
+                          <input
+                            type="checkbox"
+                            name={`singleTypes[${index}].name`}
+                            id={`singleTypes[${index}].name`}
+                            {...register(`singleTypes.${index}.status`)}
+                            className="cursor-pointer"
+                          />
+
+                          <label
+                            htmlFor={`singleTypes[${index}].name`}
+                            className="ml-1 cursor-pointer select-none text-sm"
+                          >
+                            {field.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={`flex border border-white py-2 mt-3 px-3`}>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          name="multiTypes"
+                          id="band"
+                          value="Band"
+                          {...register("multiTypes")}
+                        />
+                        <label
+                          className="ml-1 cursor-pointer select-none"
+                          htmlFor="band"
+                        >
+                          Band
+                        </label>
+                      </div>
+
+                      <div className="flex ml-5 items-center">
+                        <input
+                          type="radio"
+                          name="multiTypes"
+                          id="group"
+                          value="Group"
+                          {...register("multiTypes")}
+                          defaultChecked
+                        />
+                        <label
+                          className="ml-1 cursor-pointer select-none"
+                          htmlFor="group"
+                        >
+                          Group
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* <div
                     className={`children mt-3 ${
                       artistType === "Single" ? "block" : "hidden"
                     } h-[80px]`}
@@ -626,7 +821,6 @@ const Main = () => {
                     </div>
                   </div>
 
-                  {/* when select multiple then show children */}
                   <div
                     className={`children mt-3 ${
                       artistType === "Multiple" ? "block" : "hidden"
@@ -666,11 +860,87 @@ const Main = () => {
                         </label>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
-              <div className="mt-12 flex justify-center">
+              <hr />
+              <h4> Artist Links</h4>
+
+              {artistLinksFields.map((artistLink, index) => (
+                <div className="mt-6 sm:flex" key={artistLink.id}>
+                  <div className="label hidden w-1/3 sm:block">
+                    <label
+                      htmlFor={`artistLinks[${index}].name`}
+                      className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold"
+                    >
+                      {artistLink.name}
+                    </label>
+                  </div>
+
+                  <div className="input sm:ml-2 sm:w-2/3">
+                    <input
+                      type="text"
+                      name={`artistLinks[${index}].name`}
+                      id={`artistLinks[${index}].name`}
+                      placeholder="Enter qq music link"
+                      className="w-full rounded border-none px-5 py-2 focus:outline-none"
+                      {...register(`artistLinks.${index}.link`)}
+                    />
+
+                    <p
+                      className={`${
+                        errors.artistLinks && errors.artistLinks[index]?.name
+                          ? "block"
+                          : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                    >
+                      {errors.artistLinks &&
+                        errors.artistLinks[index]?.name?.message}
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+              <hr className="mt-5" />
+              <h4> Social Media Links</h4>
+
+              {socialMediaFields.map((socialLink, index) => (
+                <div className="mt-6 sm:flex" key={socialLink.id}>
+                  <div className="label hidden w-1/3 sm:block">
+                    <label
+                      htmlFor={`socialMedia[${index}].name`}
+                      className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold"
+                    >
+                      {socialLink.name}
+                    </label>
+                  </div>
+
+                  <div className="input sm:ml-2 sm:w-2/3">
+                    <input
+                      type="text"
+                      name={`socialMedia[${index}].name`}
+                      id={`socialMedia[${index}].name`}
+                      placeholder="Enter qq music link"
+                      className="w-full rounded border-none px-5 py-2 focus:outline-none"
+                      {...register(`socialMedia.${index}.link`)}
+                    />
+
+                    <p
+                      className={`${
+                        errors.socialMedia && errors.socialMedia[index]?.name
+                          ? "block"
+                          : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                    >
+                      {errors.socialMedia &&
+                        errors.socialMedia[index]?.name?.message}
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+              <div className="submit mt-12 flex justify-center">
                 <input
                   type="submit"
                   name="submit"
@@ -681,7 +951,7 @@ const Main = () => {
               </div>
             </div>
 
-            <div className="upload-area p-5 xs:w-[80%] sm:w-[60%] md:w-[50%] lg:w-[30%] lg:p-0 xl:w-[25%]">
+            {/* <div className="upload-area p-5 xs:w-[80%] sm:w-[60%] md:w-[50%] lg:w-[30%] lg:p-0 xl:w-[25%]">
               <div className="w-full">
                 <div className="image">
                   <Image
@@ -710,7 +980,7 @@ const Main = () => {
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </form>
       </div>

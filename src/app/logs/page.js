@@ -57,20 +57,6 @@ const Logs = () => {
     setPage(pageNumber);
   };
 
-  // const start = paramsPage ? paramsPage : 0;
-  // const end = totalPage > 8 ? 8 : totalPage;
-  // const hasPrev = false;
-
-  // const isFirstThree = page <= 3;
-  // const isLastThree = pageNumber > totalPage - 3;
-  // const isCurrentPage = page === pageNumber;
-  // const isMiddle = pageNumber === 4;
-
-  // console.log(pageNumber, "pageNumber");
-  // console.log(isFirstThree, "isFirstThree");
-  // console.log(isLastThree, "isLastThree");
-  // console.log(isMiddle, "isMiddle");
-
   // stay in page 1 // slice will be page 1 to end(7)
   // if stay in page 3 then slice will be page 3 to end(7)
   // if i stay in page last page 84 then slice will be page 1 to end(7)
@@ -78,13 +64,20 @@ const Logs = () => {
   let start = 0;
   let end = 7;
 
-  if (page == 1) {
-    start = 0;
-  } else if (Number(paramsPage)) {
-    start = Number(paramsPage);
+  if (Number(paramsPage)) {
+    start = Number(paramsPage) - 1;
+    end = start + end;
+
+    // if (end > totalPage) {
+    //   start = totalPage - 5;
+    // }
   }
 
-  console.log(start, "start");
+  // console.log(start, "start");
+  // console.log(end, "end");
+
+  // console.log(totalPage, "totalPage");
+  // console.log([...Array(totalPage)].slice(start, end), "sliced");
 
   return (
     <Layout>
@@ -141,84 +134,6 @@ const Logs = () => {
           </table>
         </div>
 
-        {/* <div className="pagination mt-5 text-center">
-          {[...Array(totalPage)].slice(start, end).map((p, index) => (
-            <button
-              key={index}
-              type="button"
-              className={`px-5 rounded-full text-white mx-1 ${
-                page === index + 1 ? "bg-blue-600" : "bg-blue-400"
-              }`}
-              onClick={() => handlePage(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div> */}
-
-        {/* <Pagination className="mt-5">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href={`/logs?page=${page - 1}`}
-                className={
-                  page <= 1
-                    ? "pointer-events-none opacity-50 select-none"
-                    : undefined
-                }
-              />
-            </PaginationItem>
-
-            {[...Array(totalPage)].slice(start).map((p, index) => {
-              const pageNumber = index + 1;
-
-              const isFirstThree = pageNumber <= 3;
-              const isLastThree = pageNumber > totalPage - 3;
-              const isCurrentPage = page === pageNumber;
-              const isMiddle = pageNumber === 4;
-
-              // 0 1 2   3   4   5   6
-              // pageNumber = 5
-              // need print 82, 83, 84
-              // console.log(pageNumber, "pageNumber");
-              // console.log(isLastThree, "isLastThree");
-
-              if (isFirstThree || isLastThree) {
-                return (
-                  <PaginationItem key={pageNumber}>
-                    <PaginationLink
-                      isActive={isCurrentPage}
-                      href={`?page=${pageNumber}`}
-                    >
-                      {pageNumber}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              }
-
-              if (pageNumber === 4 && page > 4) {
-                return (
-                  <PaginationItem key="dots-before">
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              } else if (pageNumber === totalPage - 3 && page < totalPage - 3) {
-                return (
-                  <PaginationItem key="dots-after">
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              }
-
-              return null;
-            })}
-
-            <PaginationItem>
-              <PaginationNext href={`/logs?page=${Number(page) + 1}`} />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination> */}
-
         <Pagination className="mt-5">
           <PaginationContent>
             <PaginationItem>
@@ -232,15 +147,14 @@ const Logs = () => {
               />
             </PaginationItem>
 
-            {[...Array(totalPage)].slice(start, end).map((p, index) => {
-              const pageNumber = index + 1;
+            {[...Array(totalPage)].slice(start, end).map((_, index, array) => {
+              const pageNumber = Number(page) + index;
 
-              const isFirstThree = pageNumber <= 3;
-              const isLastThree = pageNumber > totalPage - 3;
-              const isCurrentPage = page === pageNumber;
-              const isMiddle = pageNumber === 4;
+              const isFirstThree = index < 3;
+              const isCurrentPage = Number(page) === pageNumber;
+              const isMiddle = index === 3;
 
-              if (isFirstThree) {
+              if (array.length < 4) {
                 return (
                   <PaginationItem key={pageNumber}>
                     <PaginationLink
@@ -251,18 +165,67 @@ const Logs = () => {
                     </PaginationLink>
                   </PaginationItem>
                 );
-              } else if (isMiddle) {
+              } else if (isFirstThree) {
+                return (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      isActive={isCurrentPage}
+                      href={`?page=${pageNumber}`}
+                    >
+                      {pageNumber}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              } else if (isMiddle && array.length > 4) {
                 return (
                   <PaginationItem key="dots-middle">
                     <PaginationEllipsis />
                   </PaginationItem>
                 );
+              } else if (array.length === 4) {
+                return (
+                  <PaginationItem key={totalPage}>
+                    <PaginationLink
+                      // isActive={totalPage}
+                      href={`?page=${totalPage}`}
+                    >
+                      {totalPage}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              } else if (array.length === 5) {
+                return (
+                  <PaginationItem key={totalPage - 5 + index + 1}>
+                    <PaginationLink
+                      // isActive={totalPage}
+                      href={`?page=${totalPage - 5 + index + 1}`}
+                    >
+                      {totalPage - 5 + index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              } else if (array.length === 6) {
+                return (
+                  <PaginationItem key={totalPage - 6 + index + 1}>
+                    <PaginationLink
+                      // isActive={totalPage - 6 + index}
+                      href={`?page=${totalPage - 6 + index + 1}`}
+                    >
+                      {totalPage - 6 + index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
               } else {
-                <PaginationItem key={pageNumber}>
-                  <PaginationLink href={`?page=${pageNumber}`}>
-                    {pageNumber}
-                  </PaginationLink>
-                </PaginationItem>;
+                return (
+                  <PaginationItem key={totalPage - 3 + (index - 3)}>
+                    <PaginationLink
+                      // isActive={isCurrentPage}
+                      href={`?page=${totalPage - 3 + (index - 3)}`}
+                    >
+                      {totalPage - 3 + (index - 3)}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
               }
             })}
 
