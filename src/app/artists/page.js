@@ -83,7 +83,7 @@ const page = async () => {
                       <td className="border p-2">
                         <Link
                           className="block text-blue-600"
-                          href={`/artists/${_id}`}
+                          href={`/artists/${_id}/edit`}
                         >
                           Edit
                         </Link>
