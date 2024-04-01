@@ -1,8 +1,8 @@
 import { BASE_URL } from "@/config/axios";
 
-export const getAllLogs = async (token) => {
+export const getAllLogs = async ({ token, page }) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/logs`, {
+    const res = await fetch(`${BASE_URL}/api/v1/logs?page=${page}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

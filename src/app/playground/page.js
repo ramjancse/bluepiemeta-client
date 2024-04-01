@@ -142,6 +142,18 @@ const PlayGround = () => {
     <div className="">
       <h1>Playground</h1>
 
+      <div className="test">
+        {[...Array(3)].map((p, index) => (
+          <button
+            key={index}
+            type="button"
+            className="px-5 rounded-full bg-blue-400 text-white"
+          >
+            1
+          </button>
+        ))}
+      </div>
+
       <div className="albums px-10 py-2 overflow-hidden bg-[#36045D] mt-10">
         <h4 className="text-white tracking-wider">Albums</h4>
 
