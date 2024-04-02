@@ -119,15 +119,15 @@ const ArtistForm = ({ artistData }) => {
     : {
         artistDescription: "",
         status: "Pending Approval",
-        artistName: "K. Ahmed",
-        fullName: "Kawsar Ahmed",
-        sex: "male",
-        email: "web.kawsarahmed@gmail.com",
-        areaCode: "+880",
-        phoneNumber: "1733920943",
-        address: "abc 123 Dhaka",
-        region: "Bangladesh",
-        artistImage: "https://www.example.com/image",
+        artistName: "",
+        fullName: "",
+        sex: "",
+        email: "",
+        areaCode: "",
+        phoneNumber: "",
+        address: "",
+        region: "",
+        artistImage: "",
         artistType: "Single",
         singleTypes: [
           { name: "Indie", status: true },
@@ -140,25 +140,25 @@ const ArtistForm = ({ artistData }) => {
         artistLinks: [
           {
             name: "qq music",
-            link: "https://qqmusic.com",
+            link: "",
           },
           {
             name: "music",
-            link: "https://qqmusic.com",
+            link: "",
           },
         ],
         socialMedia: [
-          { name: "website", link: "website.com" },
-          { name: "facebook", link: "facebook.com" },
-          { name: "youtube", link: "youtube.com" },
-          { name: "instagram", link: "instagram.com" },
-          { name: "twitter", link: "twitter.com" },
-          { name: "tiktok", link: "tiktok.com" },
-          { name: "iTunes", link: "iTunes.com" },
-          { name: "vimeo", link: "vimeo.com" },
-          { name: "deezer", link: "deezer.com" },
-          { name: "spotify", link: "spotify.com" },
-          { name: "dailyMotion", link: "dailyMotion.com" },
+          { name: "website", link: "" },
+          { name: "facebook", link: "" },
+          { name: "youtube", link: "" },
+          { name: "instagram", link: "" },
+          { name: "twitter", link: "" },
+          { name: "tiktok", link: "" },
+          { name: "iTunes", link: "" },
+          { name: "vimeo", link: "" },
+          { name: "deezer", link: "" },
+          { name: "spotify", link: "" },
+          { name: "daily motion", link: "" },
         ],
       };
 
@@ -170,7 +170,7 @@ const ArtistForm = ({ artistData }) => {
     control,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: defaultValues,
+    defaultValues,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -198,7 +198,15 @@ const ArtistForm = ({ artistData }) => {
 
   const onSubmit = async (data) => {
     try {
-      await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
+      // update req
+      if (artistData) {
+        await axiosPrivateInstance(session?.data?.jwt).put("/artists", data);
+        console.log("update req");
+      } else {
+        // add req
+        await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
+        console.log("add req");
+      }
 
       // show success message
       toast.success("Artist added successfully");
@@ -604,7 +612,7 @@ const ArtistForm = ({ artistData }) => {
                   type="text"
                   name={`artistLinks[${index}].name`}
                   id={`artistLinks[${index}].name`}
-                  placeholder="Enter qq music link"
+                  placeholder={`Enter ${artistLink.name} link`}
                   className="w-full rounded border-none px-5 py-2 focus:outline-none"
                   {...register(`artistLinks.${index}.link`)}
                 />
@@ -631,7 +639,7 @@ const ArtistForm = ({ artistData }) => {
               <div className="label hidden w-1/3 sm:block">
                 <label
                   htmlFor={`socialMedia[${index}].name`}
-                  className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold"
+                  className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold capitalize"
                 >
                   {socialLink.name}
                 </label>
@@ -642,7 +650,7 @@ const ArtistForm = ({ artistData }) => {
                   type="text"
                   name={`socialMedia[${index}].name`}
                   id={`socialMedia[${index}].name`}
-                  placeholder="Enter qq music link"
+                  placeholder={`Enter ${socialLink.name} link`}
                   className="w-full rounded border-none px-5 py-2 focus:outline-none"
                   {...register(`socialMedia.${index}.link`)}
                 />
@@ -666,7 +674,7 @@ const ArtistForm = ({ artistData }) => {
               type="submit"
               name="submit"
               id="submit"
-              value="Submit"
+              value={`${artistData ? "Update" : "Submit"}`}
               className="float-right cursor-pointer rounded bg-gray-700 px-5 py-2 font-semibold tracking-widest text-white"
             />
           </div>
