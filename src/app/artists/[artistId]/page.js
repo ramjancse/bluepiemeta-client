@@ -74,9 +74,11 @@ const page = async ({ params: { artistId } }) => {
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
                     <p className="text-sm">
-                      {nameOfType.map((type) => (
-                        <span key={type._id}>{type.name}, </span>
-                      ))}
+                      {nameOfType
+                        .filter((type) => type.status)
+                        .map((type) => (
+                          <span key={type._id}>{type.name}, </span>
+                        ))}
                     </p>
                   </div>
 
@@ -120,7 +122,7 @@ const page = async ({ params: { artistId } }) => {
                             <td className="border p-2 text-center">
                               <Link
                                 className="px-5 py-1 bg-yellow-300 rounded"
-                                href="/artists"
+                                href={`/artists/${artistId}/edit`}
                               >
                                 Edit
                               </Link>
