@@ -106,11 +106,23 @@ const ArtistForm = ({ artistData }) => {
   const [artistType, setArtistType] = useState(
     artistData ? artistData.artistType : "Single"
   );
+
+  const singleTypes = [
+    { name: "Indie", status: true },
+    { name: "Singer", status: false },
+    { name: "Artist", status: false },
+    { name: "Lyricist", status: false },
+    { name: "Composer", status: false },
+    { name: "Producer", status: false },
+  ];
+
   const defaultValues = artistData
     ? {
         ...artistData,
         singleTypes:
-          artistData.artistType === "Single" ? artistData?.nameOfType : [],
+          artistData.artistType === "Single"
+            ? artistData?.nameOfType
+            : singleTypes,
         multiTypes:
           artistData.artistType === "Multiple"
             ? artistData?.nameOfType[0]?.name
@@ -200,19 +212,23 @@ const ArtistForm = ({ artistData }) => {
     try {
       // update req
       if (artistData) {
-        await axiosPrivateInstance(session?.data?.jwt).put("/artists", data);
-        console.log("update req");
+        await axiosPrivateInstance(session?.data?.jwt).put(
+          `/artists/${artistData._id}`,
+          data
+        );
+
+        // show success message
+        toast.success("Artist updated successfully");
       } else {
         // add req
         await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
-        console.log("add req");
+
+        // show success message
+        toast.success("Artist added successfully");
       }
 
-      // show success message
-      toast.success("Artist added successfully");
-
       // redirect to another route
-      // router.push("/artists");
+      router.push(`/artists/${artistData._id}`);
     } catch (error) {
       console.log(error, "error in add artist page");
 
