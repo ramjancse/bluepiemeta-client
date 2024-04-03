@@ -1,4 +1,3 @@
-import Footer from "@/components/artist/Footer";
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAllArtists } from "@/lib/artist";
@@ -7,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
+import Button from "@/components/artist/Button";
 
 const page = async () => {
   const session = await getServerSession(authOptions);
@@ -29,7 +29,7 @@ const page = async () => {
             <thead className="bg-gray-700 text-white">
               <tr>
                 <th className="border p-2 text-left">Image</th>
-                <th className="border p-2 text-left">Full name</th>
+                <th className="border p-2 text-left">Name</th>
                 <th className="border p-2 text-left">Type</th>
                 <th className="border p-2 text-left">Gender</th>
                 <th className="border p-2 text-left">Region</th>
@@ -82,11 +82,13 @@ const page = async () => {
 
                       <td className="border p-2">
                         <Link
-                          className="block text-blue-600"
+                          className="bg-yellow-300 px-3 py-[7px] rounded text-white"
                           href={`/artists/${_id}/edit`}
                         >
                           Edit
                         </Link>
+
+                        <Button artistId={_id} />
                       </td>
                     </tr>
                   );

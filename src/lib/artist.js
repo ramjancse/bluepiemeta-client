@@ -31,6 +31,7 @@ export const getArtistById = async ({ token, artistId }) => {
     const data = await res.json();
     return data;
   } catch (error) {
+    console.log(error, "error");
     return new Error("Something went wrong");
   }
 };
