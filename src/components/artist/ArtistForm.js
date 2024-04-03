@@ -69,7 +69,7 @@ const schema = yup
           .trim()
           .required(" Artist link name is required")
           .min(3, "Artist name must be at least 3 characters"),
-        link: yup.string().trim().required("Artist link is required"),
+        link: yup.string().trim(),
       })
     ),
     socialMedia: yup.array().of(
@@ -79,7 +79,7 @@ const schema = yup
           .trim()
           .required(" Artist social link name is required")
           .min(3, "Artist social link name must be at least 3 characters"),
-        link: yup.string().trim().required("Artist social link is required"),
+        link: yup.string().trim(),
       })
     ),
   })
@@ -108,7 +108,7 @@ const ArtistForm = ({ artistData }) => {
   );
 
   const singleTypes = [
-    { name: "Indie", status: true },
+    { name: "Indie", status: false },
     { name: "Singer", status: false },
     { name: "Artist", status: false },
     { name: "Lyricist", status: false },
@@ -141,14 +141,7 @@ const ArtistForm = ({ artistData }) => {
         region: "",
         artistImage: "",
         artistType: "Single",
-        singleTypes: [
-          { name: "Indie", status: true },
-          { name: "Singer", status: false },
-          { name: "Artist", status: false },
-          { name: "Lyricist", status: false },
-          { name: "Composer", status: false },
-          { name: "Producer", status: false },
-        ],
+        singleTypes,
         artistLinks: [
           {
             name: "qq music",
@@ -219,16 +212,19 @@ const ArtistForm = ({ artistData }) => {
 
         // show success message
         toast.success("Artist updated successfully");
+
+        // redirect to another route
+        router.push(`/artists/${artistData._id}`);
       } else {
         // add req
         await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
 
         // show success message
         toast.success("Artist added successfully");
-      }
 
-      // redirect to another route
-      router.push(`/artists/${artistData._id}`);
+        // redirect to another route
+        router.push(`/artists`);
+      }
     } catch (error) {
       console.log(error, "error in add artist page");
 
