@@ -123,7 +123,10 @@ const page = async () => {
                       <td className="border p-2">{tracks.length}</td>
 
                       <td className="border p-2">
-                        <Link href={`/albums/${_id}`} className="text-blue-600">
+                        <Link
+                          className="bg-yellow-300 px-3 py-[7px] rounded text-white"
+                          href={`/albums/${_id}/edit`}
+                        >
                           Edit
                         </Link>
                       </td>
