@@ -11,6 +11,7 @@ import DatePicker from "react-datepicker";
 import "./AddTrack.css";
 import { getAllArtists } from "@/lib/artist";
 import Header from "../dashboard/Header";
+import { useSession } from "next-auth/react";
 
 const schema = yup
   .object({
@@ -42,12 +43,31 @@ const schema = yup
       })
     ),
     composer: yup.array().of(
-      yup.object({
+      yup.object().shape({
         name: yup
           .string()
           .trim()
-          .required("Composer name is required")
-          .min(3, "Composer name must be at least 3 characters"),
+          .test(
+            "isRequiredOrMinLength",
+            "Composer name validation error",
+            function (value) {
+              const { index } = this.options || {};
+
+              if (index === 0 && !value) {
+                return this.createError({
+                  message: "Composer name is required",
+                });
+              }
+
+              if (value && value.length < 3) {
+                return this.createError({
+                  message: "Composer name must be at least 3 characters",
+                });
+              }
+
+              return true; // If no conditions are met, the field is valid
+            }
+          ),
       })
     ),
     trackType: yup
@@ -66,8 +86,27 @@ const schema = yup
             name: yup
               .string()
               .trim()
-              .required("Lyricist is required for lyrical songs")
-              .min(3, "Lyricist name must be at least 3 characters"),
+              .test(
+                "isRequiredOrMinLength",
+                "Lyricist name validation error",
+                function (value) {
+                  const { index } = this.options || {};
+
+                  if (index === 0 && !value) {
+                    return this.createError({
+                      message: "Lyricist name is required",
+                    });
+                  }
+
+                  if (value && value.length < 3) {
+                    return this.createError({
+                      message: "Lyricist name must be at least 3 characters",
+                    });
+                  }
+
+                  return true;
+                }
+              ),
           })
         ),
       otherwise: () =>
@@ -82,11 +121,7 @@ const schema = yup
       then: () =>
         yup.array().of(
           yup.object({
-            name: yup
-              .string()
-              .trim()
-              .required("Producer is required for lyrical songs")
-              .min(3, "Producer name must be at least 3 characters"),
+            name: yup.string().trim(),
           })
         ),
       otherwise: () =>
@@ -147,29 +182,66 @@ const schema = yup
     ),
     minute: yup.string().trim().required("Minute is required"),
     second: yup.string().trim().required("Second is required"),
-    trackGenre: yup.array().of(
-      yup.object({
-        name: yup
-          .string()
-          .trim()
-          .oneOf(
-            [
-              "Indie",
-              "Singer",
-              "Artist",
-              "Lyricist",
-              "Composer",
-              "Producer",
-              "Band",
-              "Group",
-            ],
-            "Genre must be select between fields"
-          ),
-        status: yup
-          .boolean()
-          .oneOf([true, false], "Status can only true or false"),
-      })
-    ),
+    trackGenre: yup
+      .array()
+      .of(
+        yup.object({
+          name: yup
+            .string()
+            .trim()
+            .oneOf(
+              [
+                "Indie",
+                "Singer",
+                "Artist",
+                "Lyricist",
+                "Composer",
+                "Producer",
+                "Band",
+                "Group",
+              ],
+              "Genre must be select between fields"
+            ),
+          status: yup
+            .boolean()
+            .oneOf([true, false], "Status can only true or false"),
+        })
+      )
+      .test(
+        "at-least-one-true",
+        "At least one genre must be selected",
+        (array) => array.some((obj) => obj.status)
+      ),
+    trackSubgenre: yup
+      .array()
+      .of(
+        yup.object({
+          name: yup
+            .string()
+            .trim()
+            .oneOf(
+              [
+                "Indie",
+                "Singer",
+                "Artist",
+                "Lyricist",
+                "Composer",
+                "Producer",
+                "Band",
+                "Group",
+              ],
+              "Album subgenre must be select between fields"
+            ),
+          status: yup
+            .boolean()
+            .oneOf([true, false], "Status can only true or false"),
+        })
+      )
+      .test(
+        "at-least-one-true",
+        "At least one sub genre must be selected",
+        (array) => array.some((obj) => obj.status)
+      ),
     tags: yup.array().of(
       yup.object({
         name: yup.string().trim().required("Tags is required"),
@@ -221,7 +293,7 @@ const schema = yup
     //   .required("P Line Year is required")
     //   .min(3, "P Line Year must be at least 3 character"),
 
-    version: yup.string().trim().required("Track version is required"),
+    version: yup.string().trim(),
     isrc: yup
       .string()
       .trim()
@@ -273,6 +345,7 @@ const links = [
 const AddTrack = ({ onSubmitTrack, setShow }) => {
   const [primaryArtists, setPrimaryArtists] = useState([]);
   const router = useRouter();
+  const session = useSession();
 
   const {
     register,
@@ -320,6 +393,16 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
       second: "",
       trackGenre: [
         { name: "Indie", status: true },
+        { name: "Singer", status: false },
+        { name: "Artist", status: false },
+        { name: "Lyricist", status: false },
+        { name: "Composer", status: false },
+        { name: "Producer", status: false },
+        { name: "Band", status: false },
+        { name: "Group", status: false },
+      ],
+      trackSubgenre: [
+        { name: "Indie", status: false },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
@@ -385,6 +468,11 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     control,
   });
 
+  const { fields: subgenreFields } = useFieldArray({
+    name: "trackSubgenre",
+    control,
+  });
+
   const {
     fields: mixerFields,
     append: mixerAppend,
@@ -421,11 +509,13 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
   };
 
   useEffect(() => {
-    loadArtistsData();
-  }, []);
+    if (session?.data?.jwt) {
+      loadArtistsData();
+    }
+  }, [session]);
 
   const loadArtistsData = async () => {
-    const { data } = await getAllArtists();
+    const { data } = await getAllArtists(session?.data?.jwt);
     setPrimaryArtists(data);
   };
 
@@ -469,7 +559,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       htmlFor="title"
                       className="cursor-pointer select-none"
                     >
-                      Title
+                      Track Title
                     </label>
 
                     <input
@@ -495,7 +585,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       htmlFor="metadataLanguage"
                       className="cursor-pointer select-none"
                     >
-                      Metadata language
+                      Track Language
                     </label>
 
                     <select
@@ -614,7 +704,9 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                           id={`composer[${index}].name`}
                           className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                           placeholder="Type composer name"
-                          {...register(`composer.${index}.name`)}
+                          {...register(`composer.${index}.name`, {
+                            context: { index },
+                          })}
                         />
 
                         {!index > 0 && (
@@ -797,7 +889,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
               <div className="input input col-start-1 col-end-13 sm:col-end-7">
                 <label htmlFor="mix" className="select-none">
-                  Mixer
+                  Remixer
                 </label>
 
                 <div className="">
@@ -1071,7 +1163,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   </div>
 
                   <div className="genre mt-5">
-                    <h4>Genre</h4>
+                    <h4>Track Genre</h4>
 
                     <div className="inputs border border-gray-200 py-2 flex flex-wrap">
                       {genreFields.map((field, index) => (
@@ -1093,6 +1185,43 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                         </div>
                       ))}
                     </div>
+                  </div>
+
+                  <div className="subGenre mt-5">
+                    <h4>Track Sub Genre</h4>
+
+                    <div className="inputs border border-gray-200 py-2 flex flex-wrap">
+                      {subgenreFields.map((field, index) => (
+                        <div className="input pl-3 py-1 w-1/4" key={field.id}>
+                          <input
+                            type="checkbox"
+                            name={`trackSubgenre[${index}].name`}
+                            id={`trackSubgenre[${index}].name`}
+                            {...register(`trackSubgenre.${index}.status`)}
+                            className="cursor-pointer"
+                          />
+
+                          <label
+                            htmlFor={`trackSubgenre[${index}].name`}
+                            className="ml-1 cursor-pointer select-none text-sm"
+                          >
+                            {field.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p
+                      className={`${
+                        errors.trackSubgenre &&
+                        errors.trackSubgenre?.root?.message
+                          ? "block"
+                          : "hidden"
+                      } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                    >
+                      {errors.trackSubgenre &&
+                        errors.trackSubgenre?.root?.message}
+                    </p>
                   </div>
                 </div>
 
@@ -1483,6 +1612,54 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                   } text-sm text-red-500 font-semibold mt-1 ml-5`}
                 >
                   {errors.isrc?.message}
+                </p>
+              </div>
+
+              <div className="input col-start-1 col-end-13">
+                <label
+                  htmlFor="releaseType"
+                  className="cursor-pointer select-none"
+                >
+                  Release Explicit
+                </label>
+
+                <div className="flex mt-1">
+                  <div className="left">
+                    <input
+                      type="radio"
+                      name="releaseExplicit"
+                      id="yes"
+                      className="mr-1"
+                      value="yes"
+                      {...register("releaseExplicit")}
+                      defaultChecked
+                    />
+                    <label htmlFor="yes" className="cursor-pointer select-none">
+                      Yes
+                    </label>
+                  </div>
+
+                  <div className="right flex items-center">
+                    <input
+                      type="radio"
+                      name="releaseExplicit"
+                      id="no"
+                      className="ml-5 mr-1"
+                      value="no"
+                      {...register("releaseExplicit")}
+                    />
+                    <label htmlFor="no" className="cursor-pointer select-none">
+                      No
+                    </label>
+                  </div>
+                </div>
+
+                <p
+                  className={`${
+                    errors.releaseExplicit?.message ? "block" : "hidden"
+                  } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                >
+                  {errors.releaseExplicit?.message}
                 </p>
               </div>
             </div>
