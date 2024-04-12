@@ -11,6 +11,7 @@ import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 const page = async () => {
   const session = await getServerSession(authOptions);
   const { data: albums = [] } = await getAllAlbums(session?.jwt);
+  // console.log(albums, "albums");
 
   return (
     <Layout>

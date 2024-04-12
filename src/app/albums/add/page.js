@@ -22,54 +22,35 @@ import Image from "next/image";
 
 const schema = yup
   .object({
-    // albumType: yup.string().trim().required("Album type is required"),
-    albumName: yup
+    releaseType: yup
       .string()
       .trim()
-      .required("Album name is required")
-      .min(3, "Album name must be at least 3 character"),
-    // metadataLanguage: yup
-    //   .string()
-    //   .trim()
-    //   .required("Metadata language is required")
-    //   .min(2, "Metadata language must be at least 2 character")
-    //   .oneOf(
-    //     [
-    //       "English",
-    //       "Spanish",
-    //       "French",
-    //       "German",
-    //       "Chinese",
-    //       "Japanese",
-    //       "Other",
-    //     ],
-    //     "Language must be select between fields"
-    //   ),
-    albumCover: yup.string().required("Album cover picture link is required"),
-    primaryArtist: yup.array().of(
+      .required("Release type is required")
+      .oneOf(["Audio", "Video"], "Release type must be select audio or video"),
+    releaseTitle: yup
+      .string()
+      .trim()
+      .required("Release title is required")
+      .min(3, "Release title must be at least 3 character"),
+    releaseCover: yup
+      .string()
+      .required("Release cover picture link is required"),
+    releasePrimaryArtist: yup.array().of(
       yup.object({
         name: yup
           .string()
           .trim()
-          .required("Primary Artist name is required")
+          .required("Release Primary Artist name is required")
           .min(3, "Primary Artist name must be at least 3 characters"),
       })
     ),
-    featuringArtist: yup.array().of(
+    releaseSecondaryArtist: yup.array().of(
       yup.object({
         name: yup.string().trim(),
       })
     ),
-    // trackType: yup
-    //   .string()
-    //   .trim()
-    //   .required("Track type is required")
-    //   .oneOf(
-    //     ["lyrical", "instrumental"],
-    //     "Track type must select lyrical or instrumental"
-    //   ),
-    audioLanguage: yup.string().trim(),
-    albumGenre: yup
+    releaseLanguage: yup.string().trim(),
+    releaseGenre: yup
       .array()
       .of(
         yup.object({
@@ -88,7 +69,7 @@ const schema = yup
                 "Band",
                 "Group",
               ],
-              "Genre must be select between fields"
+              "Release genre must be select between fields"
             ),
           status: yup
             .boolean()
@@ -97,10 +78,10 @@ const schema = yup
       )
       .test(
         "at-least-one-true",
-        "At least one genre must be selected", // Custom error message
+        "At least one release genre must be select", // Custom error message
         (array) => array.some((obj) => obj.status)
       ),
-    albumSubgenre: yup
+    releaseSubGenre: yup
       .array()
       .of(
         yup.object({
@@ -133,53 +114,23 @@ const schema = yup
     originalReleaseDate: yup
       .string()
       .trim()
-      .required("Release date is required")
-      .min(3, "Release date must be at least 3 character"),
-    recordLabel: yup
-      .string()
-      .trim()
-      .required("Label is required")
-      .min(3, "Label must be at least 3 character"),
-    cLine: yup
-      .string()
-      .trim()
-      .required("C Line is required")
-      .min(3, "C Line must be at least 3 character"),
-    cLineYear: yup
-      .string()
-      .trim()
-      .required("C Line Year is required")
-      .min(3, "C Line Year must be at least 3 character"),
-    pLine: yup
-      .string()
-      .trim()
-      .required("P Line is required")
-      .min(3, "P Line must be at least 3 character"),
-    pLineYear: yup
-      .string()
-      .trim()
-      .required("P Line Year is required")
-      .min(3, "P Line Year must be at least 3 character"),
-    upcean: yup
-      .string()
-      .trim()
-      .required("UPC is required")
-      .min(3, "UPC must be at least 3 character"),
+      .required("Release date is required"),
+    recordLabel: yup.string().trim().required("Label is required"),
+    cLineCompany: yup.string().trim().required("C-Line Company is required"),
+    cLineYear: yup.string().trim().required("C-Line Year is required"),
+    pLineCompany: yup.string().trim().required("P-Line company is required"),
+    pLineYear: yup.string().trim().required("P-Line Year is required"),
+    upcean: yup.string().trim().required("UPC is required"),
     tracks: yup.array().required("Tracks is required"),
-    releaseType: yup
-      .string()
-      .trim()
-      .required("Release type is required")
-      .oneOf(["audio", "video"], "Release type must be select audio or video"),
     formatType: yup.string().when("releaseType", {
-      is: "audio",
+      is: "Audio",
       then: () =>
         yup
           .string()
           .trim()
           .required("Format type is required")
           .oneOf(
-            ["single", "album", "compilation"],
+            ["Single", "Album", "Compilation"],
             "Format type must be select between fields"
           ),
       otherwise: () =>
@@ -187,14 +138,11 @@ const schema = yup
           .string()
           .trim()
           .required("Format type is required")
-          .oneOf(["musicVideo"], "Format type must be select between fields"),
+          .oneOf(["Music Video"], "Format type must be select between fields"),
     }),
     releaseVersion: yup.string().trim(),
-    catalogueNumber: yup.string().trim(),
-    releaseExplicit: yup
-      .string()
-      .trim()
-      .required("Release explicit is required"),
+    catalogNumber: yup.string().trim(),
+    releaseExplicit: yup.boolean().required("Release explicit is required"),
     platforms: yup.array().of(
       yup.object({
         name: yup
@@ -203,7 +151,8 @@ const schema = yup
           .oneOf(
             [
               "FUGA",
-              "Believe | Ordior",
+              "Believe",
+              "Ordior",
               "Kanjian",
               "Too Lost",
               "Horus",
@@ -239,7 +188,7 @@ const links = [
 const AddAlbumPage = () => {
   const session = useSession();
   const router = useRouter();
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [primaryArtists, setPrimaryArtists] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -251,22 +200,20 @@ const AddAlbumPage = () => {
     formState: { errors },
     setValue,
     watch,
-    setError,
-    clearErrors,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      status: "Draft",
-      artistId: "",
+      albumId: "",
       userId: session?.data?.user?.id,
-      albumType: "",
-      albumName: "",
-      metadataLanguage: "",
-      albumCover: "",
-      primaryArtist: [{ name: "" }],
-      featuringArtist: [{ name: "" }],
-      trackType: "",
-      albumGenre: [
+      artistId: "",
+      status: "Draft",
+      releaseVersion: "",
+      albumType: "Album", // ["Album", "EP", "Single", "Audio", "Video"];
+      releaseType: "Audio",
+      formatType: "",
+      releaseTitle: "",
+      releaseCover: "",
+      releaseGenre: [
         { name: "Indie", status: false },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
@@ -276,7 +223,7 @@ const AddAlbumPage = () => {
         { name: "Band", status: false },
         { name: "Group", status: false },
       ],
-      albumSubgenre: [
+      releaseSubGenre: [
         { name: "Indie", status: false },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
@@ -286,18 +233,10 @@ const AddAlbumPage = () => {
         { name: "Band", status: false },
         { name: "Group", status: false },
       ],
-      audioLanguage: "",
-      originalReleaseDate: new Date(),
-      recordLabel: "",
-      upcean: "",
-      cLine: "",
-      cLineYear: new Date(),
-      pLine: "",
-      pLineYear: new Date(),
-      tracks: [],
       platforms: [
         { name: "FUGA", status: true },
-        { name: "Believe | Ordior", status: false },
+        { name: "Believe", status: false },
+        { name: "Ordior", status: false },
         { name: "Kanjian", status: false },
         { name: "Too Lost", status: false },
         { name: "Horus", status: false },
@@ -305,12 +244,29 @@ const AddAlbumPage = () => {
         { name: "DashGo", status: false },
         { name: "Ingrooves", status: false },
       ],
+      releaseLanguage: "",
+      releasePrimaryArtist: [{ name: "" }],
+      releaseSecondaryArtist: [{ name: "" }],
+      originalReleaseDate: new Date(),
+      digitalReleaseDate: "",
+      recordLabel: "",
+      pLineCompany: "",
+      pLineYear: new Date(),
+      cLineCompany: "",
+      cLineYear: new Date(),
+      upcean: "",
+      tracks: [],
+      catalogNumber: "",
+      releaseExplicit: true,
     },
   });
 
   const releaseType = watch("releaseType");
+  const formatType = watch("formatType");
+  const primaryArtist = watch("releasePrimaryArtist");
+
   const { fields, append, remove } = useFieldArray({
-    name: "primaryArtist",
+    name: "releasePrimaryArtist",
     control,
   });
 
@@ -319,17 +275,17 @@ const AddAlbumPage = () => {
     append: featuringAppend,
     remove: featuringRemove,
   } = useFieldArray({
-    name: "featuringArtist",
+    name: "releaseSecondaryArtist",
     control,
   });
 
   const { fields: genreFields } = useFieldArray({
-    name: "albumGenre",
+    name: "releaseGenre",
     control,
   });
 
   const { fields: subgenreFields } = useFieldArray({
-    name: "albumSubgenre",
+    name: "releaseSubGenre",
     control,
   });
 
@@ -339,6 +295,15 @@ const AddAlbumPage = () => {
   });
 
   const handleAddTrack = () => {
+    // save primary artist for add track
+
+    if (formatType !== "compilation" && formatType.length) {
+      localStorage.setItem(
+        "releasePrimaryArtist",
+        JSON.stringify(primaryArtist)
+      );
+    }
+
     setShow((prevShow) => !prevShow);
 
     // scroll to top
@@ -379,8 +344,6 @@ const AddAlbumPage = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data, "data");
-
     // // Check if at least one genre is selected
     // const isSelected = data.albumGenre.some((genre) => genre.status);
 
@@ -395,27 +358,27 @@ const AddAlbumPage = () => {
     //   console.log("Selected Genres:", data);
     // }
 
-    // try {
-    //   const {
-    //     data: {
-    //       links: { self },
-    //     },
-    //   } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+    try {
+      const {
+        data: {
+          links: { self },
+        },
+      } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
 
-    //   // show success message
-    //   toast.success("Album added successfully");
+      // show success message
+      toast.success("Album added successfully");
 
-    //   // remove local storage saved tracks data
-    //   localStorage.removeItem("tracks");
+      // remove local storage saved tracks data
+      localStorage.removeItem("tracks");
 
-    //   // redirect to another route
-    //   router.push(self);
-    // } catch (error) {
-    //   console.log(error, "error in add album page");
+      // redirect to another route
+      router.push(self);
+    } catch (error) {
+      console.log(error, "error in add album page");
 
-    //   // show error message
-    //   toast.error("Something went wrong");
-    // }
+      // show error message
+      toast.error("Something went wrong");
+    }
   };
 
   useEffect(() => {
@@ -460,8 +423,6 @@ const AddAlbumPage = () => {
     });
   };
 
-  console.log(errors, "errors");
-
   return (
     <Layout>
       {show ? (
@@ -489,14 +450,14 @@ const AddAlbumPage = () => {
                           <input
                             type="radio"
                             name="releaseType"
-                            id="audio"
+                            id="Audio"
                             className="mr-1"
-                            value="audio"
+                            value="Audio"
                             {...register("releaseType")}
                             defaultChecked
                           />
                           <label
-                            htmlFor="audio"
+                            htmlFor="Audio"
                             className="cursor-pointer select-none"
                           >
                             Audio
@@ -507,13 +468,13 @@ const AddAlbumPage = () => {
                           <input
                             type="radio"
                             name="releaseType"
-                            id="video"
+                            id="Video"
                             className="ml-5 mr-1"
-                            value="video"
+                            value="Video"
                             {...register("releaseType")}
                           />
                           <label
-                            htmlFor="video"
+                            htmlFor="Video"
                             className="cursor-pointer select-none"
                           >
                             Video
@@ -548,16 +509,16 @@ const AddAlbumPage = () => {
                         <option value="" disabled>
                           Select format type
                         </option>
-                        {releaseType === "audio" && (
+                        {releaseType === "Audio" && (
                           <>
-                            <option value="single">Single</option>
-                            <option value="album">Album</option>
-                            <option value="compilation">Compilation</option>
+                            <option value="Single">Single</option>
+                            <option value="Album">Album</option>
+                            <option value="Compilation">Compilation</option>
                           </>
                         )}
 
-                        {releaseType === "video" && (
-                          <option value="musicVideo">Music Video</option>
+                        {releaseType === "Video" && (
+                          <option value="Music Video">Music Video</option>
                         )}
                       </select>
 
@@ -619,7 +580,7 @@ const AddAlbumPage = () => {
 
                     <div className="input col-start-1 col-end-13 sm:col-end-7">
                       <label
-                        htmlFor="albumName"
+                        htmlFor="releaseTitle"
                         className="cursor-pointer select-none"
                       >
                         Release Title
@@ -627,19 +588,19 @@ const AddAlbumPage = () => {
 
                       <input
                         type="text"
-                        name="albumName"
-                        id="albumName"
+                        name="releaseTitle"
+                        id="releaseTitle"
                         placeholder="Enter release title"
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("albumName")}
+                        {...register("releaseTitle")}
                       />
 
                       <p
                         className={`${
-                          errors.albumName?.message ? "block" : "hidden"
+                          errors.releaseTitle?.message ? "block" : "hidden"
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
-                        {errors.albumName?.message}
+                        {errors.releaseTitle?.message}
                       </p>
                     </div>
 
@@ -671,27 +632,27 @@ const AddAlbumPage = () => {
 
                     <div className="input col-start-1 col-end-13 sm:col-end-7">
                       <label
-                        htmlFor="albumCover"
+                        htmlFor="releaseCover"
                         className="cursor-pointer select-none"
                       >
-                        Cover image link
+                        Release Cover Image Link
                       </label>
 
                       <input
                         type="text"
-                        name="albumCover"
-                        id="albumCover"
+                        name="releaseCover"
+                        id="releaseCover"
                         placeholder="Album cover image link"
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("albumCover")}
+                        {...register("releaseCover")}
                       />
 
                       <p
                         className={`${
-                          errors.albumCover?.message ? "block" : "hidden"
+                          errors.releaseCover?.message ? "block" : "hidden"
                         } text-sm text-red-500 font-semibold mt-1 ml-5`}
                       >
-                        {errors.albumCover?.message}
+                        {errors.releaseCover?.message}
                       </p>
                     </div>
 
@@ -880,7 +841,7 @@ const AddAlbumPage = () => {
                     <div className="input col-start-1 col-end-13 sm:col-end-7">
                       <label
                         className="cursor-pointer block select-none"
-                        htmlFor="primaryArtist"
+                        htmlFor="releasePrimaryArtist"
                       >
                         Release Artist (Primary)
                       </label>
@@ -890,13 +851,15 @@ const AddAlbumPage = () => {
                           <div className="flex items-center">
                             {index < 1 && (
                               <select
-                                name={`primaryArtist[${index}].name`}
-                                id={`primaryArtist[${index}].name`}
+                                name={`releasePrimaryArtist[${index}].name`}
+                                id={`releasePrimaryArtist[${index}].name`}
                                 className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(`primaryArtist.${index}.name`)}
+                                {...register(
+                                  `releasePrimaryArtist.${index}.name`
+                                )}
                               >
                                 <option value="">Select artist</option>
-                                {primaryArtists?.map((artist) => {
+                                {primaryArtists.map((artist) => {
                                   const { id, artistName, fullName } = artist;
                                   return (
                                     <option key={id} value={artistName}>
@@ -910,10 +873,12 @@ const AddAlbumPage = () => {
                             {index > 0 && (
                               <input
                                 type="text"
-                                name={`primaryArtist[${index}].name`}
-                                id={`primaryArtist[${index}].name`}
+                                name={`releasePrimaryArtist[${index}].name`}
+                                id={`releasePrimaryArtist[${index}].name`}
                                 className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(`primaryArtist.${index}.name`)}
+                                {...register(
+                                  `releasePrimaryArtist.${index}.name`
+                                )}
                                 placeholder="Type artist name"
                               />
                             )}
@@ -935,14 +900,14 @@ const AddAlbumPage = () => {
 
                           <p
                             className={`${
-                              errors.primaryArtist &&
-                              errors.primaryArtist[index]?.name
+                              errors.releasePrimaryArtist &&
+                              errors.releasePrimaryArtist[index]?.name
                                 ? "block"
                                 : "hidden"
                             } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                           >
-                            {errors.primaryArtist &&
-                              errors.primaryArtist[index]?.name?.message}
+                            {errors.releasePrimaryArtist &&
+                              errors.releasePrimaryArtist[index]?.name?.message}
                           </p>
                         </div>
                       ))}
@@ -951,7 +916,7 @@ const AddAlbumPage = () => {
                     <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                       <label
                         className="cursor-pointer block select-none"
-                        htmlFor="featuringArtist"
+                        htmlFor="releaseSecondaryArtist"
                       >
                         Release Artist (Secondary)
                       </label>
@@ -961,15 +926,17 @@ const AddAlbumPage = () => {
                           <div className="flex items-center">
                             {index < 1 && (
                               <select
-                                name={`featuringArtist[${index}].name`}
-                                id={`featuringArtist[${index}].name`}
+                                name={`releaseSecondaryArtist[${index}].name`}
+                                id={`releaseSecondaryArtist[${index}].name`}
                                 className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(`featuringArtist.${index}.name`)}
+                                {...register(
+                                  `releaseSecondaryArtist.${index}.name`
+                                )}
                               >
                                 <option value="" disabled>
                                   Select artist
                                 </option>
-                                {primaryArtists?.map((artist) => {
+                                {primaryArtists.map((artist) => {
                                   const { id, artistName, fullName } = artist;
                                   return (
                                     <option key={id} value={artistName}>
@@ -983,10 +950,12 @@ const AddAlbumPage = () => {
                             {index > 0 && (
                               <input
                                 type="text"
-                                name={`featuringArtist[${index}].name`}
-                                id={`featuringArtist[${index}].name`}
+                                name={`releaseSecondaryArtist[${index}].name`}
+                                id={`releaseSecondaryArtist[${index}].name`}
                                 className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(`featuringArtist.${index}.name`)}
+                                {...register(
+                                  `releaseSecondaryArtist.${index}.name`
+                                )}
                                 placeholder="Type artist name"
                               />
                             )}
@@ -1008,14 +977,15 @@ const AddAlbumPage = () => {
 
                           <p
                             className={`${
-                              errors.featuringArtist &&
-                              errors.featuringArtist[index]?.name
+                              errors.releaseSecondaryArtist &&
+                              errors.releaseSecondaryArtist[index]?.name
                                 ? "block"
                                 : "hidden"
                             } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                           >
-                            {errors.featuringArtist &&
-                              errors.featuringArtist[index]?.name?.message}
+                            {errors.releaseSecondaryArtist &&
+                              errors.releaseSecondaryArtist[index]?.name
+                                ?.message}
                           </p>
                         </div>
                       ))}
@@ -1056,27 +1026,27 @@ const AddAlbumPage = () => {
 
                       <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
                         <label
-                          htmlFor="catalogueNumber"
+                          htmlFor="catalogNumber"
                           className="cursor-pointer select-none"
                         >
-                          Catalogue Number
+                          Catalog Number
                         </label>
 
                         <input
                           type="text"
-                          name="catalogueNumber"
-                          id="catalogueNumber"
+                          name="catalogNumber"
+                          id="catalogNumber"
                           className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("catalogueNumber")}
-                          placeholder="Enter catalogue number"
+                          {...register("catalogNumber")}
+                          placeholder="Enter catalog number"
                         />
 
                         <p
                           className={`${
-                            errors.catalogueNumber?.message ? "block" : "hidden"
+                            errors.catalogNumber?.message ? "block" : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5`}
                         >
-                          {errors.catalogueNumber?.message}
+                          {errors.catalogNumber?.message}
                         </p>
                       </div>
 
@@ -1116,15 +1086,18 @@ const AddAlbumPage = () => {
                       </div>
 
                       <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                        <label htmlFor="audioLanguage" className="select-none">
+                        <label
+                          htmlFor="releaseLanguage"
+                          className="select-none"
+                        >
                           Release Language
                         </label>
 
                         <select
-                          name="audioLanguage"
-                          id="audioLanguage"
+                          name="releaseLanguage"
+                          id="releaseLanguage"
                           className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("audioLanguage")}
+                          {...register("releaseLanguage")}
                           defaultValue=""
                         >
                           <option value="" disabled>
@@ -1141,16 +1114,16 @@ const AddAlbumPage = () => {
 
                         <p
                           className={`${
-                            errors.audioLanguage?.message ? "block" : "hidden"
+                            errors.releaseLanguage?.message ? "block" : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5`}
                         >
-                          {errors.audioLanguage?.message}
+                          {errors.releaseLanguage?.message}
                         </p>
                       </div>
 
                       <div className="input col-start-1 col-end-13 sm:col-end-7">
                         <label
-                          htmlFor="cLine"
+                          htmlFor="cLineCompany"
                           className="cursor-pointer select-none"
                         >
                           C-Line Company
@@ -1158,18 +1131,18 @@ const AddAlbumPage = () => {
 
                         <input
                           type="text"
-                          name="cLine"
-                          id="cLine"
+                          name="cLineCompany"
+                          id="cLineCompany"
                           className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("cLine")}
+                          {...register("cLineCompany")}
                         />
 
                         <p
                           className={`${
-                            errors.cLine?.message ? "block" : "hidden"
+                            errors.cLineCompany?.message ? "block" : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5`}
                         >
-                          {errors.cLine?.message}
+                          {errors.cLineCompany?.message}
                         </p>
                       </div>
 
@@ -1210,7 +1183,7 @@ const AddAlbumPage = () => {
 
                       <div className="input col-start-1 col-end-13 sm:col-end-7">
                         <label
-                          htmlFor="pLine"
+                          htmlFor="pLineCompany"
                           className="cursor-pointer select-none"
                         >
                           P-Line Company
@@ -1218,18 +1191,18 @@ const AddAlbumPage = () => {
 
                         <input
                           type="text"
-                          name="pLine"
-                          id="pLine"
+                          name="pLineCompany"
+                          id="pLineCompany"
                           className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("pLine")}
+                          {...register("pLineCompany")}
                         />
 
                         <p
                           className={`${
-                            errors.pLine?.message ? "block" : "hidden"
+                            errors.pLineCompany?.message ? "block" : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5`}
                         >
-                          {errors.pLine?.message}
+                          {errors.pLineCompany?.message}
                         </p>
                       </div>
 
@@ -1269,7 +1242,7 @@ const AddAlbumPage = () => {
                       </div>
 
                       <div className="input col-start-1 col-end-13">
-                        <label htmlFor="genre" className="select-none">
+                        <label htmlFor="releaseGenre" className="select-none">
                           Release Genre
                         </label>
 
@@ -1282,12 +1255,12 @@ const AddAlbumPage = () => {
                               >
                                 <input
                                   type="checkbox"
-                                  name={`albumGenre[${index}].name`}
-                                  id={`albumGenre[${index}].name`}
-                                  {...register(`albumGenre.${index}.status`)}
+                                  name={`releaseGenre[${index}].name`}
+                                  id={`releaseGenre[${index}].name`}
+                                  {...register(`releaseGenre.${index}.status`)}
                                 />
                                 <label
-                                  htmlFor={`albumGenre[${index}].name`}
+                                  htmlFor={`releaseGenre[${index}].name`}
                                   className="ml-1 cursor-pointer select-none"
                                 >
                                   {field.name}
@@ -1298,14 +1271,14 @@ const AddAlbumPage = () => {
 
                           <p
                             className={`${
-                              errors.albumGenre &&
-                              errors.albumGenre?.root?.message
+                              errors.releaseGenre &&
+                              errors.releaseGenre?.root?.message
                                 ? "block"
                                 : "hidden"
                             } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
                           >
-                            {errors.albumGenre &&
-                              errors.albumGenre?.root?.message}
+                            {errors.releaseGenre &&
+                              errors.releaseGenre?.root?.message}
                           </p>
                         </div>
                       </div>
@@ -1324,12 +1297,15 @@ const AddAlbumPage = () => {
                               >
                                 <input
                                   type="checkbox"
-                                  name={`albumSubgenre[${index}].name`}
-                                  id={`albumSubgenre[${index}].name`}
-                                  {...register(`albumSubgenre.${index}.status`)}
+                                  name={`releaseSubGenre[${index}].name`}
+                                  id={`releaseSubGenre[${index}].name`}
+                                  {...register(
+                                    `releaseSubGenre.${index}.status`
+                                  )}
                                 />
+
                                 <label
-                                  htmlFor={`albumSubgenre[${index}].name`}
+                                  htmlFor={`releaseSubGenre[${index}].name`}
                                   className="ml-1 cursor-pointer select-none"
                                 >
                                   {field.name}
@@ -1372,7 +1348,7 @@ const AddAlbumPage = () => {
 
                       <div className="input col-start-1 col-end-13">
                         <label
-                          htmlFor="releaseType"
+                          htmlFor="releaseExplicit"
                           className="cursor-pointer select-none"
                         >
                           Release Explicit
@@ -1385,7 +1361,7 @@ const AddAlbumPage = () => {
                               name="releaseExplicit"
                               id="yes"
                               className="mr-1"
-                              value="yes"
+                              value="true"
                               {...register("releaseExplicit")}
                               defaultChecked
                             />
@@ -1403,7 +1379,7 @@ const AddAlbumPage = () => {
                               name="releaseExplicit"
                               id="no"
                               className="ml-5 mr-1"
-                              value="no"
+                              value="false"
                               {...register("releaseExplicit")}
                             />
                             <label
@@ -1450,8 +1426,8 @@ const AddAlbumPage = () => {
                             {tracks.map((track, index) => {
                               const {
                                 id,
-                                titleOfTrack,
-                                primaryArtist,
+                                trackTitle,
+                                trackArtist,
                                 isrc,
                                 duration,
                               } = track;
@@ -1459,9 +1435,9 @@ const AddAlbumPage = () => {
                               return (
                                 <tr className="even:bg-gray-100" key={index}>
                                   <td className="border p-2">{index + 1}</td>
-                                  <td className="border p-2">{titleOfTrack}</td>
+                                  <td className="border p-2">{trackTitle}</td>
                                   <td className="border p-2">
-                                    {primaryArtist[0]?.name}
+                                    {trackArtist[0]?.name}
                                   </td>
                                   <td className="border p-2">{isrc}</td>
                                   <td className="border p-2">{duration}</td>
