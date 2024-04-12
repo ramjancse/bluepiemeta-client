@@ -11,6 +11,7 @@ import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 const page = async () => {
   const session = await getServerSession(authOptions);
   const { data: albums = [] } = await getAllAlbums(session?.jwt);
+  // console.log(albums, "albums");
 
   return (
     <Layout>
@@ -42,21 +43,21 @@ const page = async () => {
                 albums.map((album) => {
                   const {
                     _id,
-                    albumCover,
-                    albumGenre,
+                    releaseCover,
+                    releaseGenre,
                     albumId,
-                    albumName,
+                    releaseTitle,
                     albumType,
                     artistId,
-                    cline,
+                    cLineCompany,
                     clineYear,
                     distributionDate,
                     featuringArtist,
                     metadataLanguage,
                     originalReleaseDate,
-                    pline,
+                    pLineCompany,
                     plineYear,
-                    primaryArtist,
+                    releasePrimaryArtist,
                     recordLabel,
                     tracks,
                     userId,
@@ -72,7 +73,7 @@ const page = async () => {
                         >
                           <Image
                             src={
-                              albumCover ||
+                              releaseCover ||
                               "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
                             }
                             alt="Image"
@@ -81,7 +82,7 @@ const page = async () => {
                             height={40}
                           />
                           <span className="ml-2 text-blue-600">
-                            {albumName}
+                            {releaseTitle}
                           </span>
                         </Link>
                       </td>
@@ -93,12 +94,12 @@ const page = async () => {
                           className="block text-blue-600"
                           href={`/artists/${artistId}`}
                         >
-                          {primaryArtist[0]?.name}
+                          {releasePrimaryArtist[0]?.name}
                         </Link>
                       </td>
 
                       <td className="border p-2 space-x-1">
-                        {albumGenre
+                        {releaseGenre
                           .filter((genre) => genre.status)
                           .map((genre, index, array) => (
                             <span
