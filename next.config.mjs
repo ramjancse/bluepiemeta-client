@@ -20,6 +20,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "media.istockphoto.com",
       },
+      {
+        protocol: "https",
+        hostname: "wallpapercave.com",
+      },
     ],
   },
 };

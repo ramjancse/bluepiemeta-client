@@ -11,7 +11,6 @@ import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 const page = async () => {
   const session = await getServerSession(authOptions);
   const { data: albums = [] } = await getAllAlbums(session?.jwt);
-  // console.log(albums, "albums");
 
   return (
     <Layout>
@@ -45,23 +44,12 @@ const page = async () => {
                     _id,
                     releaseCover,
                     releaseGenre,
-                    albumId,
                     releaseTitle,
-                    albumType,
+                    formatType,
                     artistId,
-                    cLineCompany,
-                    clineYear,
-                    distributionDate,
-                    featuringArtist,
-                    metadataLanguage,
                     originalReleaseDate,
-                    pLineCompany,
-                    plineYear,
                     releasePrimaryArtist,
-                    recordLabel,
                     tracks,
-                    userId,
-                    updatedAt,
                     upcean,
                   } = album;
                   return (
@@ -74,7 +62,7 @@ const page = async () => {
                           <Image
                             src={
                               releaseCover ||
-                              "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
+                              process.env.NEXT_PUBLIC_DEFAULT_IMAGE
                             }
                             alt="Image"
                             className="w-[40px] h-[40px]"
@@ -115,10 +103,12 @@ const page = async () => {
                           ))}
                       </td>
 
-                      <td className="border p-2">{albumType}</td>
+                      <td className="border p-2">{formatType}</td>
 
                       <td className="border p-2">
-                        {format(originalReleaseDate, "dd-MMM-yyyy")}
+                        {originalReleaseDate
+                          ? format(originalReleaseDate, "dd-MMM-yyyy")
+                          : "-"}
                       </td>
 
                       <td className="border p-2">{tracks.length}</td>

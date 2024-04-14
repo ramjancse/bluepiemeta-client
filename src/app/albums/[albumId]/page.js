@@ -11,25 +11,15 @@ import React from "react";
 const page = async ({ params: { albumId } }) => {
   const session = await getServerSession(authOptions);
   const {
-    primaryArtist,
-    recordLabel,
+    releasePrimaryArtist,
     tracks,
-    userId,
-    albumCover,
-    albumGenre,
-    albumName,
-    albumType,
-    artistId,
-    distributionDate,
-    featuringArtist,
-    metadataLanguage,
+    releaseCover,
+    releaseGenre,
+    releaseTitle,
+    releaseType,
+    formatType,
     originalReleaseDate,
-    pLine,
-    pLineYear,
-    cLine,
-    cLineYear,
     upcean,
-    updatedAt,
   } = await getAlbumById({ token: session?.jwt, albumId });
 
   return (
@@ -39,19 +29,16 @@ const page = async ({ params: { albumId } }) => {
         <div className="flex flex-col md:flex-row">
           <div className="left md:w-1/4 flex flex-col">
             <Image
-              src={
-                albumCover ||
-                "https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
-              }
+              src={releaseCover || process.env.NEXT_PUBLIC_DEFAULT_IMAGE}
               className="w-full"
               alt="Album Cover Picture"
               width={1000}
               height={1000}
               placeholder="blur"
-              blurDataURL="https://images.othoba.com/images/thumbs/0483187_300-photo-6-slip-in-leather-photo-album-book-image-memory-scrapbook-gift.jpeg"
+              blurDataURL={process.env.NEXT_PUBLIC_DEFAULT_IMAGE}
             />
 
-            <h2 className="text-xl mt-3">{albumName}</h2>
+            <h2 className="text-xl mt-3">{releaseTitle}</h2>
           </div>
 
           <div className="right mt-5 md:mt-0 md:ml-3 md:w-3/4">
@@ -63,12 +50,12 @@ const page = async ({ params: { albumId } }) => {
                 <div className="one w-1/2 mr-3">
                   <div className="info border-b py-2">
                     <p className="font-semibold">Artist</p>
-                    <p className="text-sm">{primaryArtist[0]?.name}</p>
+                    <p className="text-sm">{releasePrimaryArtist[0]?.name}</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Type</p>
-                    <p className="text-sm">{albumType}</p>
+                    <p className="text-sm">{`${formatType} - ${releaseType}`}</p>
                   </div>
 
                   <div className="info border-b py-2">
@@ -81,7 +68,7 @@ const page = async ({ params: { albumId } }) => {
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
                     <p className="text-sm space-x-1">
-                      {albumGenre
+                      {releaseGenre
                         .filter((genre) => genre.status)
                         .map((genre, index, array) => (
                           <span
@@ -132,21 +119,8 @@ const page = async ({ params: { albumId } }) => {
                   <tbody>
                     {tracks.length ? (
                       tracks.map((track, index) => {
-                        const {
-                          _id,
-                          trackId,
-                          audioFile,
-                          primaryArtist,
-                          metadataLanguage,
-                          titleOfTrack,
-                          version,
-                          trackGenre,
-                          audioLanguage,
-                          lyrics,
-                          explicitContent,
-                          catalogNumber,
-                          isrc,
-                        } = track;
+                        const { _id, trackArtist, trackTitle, isrc, duration } =
+                          track;
 
                         return (
                           <tr className="even:bg-gray-100" key={_id}>
@@ -156,15 +130,15 @@ const page = async ({ params: { albumId } }) => {
                                 href={`/albums/${albumId}/tracks/${_id}`}
                                 className="block text-blue-600"
                               >
-                                {titleOfTrack}
+                                {trackTitle}
                               </Link>
                             </td>
 
                             <td className="border p-2">
-                              {primaryArtist[0]?.name}
+                              {trackArtist[0]?.name}
                             </td>
 
-                            <td className="border p-2">3.21</td>
+                            <td className="border p-2">{duration}</td>
                             <td className="border p-2">{isrc}</td>
                             <td className="border p-2 text-center">
                               <Link

@@ -344,20 +344,6 @@ const AddAlbumPage = () => {
   };
 
   const onSubmit = async (data) => {
-    // // Check if at least one genre is selected
-    // const isSelected = data.albumGenre.some((genre) => genre.status);
-
-    // if (!isSelected) {
-    //   // Set a custom error if no genres are selected
-    //   setError("albumGenre", {
-    //     type: "manual",
-    //     message: "At least one genre must be selected!",
-    //   });
-    // } else {
-    //   clearErrors("albumGenre");
-    //   console.log("Selected Genres:", data);
-    // }
-
     try {
       const {
         data: {
@@ -372,6 +358,7 @@ const AddAlbumPage = () => {
       localStorage.removeItem("tracks");
 
       // redirect to another route
+      console.log(self, "self");
       router.push(self);
     } catch (error) {
       console.log(error, "error in add album page");
