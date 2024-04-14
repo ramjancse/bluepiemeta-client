@@ -200,6 +200,7 @@ const AddAlbumPage = () => {
     formState: { errors },
     setValue,
     watch,
+    getValues,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -441,7 +442,9 @@ const AddAlbumPage = () => {
                             className="mr-1"
                             value="Audio"
                             {...register("releaseType")}
-                            defaultChecked
+                            defaultChecked={
+                              getValues("releaseType") === "Audio"
+                            }
                           />
                           <label
                             htmlFor="Audio"
@@ -459,6 +462,9 @@ const AddAlbumPage = () => {
                             className="ml-5 mr-1"
                             value="Video"
                             {...register("releaseType")}
+                            defaultChecked={
+                              getValues("releaseType") === "Video"
+                            }
                           />
                           <label
                             htmlFor="Video"
@@ -605,7 +611,7 @@ const AddAlbumPage = () => {
                         id="releaseVersion"
                         className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                         {...register("releaseVersion")}
-                        placeholder="Enter album version"
+                        placeholder="Enter version"
                       />
 
                       <p
@@ -1348,9 +1354,11 @@ const AddAlbumPage = () => {
                               name="releaseExplicit"
                               id="yes"
                               className="mr-1"
-                              value="true"
+                              value={true}
                               {...register("releaseExplicit")}
-                              defaultChecked
+                              defaultChecked={
+                                getValues("releaseExplicit") === true
+                              }
                             />
                             <label
                               htmlFor="yes"
@@ -1366,8 +1374,11 @@ const AddAlbumPage = () => {
                               name="releaseExplicit"
                               id="no"
                               className="ml-5 mr-1"
-                              value="false"
+                              value={false}
                               {...register("releaseExplicit")}
+                              defaultChecked={
+                                getValues("releaseExplicit") === false
+                              }
                             />
                             <label
                               htmlFor="no"

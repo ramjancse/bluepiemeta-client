@@ -321,6 +321,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     control,
     formState: { errors },
     reset,
+    getValues,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -359,7 +360,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
       isrc: "",
       minute: "", // minute and second modify to duration
       second: "",
-      explicit: "",
+      explicit: true,
 
       // audioFile: "",
       // arranger: [{ name: "" }],
@@ -834,7 +835,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                         className="mr-1"
                         value="Lyrical"
                         {...register("trackType")}
-                        defaultChecked
+                        defaultChecked={getValues("trackType") === "Lyrical"}
                       />
                       <label
                         htmlFor="Lyrical"
@@ -853,6 +854,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       className="ml-5 mr-1"
                       value="Instrumental"
                       {...register("trackType")}
+                      defaultChecked={getValues("trackType") === "Instrumental"}
                     />
                     <label
                       htmlFor="Instrumental"
@@ -1366,7 +1368,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       className="mr-1"
                       value="true"
                       {...register("explicit")}
-                      defaultChecked
+                      defaultChecked={getValues("explicit") === true}
                     />
                     <label htmlFor="yes" className="cursor-pointer select-none">
                       Yes
@@ -1381,6 +1383,7 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       className="ml-5 mr-1"
                       value="false"
                       {...register("explicit")}
+                      defaultChecked={getValues("explicit") === false}
                     />
                     <label htmlFor="no" className="cursor-pointer select-none">
                       No
