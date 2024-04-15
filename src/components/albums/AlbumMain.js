@@ -176,6 +176,8 @@ const AlbumMain = ({ albumData }) => {
   const [tracks, setTracks] = useState([]);
 
   const onSubmitTrack = (data) => {
+    console.log(data, "track submitted data in album main");
+
     // get local storage data
     const savedTracks = JSON.parse(localStorage.getItem("tracks"));
 
@@ -200,28 +202,29 @@ const AlbumMain = ({ albumData }) => {
         { id: prevTracks.length + 1, ...data },
       ];
 
-      setValue("tracks", updatedTracks);
+      // setValue("tracks", updatedTracks);
       return updatedTracks;
     });
   };
 
   const onSubmit = async (data) => {
+    console.log(data, "album submitted data");
     try {
-      const {
-        data: {
-          links: { self },
-        },
-      } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+      // const {
+      //   data: {
+      //     links: { self },
+      //   },
+      // } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
 
       // show success message
       toast.success("Album added successfully");
 
       // remove local storage saved tracks data
-      localStorage.removeItem("tracks");
+      // localStorage.removeItem("tracks");
 
       // redirect to another route
-      console.log(self, "self");
-      router.push(self);
+      // console.log(self, "self");
+      // router.push(self);
     } catch (error) {
       console.log(error, "error in add album page");
 
