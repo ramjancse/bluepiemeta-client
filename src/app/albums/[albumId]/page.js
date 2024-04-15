@@ -2,7 +2,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import Footer from "@/components/artist/Footer";
 import Header from "@/components/artist/Header";
 import { getAlbumById } from "@/lib/albums";
-import { format } from "date-fns";
+import dateFormatter from "@/utils/dateFormatter";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,7 +38,7 @@ const page = async ({ params: { albumId } }) => {
               blurDataURL={process.env.NEXT_PUBLIC_DEFAULT_IMAGE}
             />
 
-            <h2 className="text-xl mt-3">{releaseTitle}</h2>
+            <h2 className="text-xl mt-3">{releaseTitle || "-"}</h2>
           </div>
 
           <div className="right mt-5 md:mt-0 md:ml-3 md:w-3/4">
@@ -50,17 +50,21 @@ const page = async ({ params: { albumId } }) => {
                 <div className="one w-1/2 mr-3">
                   <div className="info border-b py-2">
                     <p className="font-semibold">Artist</p>
-                    <p className="text-sm">{releasePrimaryArtist[0]?.name}</p>
+                    <p className="text-sm">
+                      {releasePrimaryArtist[0]?.name || "-"}
+                    </p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Type</p>
-                    <p className="text-sm">{`${formatType} - ${releaseType}`}</p>
+                    <p className="text-sm">{`${formatType || "-"} - ${
+                      releaseType || "-"
+                    }`}</p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Total tracks</p>
-                    <p className="text-sm">{tracks?.length}</p>
+                    <p className="text-sm">{tracks.length}</p>
                   </div>
                 </div>
 
@@ -68,33 +72,35 @@ const page = async ({ params: { albumId } }) => {
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
                     <p className="text-sm space-x-1">
-                      {releaseGenre
-                        .filter((genre) => genre.status)
-                        .map((genre, index, array) => (
-                          <span
-                            key={genre._id}
-                            className={
-                              index !== array.length - 1
-                                ? 'after:content-[","]'
-                                : ""
-                            }
-                          >
-                            {genre.name}
-                          </span>
-                        ))}
+                      {releaseGenre.length
+                        ? releaseGenre
+                            .filter((genre) => genre.status)
+                            .map((genre, index, array) => (
+                              <span
+                                key={genre._id}
+                                className={
+                                  index !== array.length - 1
+                                    ? 'after:content-[","]'
+                                    : ""
+                                }
+                              >
+                                {genre.name}
+                              </span>
+                            ))
+                        : "-"}
                     </p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Release Date</p>
                     <p className="text-sm">
-                      {format(originalReleaseDate, "dd-MMMM-yyyy")}
+                      {dateFormatter(originalReleaseDate, "dd-MMMM-yyyy")}
                     </p>
                   </div>
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">UPC/EAN</p>
-                    <p className="text-sm">{upcean}</p>
+                    <p className="text-sm">{upcean || "-"}</p>
                   </div>
                 </div>
               </div>
@@ -130,16 +136,16 @@ const page = async ({ params: { albumId } }) => {
                                 href={`/albums/${albumId}/tracks/${_id}`}
                                 className="block text-blue-600"
                               >
-                                {trackTitle}
+                                {trackTitle || "-"}
                               </Link>
                             </td>
 
                             <td className="border p-2">
-                              {trackArtist[0]?.name}
+                              {trackArtist[0]?.name || "-"}
                             </td>
 
-                            <td className="border p-2">{duration}</td>
-                            <td className="border p-2">{isrc}</td>
+                            <td className="border p-2">{duration || "-"}</td>
+                            <td className="border p-2">{isrc || "-"}</td>
                             <td className="border p-2 text-center">
                               <Link
                                 href={`/albums/${albumId}/tracks/${_id}`}
