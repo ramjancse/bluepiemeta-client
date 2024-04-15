@@ -1,12 +1,12 @@
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAllAlbums } from "@/lib/albums";
-import { format } from "date-fns";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
+import dateFormatter from "@/utils/dateFormatter";
 
 const page = async () => {
   const session = await getServerSession(authOptions);
@@ -70,7 +70,7 @@ const page = async () => {
                             height={40}
                           />
                           <span className="ml-2 text-blue-600">
-                            {releaseTitle}
+                            {releaseTitle || "-"}
                           </span>
                         </Link>
                       </td>
@@ -78,40 +78,37 @@ const page = async () => {
                       <td className="border p-2">{upcean}</td>
 
                       <td className="border p-2">
-                        <Link
-                          className="block text-blue-600"
-                          href={`/artists/${artistId}`}
-                        >
-                          {releasePrimaryArtist[0]?.name}
+                        <Link className="block text-blue-600" href={`/artists`}>
+                          {releasePrimaryArtist[0]?.name || "-"}
                         </Link>
                       </td>
 
                       <td className="border p-2 space-x-1">
-                        {releaseGenre
-                          .filter((genre) => genre.status)
-                          .map((genre, index, array) => (
-                            <span
-                              key={genre._id}
-                              className={
-                                index !== array.length - 1
-                                  ? 'after:content-[","]'
-                                  : ""
-                              }
-                            >
-                              {genre.name}
-                            </span>
-                          ))}
-                      </td>
-
-                      <td className="border p-2">{formatType}</td>
-
-                      <td className="border p-2">
-                        {originalReleaseDate
-                          ? format(originalReleaseDate, "dd-MMM-yyyy")
+                        {releaseGenre.length
+                          ? releaseGenre
+                              .filter((genre) => genre.status)
+                              .map((genre, index, array) => (
+                                <span
+                                  key={genre._id}
+                                  className={
+                                    index !== array.length - 1
+                                      ? 'after:content-[","]'
+                                      : ""
+                                  }
+                                >
+                                  {genre.name}
+                                </span>
+                              ))
                           : "-"}
                       </td>
 
-                      <td className="border p-2">{tracks.length}</td>
+                      <td className="border p-2">{formatType || "-"}</td>
+
+                      <td className="border p-2">
+                        {dateFormatter(originalReleaseDate, "dd-MMM-yyyy")}
+                      </td>
+
+                      <td className="border p-2">{tracks?.length}</td>
 
                       <td className="border p-2">
                         <Link

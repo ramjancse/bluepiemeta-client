@@ -3,7 +3,7 @@ import Footer from "@/components/artist/Footer";
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAlbumById } from "@/lib/albums";
-import { format } from "date-fns";
+import dateFormatter from "@/utils/dateFormatter";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
@@ -56,7 +56,7 @@ const page = async ({ params: { albumId, trackId } }) => {
               <div className="one w-1/2 mr-3">
                 <div className="info border-b py-2 ">
                   <p className="font-semibold">Title</p>
-                  <p className="text-sm">{trackTitle}</p>
+                  <p className="text-sm">{trackTitle || "-"}</p>
                 </div>
 
                 <div className="info border-b py-2">
@@ -83,7 +83,7 @@ const page = async ({ params: { albumId, trackId } }) => {
               <div className="two w-1/2 ml-3">
                 <div className="info border-b py-2">
                   <p className="font-semibold">Language</p>
-                  <p className="text-sm">{audioLanguage}</p>
+                  <p className="text-sm">{audioLanguage || "-"}</p>
                 </div>
 
                 <div className="info border-b py-2">
@@ -257,7 +257,7 @@ const page = async ({ params: { albumId, trackId } }) => {
 
                 <div className="info border-b py-2">
                   <p className="font-semibold">Duration</p>
-                  <p className="text-sm">{duration}</p>
+                  <p className="text-sm">{duration || "-"}</p>
                 </div>
               </div>
             </div>
@@ -273,19 +273,19 @@ const page = async ({ params: { albumId, trackId } }) => {
                 <div className="info border-b py-2">
                   <p className="font-semibold">Release Date</p>
                   <p className="text-sm">
-                    {format(originalReleaseDate, "dd-MMMM-yyyy")}
+                    {dateFormatter(originalReleaseDate, "dd-MMMM-yyyy")}
                   </p>
                 </div>
 
                 <div className="info border-b py-2">
                   <p className="font-semibold">Version</p>
-                  <p className="text-sm">{trackVersion ?? "-"}</p>
+                  <p className="text-sm">{trackVersion || "-"}</p>
                 </div>
 
                 <div className="info border-b py-2">
                   <p className="font-semibold">P Line Company</p>
                   <p className="text-sm">
-                    {pLineCompany}, {format(pLineYear, "yyyy")}
+                    {pLineCompany || "-"} {dateFormatter(pLineYear, "yyyy")}
                   </p>
                 </div>
               </div>
@@ -293,18 +293,18 @@ const page = async ({ params: { albumId, trackId } }) => {
               <div className="two w-1/2 ml-3">
                 <div className="info border-b py-2">
                   <p className="font-semibold">Label</p>
-                  <p className="text-sm">{recordLabel}</p>
+                  <p className="text-sm">{recordLabel || "-"}</p>
                 </div>
 
                 <div className="info border-b py-2">
                   <p className="font-semibold">ISRC</p>
-                  <p className="text-sm">{isrc}</p>
+                  <p className="text-sm">{isrc || "-"}</p>
                 </div>
 
                 <div className="info border-b py-2">
                   <p className="font-semibold">C Line Company</p>
                   <p className="text-sm">
-                    {cLineCompany}, {format(cLineYear, "yyyy")}
+                    {cLineCompany || "-"} {dateFormatter(cLineYear, "yyyy")}
                   </p>
                 </div>
               </div>
