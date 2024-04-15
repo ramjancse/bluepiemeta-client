@@ -279,7 +279,9 @@ const DashboardIntro = ({ albums }) => {
             >
               <Link href={`/albums/${album.id}`} className="block mb-3">
                 <Image
-                  src={album.albumCover}
+                  src={
+                    album.releaseCover || process.env.NEXT_PUBLIC_DEFAULT_IMAGE
+                  }
                   alt="Album image"
                   width={calculateImageSize(index).width}
                   height={calculateImageSize(index).height}
@@ -292,7 +294,7 @@ const DashboardIntro = ({ albums }) => {
                   index === 4 ? "block" : "hidden"
                 }`}
               >
-                <p>{album.albumName}</p>
+                <p>{album.releaseTitle}</p>
               </div>
             </div>
           ))}

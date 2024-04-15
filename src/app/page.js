@@ -34,7 +34,7 @@ const Dashboard = async () => {
             {albums
               .slice(0, process.env.RECENTLY_ADDED_ALBUMS_SHOW)
               .map((album, index) => {
-                const { _id, albumName, albumCover, author } = album;
+                const { _id, releaseTitle, releaseCover, author } = album;
                 return (
                   <div
                     key={_id}
@@ -45,7 +45,9 @@ const Dashboard = async () => {
                     <div className="image mr-2">
                       <Image
                         className="w-[60px]"
-                        src={albumCover}
+                        src={
+                          releaseCover || process.env.NEXT_PUBLIC_DEFAULT_IMAGE
+                        }
                         alt="Track Image"
                         width={60}
                         height={60}
@@ -59,7 +61,7 @@ const Dashboard = async () => {
                             href={`/albums/${_id}`}
                             className="hover:text-fill"
                           >
-                            {albumName}
+                            {releaseTitle}
                           </Link>
                         </h5>
 
@@ -143,7 +145,7 @@ const Dashboard = async () => {
             {albums
               .slice(0, process.env.TRACK_LIST_SHOW)
               .map((album, index) => {
-                const { _id, albumName, albumCover, tracks } = album;
+                const { _id, releaseTitle, releaseCover, tracks } = album;
                 if (tracks && tracks.length > 0) {
                   const firstTrack = tracks[0];
                   return (
@@ -155,7 +157,10 @@ const Dashboard = async () => {
                     >
                       <div className="cover w-[50px]">
                         <Image
-                          src={albumCover}
+                          src={
+                            releaseCover ||
+                            process.env.NEXT_PUBLIC_DEFAULT_IMAGE
+                          }
                           className="w-full"
                           alt="Album"
                           width={50}
@@ -170,14 +175,14 @@ const Dashboard = async () => {
                               href={`/albums/${_id}/tracks/${firstTrack._id}`}
                               className="hover:text-fill"
                             >
-                              {firstTrack.titleOfTrack}{" "}
+                              {firstTrack.trackTitle}{" "}
                             </a>
 
                             <a
                               className="text-xs italic hover:text-fill"
                               href={`/albums/${_id}/tracks/${firstTrack._id}`}
                             >
-                              - {firstTrack?.primaryArtist[0]?.name}
+                              - {firstTrack?.trackArtist[0]?.name}
                             </a>
                           </h6>
 
