@@ -1,4 +1,6 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import AlbumForm from "@/components/albums/AlbumForm";
+import AlbumMain from "@/components/albums/AlbumMain";
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import { getAlbumById } from "@/lib/albums";
@@ -11,8 +13,7 @@ const page = async ({ params: { albumId } }) => {
 
   return (
     <Layout>
-      <Header name="Edit Album" />
-      <main>Edit Album</main>
+      <AlbumMain albumData={albumData} />
     </Layout>
   );
 };

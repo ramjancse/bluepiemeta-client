@@ -43,7 +43,7 @@ const Login = () => {
       });
       console.log(result, "login result");
 
-      if (!result.error) {
+      if (!result.error && result.ok) {
         // show success message
         toast.success("Login success!");
         router.push(callbackUrl ? callbackUrl : "/");
