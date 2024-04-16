@@ -10,9 +10,7 @@ const Header = ({ name = "Dashboard" }) => {
     <div className="flex justify-between border-b pr-4 py-6">
       <div className="left">
         <div className="flex items-center">
-          <Link href="/">
-            <HiBars3BottomLeft className="text-blue-600 text-[40px] -ml-[5px]" />
-          </Link>
+          <HiBars3BottomLeft className="text-blue-600 text-[40px] -ml-[5px]" />
 
           <h3 className="font-semibold ml-2">{name}</h3>
         </div>
