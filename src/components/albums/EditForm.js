@@ -165,11 +165,11 @@ const schema = yup
   })
   .required();
 
-const AlbumForm = ({ albumData, setShow, onSubmit }) => {
+const EditForm = ({ albumData, setShow, onSubmit, tracks, setTracks }) => {
   const session = useSession();
   const router = useRouter();
   // const [show, setShow] = useState(false);
-  const [tracks, setTracks] = useState([]);
+  // const [tracks, setTracks] = useState([]);
   const [primaryArtists, setPrimaryArtists] = useState([]);
   const [labels, setLabels] = useState([]);
 
@@ -187,7 +187,7 @@ const AlbumForm = ({ albumData, setShow, onSubmit }) => {
         releaseTitle: "",
         releaseCover: "",
         releaseGenre: [
-          { name: "Indie", status: false },
+          { name: "Indie", status: true },
           { name: "Singer", status: false },
           { name: "Artist", status: false },
           { name: "Lyricist", status: false },
@@ -197,7 +197,7 @@ const AlbumForm = ({ albumData, setShow, onSubmit }) => {
           { name: "Group", status: false },
         ],
         releaseSubGenre: [
-          { name: "Indie", status: false },
+          { name: "Indie", status: true },
           { name: "Singer", status: false },
           { name: "Artist", status: false },
           { name: "Lyricist", status: false },
@@ -1424,4 +1424,4 @@ const AlbumForm = ({ albumData, setShow, onSubmit }) => {
   );
 };
 
-export default AlbumForm;
+export default EditForm;

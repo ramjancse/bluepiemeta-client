@@ -52,6 +52,7 @@ const page = async () => {
                     tracks,
                     upcean,
                   } = album;
+
                   return (
                     <tr className="even:bg-gray-100" key={_id}>
                       <td className="border p-2">
