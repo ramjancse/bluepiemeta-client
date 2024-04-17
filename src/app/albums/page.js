@@ -7,10 +7,14 @@ import Link from "next/link";
 import React from "react";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import dateFormatter from "@/utils/dateFormatter";
+import PaginationComp from "@/components/shared/Pagination";
 
 const page = async () => {
   const session = await getServerSession(authOptions);
-  const { data: albums = [] } = await getAllAlbums(session?.jwt);
+  const {
+    data: albums = [],
+    pagination: { page, limit, totalItems, totalPage, next },
+  } = await getAllAlbums(session?.jwt);
 
   return (
     <Layout>
@@ -138,6 +142,9 @@ const page = async () => {
             </tbody>
           </table>
         </div>
+
+        {/* pagination */}
+        <PaginationComp />
       </main>
     </Layout>
   );
