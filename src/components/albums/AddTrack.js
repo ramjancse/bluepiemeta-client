@@ -123,6 +123,7 @@ const schema = yup
           name: yup
             .string()
             .trim()
+            // .required("Track genre must be select")
             .oneOf(
               [
                 "Indie",
@@ -134,7 +135,7 @@ const schema = yup
                 "Band",
                 "Group",
               ],
-              "Genre must be select between fields"
+              "Track genre must be select between fields"
             ),
           status: yup
             .boolean()
@@ -143,7 +144,7 @@ const schema = yup
       )
       .test(
         "at-least-one-true",
-        "At least one genre must be selected",
+        "At least one track genre must be select", // Custom error message
         (array) => array.some((obj) => obj.status)
       ),
     trackSubGenre: yup.array().of(
@@ -169,6 +170,37 @@ const schema = yup
           .oneOf([true, false], "Status can only true or false"),
       })
     ),
+    releaseGenre: yup
+      .array()
+      .of(
+        yup.object({
+          name: yup
+            .string()
+            .trim()
+            .required("Release genre must be select")
+            .oneOf(
+              [
+                "Indie",
+                "Singer",
+                "Artist",
+                "Lyricist",
+                "Composer",
+                "Producer",
+                "Band",
+                "Group",
+              ],
+              "Release genre must be select between fields"
+            ),
+          status: yup
+            .boolean()
+            .oneOf([true, false], "Status can only true or false"),
+        })
+      )
+      .test(
+        "at-least-one-true",
+        "At least one release genre must be select", // Custom error message
+        (array) => array.some((obj) => obj.status)
+      ),
     trackLanguage: yup
       .string()
       .trim()
@@ -310,7 +342,7 @@ const schema = yup
   })
   .required();
 
-const AddTrack = ({ onSubmitTrack, setShow }) => {
+const AddTrack = () => {
   const [releaseArtists, setReleaseArtists] = useState([]);
   const router = useRouter();
   const session = useSession();
@@ -346,7 +378,17 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
         { name: "Group", status: false },
       ],
       trackSubGenre: [
-        { name: "Indie", status: false },
+        { name: "Indie", status: true },
+        { name: "Singer", status: false },
+        { name: "Artist", status: false },
+        { name: "Lyricist", status: false },
+        { name: "Composer", status: false },
+        { name: "Producer", status: false },
+        { name: "Band", status: false },
+        { name: "Group", status: false },
+      ],
+      releaseGenre: [
+        { name: "Indie", status: true },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
@@ -453,6 +495,11 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     control,
   });
 
+  const { fields: releaseGenreFields } = useFieldArray({
+    name: "releaseGenre",
+    control,
+  });
+
   const {
     fields: remixerFields,
     append: remixerAppend,
@@ -490,11 +537,15 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
   // });
 
   const onSubmit = async (data) => {
+    console.log(data, "add track data");
     // submitted data to parent
     onSubmitTrack(data);
 
     // show album form
     setShow((prevShow) => !prevShow);
+
+    // remove artist from local storage
+    localStorage.removeItem("releasePrimaryArtist");
   };
 
   useEffect(() => {
@@ -522,9 +573,10 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     setReleaseArtists(data);
   };
 
+  // console.log(errors, "errors");
+
   return (
     <>
-      <Header name="Add Track" />
       <main className="px-4 py-2 border-l border-b">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="asset mt-4">
@@ -1293,6 +1345,43 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                       </label>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              <div className="input col-start-1 col-end-13">
+                <label htmlFor="releaseGenre" className="select-none">
+                  Release Genre
+                </label>
+
+                <div className="genre mt-2">
+                  <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
+                    {releaseGenreFields.map((field, index) => (
+                      <div className="input px-3 py-1 w-1/6" key={field.id}>
+                        <input
+                          type="checkbox"
+                          name={`releaseGenre[${index}].name`}
+                          id={`releaseGenre[${index}].name`}
+                          {...register(`releaseGenre.${index}.status`)}
+                        />
+                        <label
+                          htmlFor={`releaseGenre[${index}].name`}
+                          className="ml-1 cursor-pointer select-none"
+                        >
+                          {field.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p
+                    className={`${
+                      errors.releaseGenre && errors.releaseGenre?.root?.message
+                        ? "block"
+                        : "hidden"
+                    } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                  >
+                    {errors.releaseGenre && errors.releaseGenre?.root?.message}
+                  </p>
                 </div>
               </div>
             </div>

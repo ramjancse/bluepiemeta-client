@@ -24,6 +24,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "wallpapercave.com",
       },
+      {
+        protocol: "https",
+        hostname: "pixlr.com",
+      },
     ],
   },
 };

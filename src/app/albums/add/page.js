@@ -170,22 +170,7 @@ const schema = yup
   })
   .required();
 
-const links = [
-  { id: 1, label: "Website", name: "website" },
-  { id: 2, label: "iTunes", name: "iTunes" },
-  { id: 3, label: "Facebook", name: "facebook" },
-  { id: 4, label: "Vimeo", name: "vimeo" },
-  { id: 4, label: "Youtube", name: "youtube" },
-  { id: 4, label: "Deezer", name: "deezer" },
-  { id: 4, label: "Instagram", name: "instagram" },
-  { id: 4, label: "Spotify", name: "spotify" },
-  { id: 4, label: "Twitter", name: "twitter" },
-  { id: 4, label: "Daily Motion", name: "dailyMotion" },
-  { id: 4, label: "Tiktok", name: "tikTok" },
-  { id: 4, label: "Video Rating", name: "videoRating" },
-];
-
-const AddAlbumPage = () => {
+const AddAlbum = () => {
   const session = useSession();
   const router = useRouter();
   const [show, setShow] = useState(false);
@@ -215,7 +200,7 @@ const AddAlbumPage = () => {
       releaseTitle: "",
       releaseCover: "",
       releaseGenre: [
-        { name: "Indie", status: false },
+        { name: "Indie", status: true },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
@@ -225,7 +210,7 @@ const AddAlbumPage = () => {
         { name: "Group", status: false },
       ],
       releaseSubGenre: [
-        { name: "Indie", status: false },
+        { name: "Indie", status: true },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
@@ -315,6 +300,8 @@ const AddAlbumPage = () => {
   };
 
   const onSubmitTrack = (data) => {
+    console.log(data, "track data");
+
     // get local storage data
     const savedTracks = JSON.parse(localStorage.getItem("tracks"));
 
@@ -345,6 +332,8 @@ const AddAlbumPage = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log(data, "album data");
+
     try {
       const {
         data: {
@@ -359,7 +348,6 @@ const AddAlbumPage = () => {
       localStorage.removeItem("tracks");
 
       // redirect to another route
-      console.log(self, "self");
       router.push(self);
     } catch (error) {
       console.log(error, "error in add album page");
@@ -388,6 +376,7 @@ const AddAlbumPage = () => {
     // update state with track data
     if (savedTracks) {
       setTracks(savedTracks);
+      setValue("tracks", savedTracks);
     }
 
     setPrimaryArtists(data);
@@ -414,7 +403,10 @@ const AddAlbumPage = () => {
   return (
     <Layout>
       {show ? (
-        <AddTrack onSubmitTrack={onSubmitTrack} setShow={setShow} />
+        <>
+          <Header name="Add Track" />
+          <AddTrack onSubmitTrack={onSubmitTrack} setShow={setShow} />
+        </>
       ) : (
         <>
           <Header name="Add Album" />
@@ -1489,4 +1481,4 @@ const AddAlbumPage = () => {
   );
 };
 
-export default AddAlbumPage;
+export default AddAlbum;

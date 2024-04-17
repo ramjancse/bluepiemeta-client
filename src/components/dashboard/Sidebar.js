@@ -69,6 +69,13 @@ const menus = [
     icon: DashboardIcon,
     children: [],
   },
+  {
+    id: 7,
+    name: "Search",
+    link: "/search",
+    icon: DashboardIcon,
+    children: [],
+  },
 ];
 
 const Sidebar = () => {
