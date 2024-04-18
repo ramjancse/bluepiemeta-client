@@ -148,9 +148,7 @@ const page = async ({ searchParams: { page: queryPage } }) => {
 
         <Pagination
           route="/albums"
-          currentPage={
-            queryPage ? (queryPage > totalPages ? 1 : Number(queryPage)) : 1
-          }
+          currentPage={queryPage ? Number(queryPage) : 1}
           totalPage={totalPages}
         />
       </main>
