@@ -1,6 +1,7 @@
 "use client";
 
 export default function Error({ error, reset }) {
+  console.log(error, "error in error handling page");
   return (
     <html>
       <body>
