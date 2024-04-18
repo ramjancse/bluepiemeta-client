@@ -1,8 +1,8 @@
 import { BASE_URL, axiosPublicInstance } from "@/config/axios";
 
-export const getAllAlbums = async (token) => {
+export const getAllAlbums = async ({ token, page }) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/albums`, {
+    const res = await fetch(`${BASE_URL}/api/v1/albums?page=${page}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
