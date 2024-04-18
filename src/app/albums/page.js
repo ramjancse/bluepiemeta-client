@@ -7,10 +7,14 @@ import Link from "next/link";
 import React from "react";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import dateFormatter from "@/utils/dateFormatter";
+import Pagination from "@/components/shared/Pagination";
 
-const page = async () => {
+const page = async ({ searchParams: { page: queryPage } }) => {
   const session = await getServerSession(authOptions);
-  const { data: albums = [] } = await getAllAlbums(session?.jwt);
+  const {
+    data: albums = [],
+    pagination: { currentPage, totalPages },
+  } = await getAllAlbums(session?.jwt);
 
   return (
     <Layout>
@@ -138,6 +142,14 @@ const page = async () => {
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          route="/albums"
+          currentPage={
+            queryPage ? (queryPage > totalPages ? 1 : Number(queryPage)) : 1
+          }
+          totalPage={totalPages}
+        />
       </main>
     </Layout>
   );
