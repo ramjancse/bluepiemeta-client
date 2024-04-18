@@ -58,7 +58,14 @@ const PaginationPage = ({
         })}
 
         <PaginationItem>
-          <PaginationNext href={`${route}?page=${Number(currentPage) + 1}`} />
+          <PaginationNext
+            href={`${route}?page=${Number(currentPage) + 1}`}
+            className={
+              currentPage >= totalPage
+                ? "pointer-events-none opacity-50 select-none"
+                : undefined
+            }
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
