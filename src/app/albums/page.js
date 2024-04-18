@@ -14,7 +14,10 @@ const page = async ({ searchParams: { page: queryPage } }) => {
   const {
     data: albums = [],
     pagination: { currentPage, totalPages },
-  } = await getAllAlbums(session?.jwt);
+  } = await getAllAlbums({
+    token: session?.jwt,
+    page: queryPage ? Number(queryPage) : 1,
+  });
 
   return (
     <Layout>
