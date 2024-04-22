@@ -11,6 +11,17 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { getAllAlbums } from "@/lib/albums";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { axiosPrivateInstance } from "@/config/axios";
+
+const schema = yup
+  .object({
+    keyword: yup.string().trim(),
+  })
+  .required();
 
 const Main = () => {
   const session = useSession();
@@ -22,25 +33,63 @@ const Main = () => {
   );
   const [totalPages, setTotalPages] = useState(1);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const loadData = async () => {
+    const {
+      data,
+      pagination: { currentPage, totalPages },
+    } = await getAllAlbums({
+      token: session?.data?.jwt,
+      page: queryPage ? Number(queryPage) : 1,
+    });
+
+    setAlbums(data);
+    setCurrentPage(currentPage);
+    setTotalPages(totalPages);
+  };
+
   useEffect(() => {
     if (session?.data?.jwt) {
-      const loadData = async () => {
-        const {
-          data,
-          pagination: { currentPage, totalPages },
-        } = await getAllAlbums({
-          token: session?.data?.jwt,
-          page: queryPage ? Number(queryPage) : 1,
-        });
-
-        setAlbums(data);
-        setCurrentPage(currentPage);
-        setTotalPages(totalPages);
-      };
-
       loadData();
     }
   }, [queryPage, session]);
+
+  const onSubmit = async (data) => {
+    if (data.keyword === "" || data.keyword === " ") {
+      loadData();
+      return false;
+    }
+
+    try {
+      const encoded = encodeURI(data.keyword);
+      const {
+        data: { data: albums, pagination },
+      } = await axiosPrivateInstance(session?.data?.jwt).get(
+        `/albums?search=${encoded}`
+      );
+      // console.log(albums, "search res");
+      // console.log(pagination, "search res");
+
+      setAlbums(albums);
+      // setCurrentPage(currentPage);
+      // setTotalPages(totalPages);
+
+      // show success message
+      // toast.success("Album added successfully");
+    } catch (error) {
+      console.log(error, "error in search page");
+
+      // show error message
+      toast.error("Something went wrong");
+    }
+  };
 
   return (
     <Layout>
@@ -49,20 +98,23 @@ const Main = () => {
         <div className="top flex items-center justify-between">
           <h2 className="text-xl mb-3">Album table</h2>
 
-          <div className="relative">
-            <span className="absolute left-3 top-4">
-              <FaMagnifyingGlass className="z-20 text-primary" />
-            </span>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="relative">
+              <span className="absolute left-3 top-4">
+                <FaMagnifyingGlass className="z-20 text-primary" />
+              </span>
 
-            <input
-              className="z-10 w-full my-1 bg-white outline-none pl-8 pr-3 py-2 border-gray-300 text-sm border-2 rounded-full"
-              type="text"
-              name="search"
-              id="search"
-              placeholder="Search Song"
-              autoComplete="off"
-            />
-          </div>
+              <input
+                className="z-10 w-full my-1 bg-white outline-none pl-8 pr-3 py-2 border-gray-300 text-sm border-2 rounded-full"
+                type="text"
+                name="keyword"
+                id="keyword"
+                placeholder="Search album"
+                autoComplete="off"
+                {...register("keyword")}
+              />
+            </div>
+          </form>
 
           <Link href="/albums/add" className="px-10 py-2 rounded bg-gray-200">
             Add album

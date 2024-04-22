@@ -193,12 +193,24 @@ const AddAlbum = () => {
       userId: session?.data?.user?.id,
       artistId: "",
       status: "Draft",
-      releaseVersion: "",
+      digitalReleaseDate: "",
       albumType: "Album", // ["Album", "EP", "Single", "Audio", "Video"];
       releaseType: "Audio",
       formatType: "",
+      originalReleaseDate: new Date(),
       releaseTitle: "",
+      releaseVersion: "",
       releaseCover: "",
+      releasePrimaryArtist: [{ name: "" }],
+      releaseSecondaryArtist: [{ name: "" }],
+      upcean: "",
+      catalogNumber: "",
+      recordLabel: "",
+      releaseLanguage: "",
+      cLineCompany: "",
+      cLineYear: new Date(),
+      pLineCompany: "",
+      pLineYear: new Date(),
       releaseGenre: [
         { name: "Indie", status: true },
         { name: "Singer", status: false },
@@ -230,20 +242,8 @@ const AddAlbum = () => {
         { name: "DashGo", status: false },
         { name: "Ingrooves", status: false },
       ],
-      releaseLanguage: "",
-      releasePrimaryArtist: [{ name: "" }],
-      releaseSecondaryArtist: [{ name: "" }],
-      originalReleaseDate: new Date(),
-      digitalReleaseDate: "",
-      recordLabel: "",
-      pLineCompany: "",
-      pLineYear: new Date(),
-      cLineCompany: "",
-      cLineYear: new Date(),
-      upcean: "",
-      tracks: [],
-      catalogNumber: "",
       releaseExplicit: true,
+      tracks: [],
     },
   });
 
@@ -300,8 +300,6 @@ const AddAlbum = () => {
   };
 
   const onSubmitTrack = (data) => {
-    console.log(data, "track data");
-
     // get local storage data
     const savedTracks = JSON.parse(localStorage.getItem("tracks"));
 
@@ -332,8 +330,6 @@ const AddAlbum = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data, "album data");
-
     try {
       const {
         data: {
@@ -652,172 +648,6 @@ const AddAlbum = () => {
                     </div> */}
                   </div>
                 </div>
-
-                {/* <div className="extra">
-                  <div className="input-section mt-2 border-2 px-4 py-3">
-                    <div className="top">
-                      <h3>Type</h3>
-                      <hr />
-
-                      <div className="top mt-2 mb-4">
-                        <div className="flex">
-                          <div className="left">
-                            <input
-                              type="radio"
-                              name="albumType"
-                              id="albumEpisode"
-                              className="mr-1"
-                              value="Album"
-                              {...register("albumType")}
-                              defaultChecked
-                            />
-                            <label
-                              htmlFor="albumEpisode"
-                              className="cursor-pointer select-none"
-                            >
-                              Album/Episode
-                            </label>
-                          </div>
-
-                          <div className="right flex items-center">
-                            <input
-                              type="radio"
-                              name="albumType"
-                              id="single"
-                              className="ml-5 mr-1"
-                              value="Single"
-                              {...register("albumType")}
-                            />
-                            <label
-                              htmlFor="single"
-                              className="cursor-pointer select-none"
-                            >
-                              Single
-                            </label>
-                          </div>
-                        </div>
-
-                        <p
-                          className={`${
-                            errors.type?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.type?.message}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="input-area flex flex-wrap">
-                      <div className="input w-1/2 pl-2">
-                        <label
-                          htmlFor="metadataLanguage"
-                          className="cursor-pointer select-none"
-                        >
-                          Metadata Language
-                        </label>
-
-                        <select
-                          name="metadataLanguage"
-                          id="metadataLanguage"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("metadataLanguage")}
-                        >
-                          <option value="">Select language</option>
-                          <option value="English">English</option>
-                          <option value="Spanish">Spanish</option>
-                          <option value="French">French</option>
-                          <option value="German">German</option>
-                          <option value="Chinese">Chinese</option>
-                          <option value="Japanese">Japanese</option>
-                          <option value="Other">Other</option>
-                        </select>
-
-                        <p
-                          className={`${
-                            errors.metadataLanguage?.message
-                              ? "block"
-                              : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.metadataLanguage?.message}
-                        </p>
-                      </div>
-
-                      <div className="input w-1/2 pr-2 mt-3">
-                        <label
-                          htmlFor="albumCover"
-                          className="cursor-pointer select-none"
-                        >
-                          Cover image link
-                        </label>
-
-                        <input
-                          type="text"
-                          name="albumCover"
-                          id="albumCover"
-                          placeholder="Album cover image link"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("albumCover")}
-                        />
-
-                        <p
-                          className={`${
-                            errors.albumCover?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.albumCover?.message}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="top mb-4">
-                    <div className="flex">
-                      <div className="left">
-                        <input
-                          type="radio"
-                          name="trackType"
-                          id="lyrical"
-                          className="mr-1"
-                          value="lyrical"
-                          {...register("trackType")}
-                          defaultChecked
-                        />
-                        <label
-                          htmlFor="lyrical"
-                          className="cursor-pointer select-none"
-                        >
-                          Lyrical
-                        </label>
-                      </div>
-
-                      <div className="right">
-                        <input
-                          type="radio"
-                          name="trackType"
-                          id="instrumental"
-                          className="ml-5 mr-1"
-                          value="instrumental"
-                          {...register("trackType")}
-                        />
-                        <label
-                          htmlFor="instrumental"
-                          className="cursor-pointer select-none"
-                        >
-                          Instrumental
-                        </label>
-                      </div>
-                    </div>
-
-                    <p
-                      className={`${
-                        errors.trackType?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.trackType?.message}
-                    </p>
-                  </div>
-                </div> */}
 
                 <div className="releaseArtists mt-8">
                   <h2 className="text-2xl">Release Artists</h2>
