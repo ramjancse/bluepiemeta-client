@@ -163,44 +163,13 @@ const schema = yup
               "Band",
               "Group",
             ],
-            "Album subgenre must be select between fields"
+            "Track subgenre must be select between fields"
           ),
         status: yup
           .boolean()
           .oneOf([true, false], "Status can only true or false"),
       })
     ),
-    releaseGenre: yup
-      .array()
-      .of(
-        yup.object({
-          name: yup
-            .string()
-            .trim()
-            .required("Release genre must be select")
-            .oneOf(
-              [
-                "Indie",
-                "Singer",
-                "Artist",
-                "Lyricist",
-                "Composer",
-                "Producer",
-                "Band",
-                "Group",
-              ],
-              "Release genre must be select between fields"
-            ),
-          status: yup
-            .boolean()
-            .oneOf([true, false], "Status can only true or false"),
-        })
-      )
-      .test(
-        "at-least-one-true",
-        "At least one release genre must be select", // Custom error message
-        (array) => array.some((obj) => obj.status)
-      ),
     trackLanguage: yup
       .string()
       .trim()
@@ -237,96 +206,6 @@ const schema = yup
     minute: yup.string().trim().required("Minute is required"),
     second: yup.string().trim().required("Second is required"),
     explicit: yup.boolean(),
-    // audioFile: yup.string().trim(),
-
-    // trackMood: yup.array().of(
-    //   yup.object({
-    //     name: yup
-    //       .string()
-    //       .trim()
-    //       .oneOf(
-    //         ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
-    //         "Mood must be select between fields"
-    //       ),
-    //     status: yup
-    //       .boolean()
-    //       .oneOf([true, false], "Status can only true or false"),
-    //   })
-    // ),
-    // mix: yup.array().of(
-    //   yup.object({
-    //     name: yup
-    //       .string()
-    //       .trim()
-    //       .required("Mix is required")
-    //       .min(2, "Mix must be at least 2 character"),
-    //   })
-    // ),
-
-    // tags: yup.array().of(
-    //   yup.object({
-    //     name: yup.string().trim().required("Tags is required"),
-    //   })
-    // ),
-    // instruments: yup
-    //   .string()
-    //   .trim()
-    //   .required("Instruments is required")
-    //   .oneOf(
-    //     ["Sad", "Angry", "Emotional", "Peaceful", "Romantic"],
-    //     "Instruments must be select between fields"
-    //   ),
-    // bpm: yup.string().trim().required("BPM is required"),
-    // upc: yup
-    // .string()
-    // .trim()
-    // .required("UPC is required")
-    // .min(3, "UPC must be at least 3 character"),
-
-    // releaseDate: yup
-    //   .string()
-    //   .trim()
-    //   .required("Release date is required")
-    //   .min(3, "Release date must be at least 3 character"),
-    // label: yup
-    //   .string()
-    //   .trim()
-    //   .required("Label is required")
-    //   .min(3, "Label must be at least 3 character"),
-    // cLine: yup
-    //   .string()
-    //   .trim()
-    //   .required("C Line is required")
-    //   .min(3, "C Line must be at least 3 character"),
-    // cLineYear: yup
-    //   .string()
-    //   .trim()
-    //   .required("C Line Year is required")
-    //   .min(3, "C Line Year must be at least 3 character"),
-    // pLine: yup
-    //   .string()
-    //   .trim()
-    //   .required("P Line is required")
-    //   .min(3, "P Line must be at least 3 character"),
-    // pLineYear: yup
-    //   .string()
-    //   .trim()
-    //   .required("P Line Year is required")
-    //   .min(3, "P Line Year must be at least 3 character"),
-
-    // lyrics: yup.string().trim().required("Lyrics is required"),
-    // complianceRight: yup
-    //   .boolean()
-    //   .oneOf([true, false], "Compilation Rights can only true or false"),
-    // videoRights: yup
-    //   .boolean()
-    //   .oneOf([true, false], "Video Rights can only true or false"),
-    // audioRights: yup
-    //   .boolean()
-    //   .oneOf([true, false], "Audio Rights can only true or false"),
-    // promoRights: yup
-    //   .boolean()
-    //   .oneOf([true, false], "Promo Rights can only true or false"),
   })
   .transform((originalValue, originalObject) => {
     const { minute, second } = originalObject;
@@ -342,7 +221,7 @@ const schema = yup
   })
   .required();
 
-const AddTrack = () => {
+const AddTrack = ({ onSubmitTrack, setShow }) => {
   const [releaseArtists, setReleaseArtists] = useState([]);
   const router = useRouter();
   const session = useSession();
@@ -369,8 +248,8 @@ const AddTrack = () => {
       lyricist: [{ name: "" }],
       trackGenre: [
         { name: "Indie", status: true },
-        { name: "Singer", status: false },
-        { name: "Artist", status: false },
+        { name: "Singer", status: true },
+        { name: "Artist", status: true },
         { name: "Lyricist", status: false },
         { name: "Composer", status: false },
         { name: "Producer", status: false },
@@ -379,17 +258,7 @@ const AddTrack = () => {
       ],
       trackSubGenre: [
         { name: "Indie", status: true },
-        { name: "Singer", status: false },
-        { name: "Artist", status: false },
-        { name: "Lyricist", status: false },
-        { name: "Composer", status: false },
-        { name: "Producer", status: false },
-        { name: "Band", status: false },
-        { name: "Group", status: false },
-      ],
-      releaseGenre: [
-        { name: "Indie", status: true },
-        { name: "Singer", status: false },
+        { name: "Singer", status: true },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
         { name: "Composer", status: false },
@@ -403,35 +272,6 @@ const AddTrack = () => {
       minute: "", // minute and second modify to duration
       second: "",
       explicit: true,
-
-      // audioFile: "",
-      // arranger: [{ name: "" }],
-      // featuringArtist: [{ name: "" }],
-      // trackLinks: [{ name: "", link: "" }],
-      // rating: 5,
-      // contract: "",
-
-      // complianceRight: true,
-      // videoRights: true,
-      // audioRights: true,
-      // promoRights: true,
-      // catalogNumber: "ABC-123-456",
-
-      // trackType: "",
-      // trackMood: [
-      //   { name: "Sad", status: true },
-      //   { name: "Angry", status: false },
-      //   { name: "Emotional", status: false },
-      //   { name: "Peaceful", status: false },
-      //   { name: "Romantic", status: false },
-      // ],
-      // mix: [
-      //   {
-      //     name: "",
-      //   },
-      // ],
-      // tags: [{ name: "" }],
-      // // lyrics: "",
     },
   });
 
@@ -485,18 +325,13 @@ const AddTrack = () => {
     control,
   });
 
-  const { fields: genreFields } = useFieldArray({
+  const { fields: trackGenreFields } = useFieldArray({
     name: "trackGenre",
     control,
   });
 
-  const { fields: subgenreFields } = useFieldArray({
+  const { fields: trackSubgenreFields } = useFieldArray({
     name: "trackSubGenre",
-    control,
-  });
-
-  const { fields: releaseGenreFields } = useFieldArray({
-    name: "releaseGenre",
     control,
   });
 
@@ -509,35 +344,7 @@ const AddTrack = () => {
     control,
   });
 
-  // const {
-  //   fields: moodFields,
-  //   append: moodAppend,
-  //   remove: moodRemove,
-  // } = useFieldArray({
-  //   name: "trackMood",
-  //   control,
-  // });
-
-  // const {
-  //   fields: tagsFields,
-  //   append: tagsAppend,
-  //   remove: tagsRemove,
-  // } = useFieldArray({
-  //   name: "tags",
-  //   control,
-  // });
-
-  // const {
-  //   fields: mixFields,
-  //   append: mixAppend,
-  //   remove: mixRemove,
-  // } = useFieldArray({
-  //   name: "mix",
-  //   control,
-  // });
-
   const onSubmit = async (data) => {
-    console.log(data, "add track data");
     // submitted data to parent
     onSubmitTrack(data);
 
@@ -550,30 +357,30 @@ const AddTrack = () => {
 
   useEffect(() => {
     if (session?.data?.jwt) {
+      const loadArtistsData = async () => {
+        const { data } = await getAllArtists(session?.data?.jwt);
+        const releasePrimaryArtist = JSON.parse(
+          localStorage.getItem("releasePrimaryArtist")
+        );
+
+        if (releasePrimaryArtist && releasePrimaryArtist.length > 0) {
+          const currentFormValues = getValues();
+
+          reset({
+            ...currentFormValues,
+            trackArtist: releasePrimaryArtist,
+          });
+        }
+
+        // update local state by all data
+        setReleaseArtists(data);
+      };
+
       loadArtistsData();
+
+      console.log("rendering...");
     }
-  }, [session]);
-
-  const loadArtistsData = async () => {
-    const { data } = await getAllArtists(session?.data?.jwt);
-    const isFound = localStorage.getItem("releasePrimaryArtist");
-
-    let releasePrimaryArtist = null;
-
-    if (isFound) {
-      releasePrimaryArtist = JSON.parse(isFound);
-    }
-
-    if (releasePrimaryArtist && releasePrimaryArtist[0]?.name?.length) {
-      // populate filed by array
-      reset({ trackArtist: releasePrimaryArtist });
-    }
-
-    // update local state by all data
-    setReleaseArtists(data);
-  };
-
-  // console.log(errors, "errors");
+  }, [session, getValues, reset]);
 
   return (
     <>
@@ -1292,7 +1099,7 @@ const AddTrack = () => {
                 <h4>Track Genre</h4>
 
                 <div className="inputs border border-gray-200 py-2 flex flex-wrap">
-                  {genreFields.map((field, index) => (
+                  {trackGenreFields.map((field, index) => (
                     <div className="input pl-3 py-1 w-1/4" key={field.id}>
                       <input
                         type="checkbox"
@@ -1327,7 +1134,7 @@ const AddTrack = () => {
                 <h4>Track Sub Genre</h4>
 
                 <div className="inputs border border-gray-200 py-2 flex flex-wrap">
-                  {subgenreFields.map((field, index) => (
+                  {trackSubgenreFields.map((field, index) => (
                     <div className="input pl-3 py-1 w-1/4" key={field.id}>
                       <input
                         type="checkbox"
@@ -1345,43 +1152,6 @@ const AddTrack = () => {
                       </label>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              <div className="input col-start-1 col-end-13">
-                <label htmlFor="releaseGenre" className="select-none">
-                  Release Genre
-                </label>
-
-                <div className="genre mt-2">
-                  <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
-                    {releaseGenreFields.map((field, index) => (
-                      <div className="input px-3 py-1 w-1/6" key={field.id}>
-                        <input
-                          type="checkbox"
-                          name={`releaseGenre[${index}].name`}
-                          id={`releaseGenre[${index}].name`}
-                          {...register(`releaseGenre.${index}.status`)}
-                        />
-                        <label
-                          htmlFor={`releaseGenre[${index}].name`}
-                          className="ml-1 cursor-pointer select-none"
-                        >
-                          {field.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-
-                  <p
-                    className={`${
-                      errors.releaseGenre && errors.releaseGenre?.root?.message
-                        ? "block"
-                        : "hidden"
-                    } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                  >
-                    {errors.releaseGenre && errors.releaseGenre?.root?.message}
-                  </p>
                 </div>
               </div>
             </div>
