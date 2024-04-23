@@ -10,11 +10,11 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import { axiosPrivateInstance } from "@/config/axios";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import AddTrack from "@/components/albums/AddTrack";
 import ReactDatePicker from "react-datepicker";
 import { getAllArtists } from "@/lib/artist";
-import { getAllLabel } from "@/lib/albums";
+import { getAlbumById, getAllLabel } from "@/lib/albums";
 import Layout from "@/components/dashboard/Layout";
 import Header from "@/components/dashboard/Header";
 import UploadImage from "@/assets/images/main_banner.jpg";
@@ -177,6 +177,66 @@ const EditAlbum = () => {
   const [tracks, setTracks] = useState([]);
   const [primaryArtists, setPrimaryArtists] = useState([]);
   const [labels, setLabels] = useState([]);
+  const { albumId } = useParams();
+  // const
+
+  const defaultValues = {
+    albumId: "",
+    userId: session?.data?.user?.id,
+    artistId: "",
+    status: "Draft",
+    digitalReleaseDate: "",
+    albumType: "Album", // ["Album", "EP", "Single", "Audio", "Video"];
+    releaseType: "Audio",
+    formatType: "",
+    originalReleaseDate: new Date(),
+    releaseTitle: "",
+    releaseVersion: "",
+    releaseCover: "",
+    releasePrimaryArtist: [{ name: "" }],
+    releaseSecondaryArtist: [{ name: "" }],
+    upcean: "",
+    catalogNumber: "",
+    recordLabel: "",
+    releaseLanguage: "",
+    cLineCompany: "",
+    cLineYear: new Date(),
+    pLineCompany: "",
+    pLineYear: new Date(),
+    releaseGenre: [
+      { name: "Indie", status: true },
+      { name: "Singer", status: false },
+      { name: "Artist", status: false },
+      { name: "Lyricist", status: false },
+      { name: "Composer", status: false },
+      { name: "Producer", status: false },
+      { name: "Band", status: false },
+      { name: "Group", status: false },
+    ],
+    releaseSubGenre: [
+      { name: "Indie", status: true },
+      { name: "Singer", status: false },
+      { name: "Artist", status: false },
+      { name: "Lyricist", status: false },
+      { name: "Composer", status: false },
+      { name: "Producer", status: false },
+      { name: "Band", status: false },
+      { name: "Group", status: false },
+    ],
+    platforms: [
+      { name: "FUGA", status: true },
+      { name: "Believe", status: false },
+      { name: "Ordior", status: false },
+      { name: "Kanjian", status: false },
+      { name: "Too Lost", status: false },
+      { name: "Horus", status: false },
+      { name: "DITTO", status: false },
+      { name: "DashGo", status: false },
+      { name: "Ingrooves", status: false },
+    ],
+    releaseExplicit: true,
+    tracks: [],
+  };
 
   const {
     register,
@@ -186,6 +246,7 @@ const EditAlbum = () => {
     setValue,
     watch,
     getValues,
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -193,14 +254,26 @@ const EditAlbum = () => {
       userId: session?.data?.user?.id,
       artistId: "",
       status: "Draft",
-      releaseVersion: "",
+      digitalReleaseDate: "",
       albumType: "Album", // ["Album", "EP", "Single", "Audio", "Video"];
       releaseType: "Audio",
       formatType: "",
+      originalReleaseDate: new Date(),
       releaseTitle: "",
+      releaseVersion: "",
       releaseCover: "",
+      releasePrimaryArtist: [{ name: "" }],
+      releaseSecondaryArtist: [{ name: "" }],
+      upcean: "",
+      catalogNumber: "",
+      recordLabel: "",
+      releaseLanguage: "",
+      cLineCompany: "",
+      cLineYear: new Date(),
+      pLineCompany: "",
+      pLineYear: new Date(),
       releaseGenre: [
-        { name: "Indie", status: true },
+        { name: "Indie", status: false },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
@@ -210,7 +283,7 @@ const EditAlbum = () => {
         { name: "Group", status: false },
       ],
       releaseSubGenre: [
-        { name: "Indie", status: true },
+        { name: "Indie", status: false },
         { name: "Singer", status: false },
         { name: "Artist", status: false },
         { name: "Lyricist", status: false },
@@ -220,7 +293,7 @@ const EditAlbum = () => {
         { name: "Group", status: false },
       ],
       platforms: [
-        { name: "FUGA", status: true },
+        { name: "FUGA", status: false },
         { name: "Believe", status: false },
         { name: "Ordior", status: false },
         { name: "Kanjian", status: false },
@@ -230,20 +303,8 @@ const EditAlbum = () => {
         { name: "DashGo", status: false },
         { name: "Ingrooves", status: false },
       ],
-      releaseLanguage: "",
-      releasePrimaryArtist: [{ name: "" }],
-      releaseSecondaryArtist: [{ name: "" }],
-      originalReleaseDate: new Date(),
-      digitalReleaseDate: "",
-      recordLabel: "",
-      pLineCompany: "",
-      pLineYear: new Date(),
-      cLineCompany: "",
-      cLineYear: new Date(),
-      upcean: "",
-      tracks: [],
-      catalogNumber: "",
       releaseExplicit: true,
+      tracks: [],
     },
   });
 
@@ -300,7 +361,6 @@ const EditAlbum = () => {
   };
 
   const onSubmitTrack = (data) => {
-    console.log(data, "track data");
     // get local storage data
     const savedTracks = JSON.parse(localStorage.getItem("tracks"));
 
@@ -331,24 +391,21 @@ const EditAlbum = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data, "album data");
-
     try {
-      // const {
-      //   data: {
-      //     links: { self },
-      //   },
-      // } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+      const {
+        data: {
+          links: { self },
+        },
+      } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
 
       // show success message
       toast.success("Album added successfully");
 
       // remove local storage saved tracks data
-      // localStorage.removeItem("tracks");
+      localStorage.removeItem("tracks");
 
       // redirect to another route
-      // console.log(self, "self");
-      // router.push(self);
+      router.push(self);
     } catch (error) {
       console.log(error, "error in add album page");
 
@@ -358,12 +415,16 @@ const EditAlbum = () => {
   };
 
   useEffect(() => {
-    if (session?.data?.jwt) {
+    if (session?.data?.jwt && albumId) {
       loadData();
     }
-  }, [session]);
+  }, [session, albumId]);
 
   const loadData = async () => {
+    const albumData = await getAlbumById({
+      token: session?.data?.jwt,
+      albumId,
+    });
     const { data } = await getAllArtists(session?.data?.jwt);
     const { data: allLabels } = await getAllLabel({
       token: session?.data?.jwt,
@@ -381,6 +442,62 @@ const EditAlbum = () => {
 
     setPrimaryArtists(data);
     setLabels(allLabels);
+
+    const currentFormValues = getValues();
+    const defaultValues = {
+      releaseExplicit: true,
+    };
+
+    console.log(albumData, "albumData");
+
+    reset({
+      ...currentFormValues,
+      ...albumData,
+      releasePrimaryArtist: albumData?.releasePrimaryArtist?.length
+        ? albumData.releasePrimaryArtist
+        : [{ name: "" }],
+      releaseSecondaryArtist: albumData?.releaseSecondaryArtist?.length
+        ? albumData.releaseSecondaryArtist
+        : [{ name: "" }],
+      releaseGenre: albumData?.releaseGenre?.length
+        ? albumData.releaseGenre
+        : [
+            { name: "Indie", status: false },
+            { name: "Singer", status: false },
+            { name: "Artist", status: false },
+            { name: "Lyricist", status: false },
+            { name: "Composer", status: false },
+            { name: "Producer", status: false },
+            { name: "Band", status: false },
+            { name: "Group", status: false },
+          ],
+      releaseSubGenre: albumData?.releaseSubGenre?.length
+        ? albumData.releaseSubGenre
+        : [
+            { name: "Indie", status: false },
+            { name: "Singer", status: false },
+            { name: "Artist", status: false },
+            { name: "Lyricist", status: false },
+            { name: "Composer", status: false },
+            { name: "Producer", status: false },
+            { name: "Band", status: false },
+            { name: "Group", status: false },
+          ],
+      platforms: albumData?.platforms?.length
+        ? albumData.platforms
+        : [
+            { name: "FUGA", status: false },
+            { name: "Believe", status: false },
+            { name: "Ordior", status: false },
+            { name: "Kanjian", status: false },
+            { name: "Too Lost", status: false },
+            { name: "Horus", status: false },
+            { name: "DITTO", status: false },
+            { name: "DashGo", status: false },
+            { name: "Ingrooves", status: false },
+          ],
+      tracks: albumData?.tracks ? albumData.tracks : [],
+    });
   };
 
   const handleDelete = (trackId) => {
@@ -653,172 +770,6 @@ const EditAlbum = () => {
                   </div>
                 </div>
 
-                {/* <div className="extra">
-                  <div className="input-section mt-2 border-2 px-4 py-3">
-                    <div className="top">
-                      <h3>Type</h3>
-                      <hr />
-
-                      <div className="top mt-2 mb-4">
-                        <div className="flex">
-                          <div className="left">
-                            <input
-                              type="radio"
-                              name="albumType"
-                              id="albumEpisode"
-                              className="mr-1"
-                              value="Album"
-                              {...register("albumType")}
-                              defaultChecked
-                            />
-                            <label
-                              htmlFor="albumEpisode"
-                              className="cursor-pointer select-none"
-                            >
-                              Album/Episode
-                            </label>
-                          </div>
-
-                          <div className="right flex items-center">
-                            <input
-                              type="radio"
-                              name="albumType"
-                              id="single"
-                              className="ml-5 mr-1"
-                              value="Single"
-                              {...register("albumType")}
-                            />
-                            <label
-                              htmlFor="single"
-                              className="cursor-pointer select-none"
-                            >
-                              Single
-                            </label>
-                          </div>
-                        </div>
-
-                        <p
-                          className={`${
-                            errors.type?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.type?.message}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="input-area flex flex-wrap">
-                      <div className="input w-1/2 pl-2">
-                        <label
-                          htmlFor="metadataLanguage"
-                          className="cursor-pointer select-none"
-                        >
-                          Metadata Language
-                        </label>
-
-                        <select
-                          name="metadataLanguage"
-                          id="metadataLanguage"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("metadataLanguage")}
-                        >
-                          <option value="">Select language</option>
-                          <option value="English">English</option>
-                          <option value="Spanish">Spanish</option>
-                          <option value="French">French</option>
-                          <option value="German">German</option>
-                          <option value="Chinese">Chinese</option>
-                          <option value="Japanese">Japanese</option>
-                          <option value="Other">Other</option>
-                        </select>
-
-                        <p
-                          className={`${
-                            errors.metadataLanguage?.message
-                              ? "block"
-                              : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.metadataLanguage?.message}
-                        </p>
-                      </div>
-
-                      <div className="input w-1/2 pr-2 mt-3">
-                        <label
-                          htmlFor="albumCover"
-                          className="cursor-pointer select-none"
-                        >
-                          Cover image link
-                        </label>
-
-                        <input
-                          type="text"
-                          name="albumCover"
-                          id="albumCover"
-                          placeholder="Album cover image link"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("albumCover")}
-                        />
-
-                        <p
-                          className={`${
-                            errors.albumCover?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.albumCover?.message}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="top mb-4">
-                    <div className="flex">
-                      <div className="left">
-                        <input
-                          type="radio"
-                          name="trackType"
-                          id="lyrical"
-                          className="mr-1"
-                          value="lyrical"
-                          {...register("trackType")}
-                          defaultChecked
-                        />
-                        <label
-                          htmlFor="lyrical"
-                          className="cursor-pointer select-none"
-                        >
-                          Lyrical
-                        </label>
-                      </div>
-
-                      <div className="right">
-                        <input
-                          type="radio"
-                          name="trackType"
-                          id="instrumental"
-                          className="ml-5 mr-1"
-                          value="instrumental"
-                          {...register("trackType")}
-                        />
-                        <label
-                          htmlFor="instrumental"
-                          className="cursor-pointer select-none"
-                        >
-                          Instrumental
-                        </label>
-                      </div>
-                    </div>
-
-                    <p
-                      className={`${
-                        errors.trackType?.message ? "block" : "hidden"
-                      } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                    >
-                      {errors.trackType?.message}
-                    </p>
-                  </div>
-                </div> */}
-
                 <div className="releaseArtists mt-8">
                   <h2 className="text-2xl">Release Artists</h2>
 
@@ -843,7 +794,10 @@ const EditAlbum = () => {
                                   `releasePrimaryArtist.${index}.name`
                                 )}
                               >
-                                <option value="">Select artist</option>
+                                <option value="" disabled>
+                                  Select artist
+                                </option>
+
                                 {primaryArtists.map((artist) => {
                                   const { id, artistName, fullName } = artist;
                                   return (

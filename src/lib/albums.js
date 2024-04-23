@@ -12,7 +12,7 @@ export const getAllAlbums = async ({ token, page }) => {
     });
 
     if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+      throw new Error(`Something went wrong`);
     }
 
     const data = await res.json();
