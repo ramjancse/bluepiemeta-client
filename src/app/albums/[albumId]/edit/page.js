@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import { axiosPrivateInstance } from "@/config/axios";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
-import AddTrack from "@/components/albums/AddTrack";
 import ReactDatePicker from "react-datepicker";
 import { getAllArtists } from "@/lib/artist";
 import { getAlbumById, getAllLabel } from "@/lib/albums";
@@ -19,6 +18,9 @@ import Layout from "@/components/dashboard/Layout";
 import Header from "@/components/dashboard/Header";
 import UploadImage from "@/assets/images/main_banner.jpg";
 import Image from "next/image";
+import EditTrack from "@/components/albums/EditTrack";
+import AddTrack from "@/components/albums/AddTrack";
+import TrackForm from "@/components/albums/TrackForm";
 
 const schema = yup
   .object({
@@ -173,70 +175,13 @@ const schema = yup
 const EditAlbum = () => {
   const session = useSession();
   const router = useRouter();
-  const [show, setShow] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [primaryArtists, setPrimaryArtists] = useState([]);
   const [labels, setLabels] = useState([]);
+  const [show, setShow] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const { albumId } = useParams();
-  // const
-
-  const defaultValues = {
-    albumId: "",
-    userId: session?.data?.user?.id,
-    artistId: "",
-    status: "Draft",
-    digitalReleaseDate: "",
-    albumType: "Album", // ["Album", "EP", "Single", "Audio", "Video"];
-    releaseType: "Audio",
-    formatType: "",
-    originalReleaseDate: new Date(),
-    releaseTitle: "",
-    releaseVersion: "",
-    releaseCover: "",
-    releasePrimaryArtist: [{ name: "" }],
-    releaseSecondaryArtist: [{ name: "" }],
-    upcean: "",
-    catalogNumber: "",
-    recordLabel: "",
-    releaseLanguage: "",
-    cLineCompany: "",
-    cLineYear: new Date(),
-    pLineCompany: "",
-    pLineYear: new Date(),
-    releaseGenre: [
-      { name: "Indie", status: true },
-      { name: "Singer", status: false },
-      { name: "Artist", status: false },
-      { name: "Lyricist", status: false },
-      { name: "Composer", status: false },
-      { name: "Producer", status: false },
-      { name: "Band", status: false },
-      { name: "Group", status: false },
-    ],
-    releaseSubGenre: [
-      { name: "Indie", status: true },
-      { name: "Singer", status: false },
-      { name: "Artist", status: false },
-      { name: "Lyricist", status: false },
-      { name: "Composer", status: false },
-      { name: "Producer", status: false },
-      { name: "Band", status: false },
-      { name: "Group", status: false },
-    ],
-    platforms: [
-      { name: "FUGA", status: true },
-      { name: "Believe", status: false },
-      { name: "Ordior", status: false },
-      { name: "Kanjian", status: false },
-      { name: "Too Lost", status: false },
-      { name: "Horus", status: false },
-      { name: "DITTO", status: false },
-      { name: "DashGo", status: false },
-      { name: "Ingrooves", status: false },
-    ],
-    releaseExplicit: true,
-    tracks: [],
-  };
+  const [editFormData, setEditFormData] = useState(null);
 
   const {
     register,
@@ -303,7 +248,7 @@ const EditAlbum = () => {
         { name: "DashGo", status: false },
         { name: "Ingrooves", status: false },
       ],
-      releaseExplicit: true,
+      releaseExplicit: false,
       tracks: [],
     },
   });
@@ -431,26 +376,8 @@ const EditAlbum = () => {
       page: 1,
     });
 
-    // get local storage data
-    const savedTracks = JSON.parse(localStorage.getItem("tracks"));
-
-    // update state with track data
-    if (savedTracks) {
-      setTracks(savedTracks);
-      setValue("tracks", savedTracks);
-    }
-
-    setPrimaryArtists(data);
-    setLabels(allLabels);
-
     const currentFormValues = getValues();
-    const defaultValues = {
-      releaseExplicit: true,
-    };
-
-    console.log(albumData, "albumData");
-
-    reset({
+    const updatedData = {
       ...currentFormValues,
       ...albumData,
       releasePrimaryArtist: albumData?.releasePrimaryArtist?.length
@@ -497,7 +424,15 @@ const EditAlbum = () => {
             { name: "Ingrooves", status: false },
           ],
       tracks: albumData?.tracks ? albumData.tracks : [],
-    });
+      releaseExplicit: albumData.releaseExplicit ? true : false,
+    };
+
+    reset(updatedData);
+
+    // update local state
+    setTracks(albumData.tracks);
+    setPrimaryArtists(data);
+    setLabels(allLabels);
   };
 
   const handleDelete = (trackId) => {
@@ -517,12 +452,30 @@ const EditAlbum = () => {
     });
   };
 
+  const handleEdit = (trackData) => {
+    // show edit form
+    setShow((prevShow) => !prevShow);
+
+    // update local state by edit data
+    setEditFormData(trackData);
+
+    // scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <Layout>
       {show ? (
         <>
           <Header name="Edit Track" />
-          <AddTrack onSubmitTrack={onSubmitTrack} setShow={setShow} />
+          <TrackForm
+            editFormData={editFormData}
+            onSubmitTrack={onSubmitTrack}
+            setShow={setShow}
+          />
         </>
       ) : (
         <>
@@ -757,16 +710,6 @@ const EditAlbum = () => {
                         {errors.releaseCover?.message}
                       </p>
                     </div>
-
-                    {/* <div className="right w-1/3 ml-5 rounded">
-                      <Image
-                        className="float-right"
-                        src={UploadImage}
-                        alt="Main Image"
-                        width={200}
-                        height={200}
-                      />
-                    </div> */}
                   </div>
                 </div>
 
@@ -1388,7 +1331,15 @@ const EditAlbum = () => {
                                   <td className="border p-2">
                                     <button
                                       type="button"
-                                      className="bg-red-400 px-3 py-1 rounded text-white"
+                                      className="bg-yellow-300 px-3 py-1 rounded text-white mr-2"
+                                      onClick={() => handleEdit(track)}
+                                    >
+                                      Edit
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      className="bg-red-500 px-3 py-1 rounded text-white"
                                       onClick={() => handleDelete(id)}
                                     >
                                       Delete

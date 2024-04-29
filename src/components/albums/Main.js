@@ -91,6 +91,24 @@ const Main = () => {
     }
   };
 
+  const handleDelete = async (albumId) => {
+    try {
+      const res = await axiosPrivateInstance(session?.data?.jwt).delete(
+        `/albums/${albumId}`
+      );
+
+      console.log(res, "res");
+
+      // show success message
+      toast.success("Album delete successfully");
+    } catch (error) {
+      console.log(error, "error in search page");
+
+      // show error message
+      toast.error("Something went wrong");
+    }
+  };
+
   return (
     <Layout>
       <Header name="All Albums" />
@@ -209,13 +227,20 @@ const Main = () => {
 
                       <td className="border p-2">{tracks?.length}</td>
 
-                      <td className="border p-2">
+                      <td className="border p-2 flex">
                         <Link
                           className="bg-yellow-300 px-3 py-[7px] rounded text-white"
                           href={`/albums/${_id}/edit`}
                         >
                           Edit
                         </Link>
+
+                        <button
+                          className="bg-red-400 px-3 py-[5px] rounded text-white ml-1"
+                          onClick={() => handleDelete(_id)}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   );
