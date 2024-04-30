@@ -16,6 +16,9 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { axiosPrivateInstance } from "@/config/axios";
+import { useGetAlbumsQuery } from "@/features/albums/albumAPI";
+import { useDispatch } from "react-redux";
+
 
 const schema = yup
   .object({
@@ -32,6 +35,16 @@ const Main = () => {
     queryPage ? Number(queryPage) : 1
   );
   const [totalPages, setTotalPages] = useState(1);
+
+  const dispatch = useDispatch();
+  const { data, isLoading, isSuccess, isError, error, refetch } =
+    useGetAlbumsQuery(queryPage ? Number(queryPage) : 1);
+
+    if(isSuccess) {
+
+      console.log(data, "data in albums rtk query");
+    }
+
 
   const {
     register,

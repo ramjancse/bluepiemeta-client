@@ -5,8 +5,11 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { FaCircleInfo } from "react-icons/fa6";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { useLoginMutation } from "@/features/auth/authAPI";
+import { userLoggedIn } from "@/features/auth/authSlice";
 
 const schema = yup
   .object({
@@ -33,6 +36,9 @@ const Login = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
+  const [login, { data, isLoading, isSuccess, isError, error }] =
+    useLoginMutation();
+  const dispatch = useDispatch();
 
   const onSubmit = async (data) => {
     try {
@@ -44,6 +50,16 @@ const Login = () => {
       console.log(result, "login result");
 
       if (!result.error && result.ok) {
+
+        // set data to redux store
+        const {jwt, user} = await getSession();
+        dispatch(
+          userLoggedIn({
+            user,
+            accessToken: jwt
+          })
+        );
+
         // show success message
         toast.success("Login success!");
         router.push(callbackUrl ? callbackUrl : "/");
