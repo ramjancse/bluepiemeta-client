@@ -1,15 +1,19 @@
 "use client";
 
-import { store } from "@/store";
+import Loader from "@/components/shared/Loader";
+import useAuthCheck from "@/hooks/useAuthCheck";
 import { SessionProvider } from "next-auth/react";
-import { Provider } from "react-redux";
+
+
 
 const AuthProvider = ({ children }) => {
-  return (
-    <Provider store={store}>
-      <SessionProvider>{children}</SessionProvider>
-    </Provider>
-  );
+  const isAuth = useAuthCheck();
+
+  if (!isAuth) {
+    return <Loader />
+  }
+
+  return <SessionProvider>{children}</SessionProvider>;
 };
 
 export default AuthProvider;

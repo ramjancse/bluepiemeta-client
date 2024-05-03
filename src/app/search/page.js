@@ -10,18 +10,25 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as yup from "yup";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import Album from "@/components/search/Album";
+import { getAllArtists } from "@/lib/artist";
 
 const schema = yup
   .object({
     search: yup.string().trim(),
     artist: yup.string().trim(),
     label: yup.string().trim(),
-    display: yup.string().trim(),
+    // display: yup.string().trim(),
     sortBy: yup.string().trim(),
   })
   .required();
 
 const SearchPage = () => {
+  const [albums, setAlbums] = useState([]);
+  const [artists, setArtists] = useState([]);
+  const session = useSession();
   const {
     register,
     handleSubmit,
@@ -32,26 +39,43 @@ const SearchPage = () => {
       search: "",
       artist: "all",
       label: "all",
-      display: "releases",
       sortBy: "aToZ",
     },
   });
 
+  useEffect(() => {
+    if(session?.data?.jwt) {
+      loadArtists()
+    }
+  },[session])
+
   const onSubmit = async (data) => {
-    console.log(data, "search data");
+    // console.log(data, "search data");
+
+    const url = `/albums?search=${data.search}&artists=${data.artist}&label=${data.label}&sort=${data.sort}`
 
     try {
-      //   const {
-      //     data: {
-      //       links: { self },
-      //     },
-      //   } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+
+      const encoded = encodeURI(data.keyword);
+      const {data: {data:albumData}} = await axiosPrivateInstance(session?.data?.jwt).get(
+        url
+      );
+       
+        setAlbums(albumData)
+
     } catch (error) {
       console.log(error, "error in add album page");
 
       // show error message
       toast.error("Something went wrong");
     }
+  };
+
+  const loadArtists = async () => {
+    const {data} = await getAllArtists(session?.data?.jwt);
+
+    // update local state by all data
+    setArtists(data);
   };
 
   return (
@@ -103,9 +127,8 @@ const SearchPage = () => {
                       {...register("artist")}
                       className="w-full my-1 bg-white outline-none px-2 py-2 border-gray-300 text-sm border-2 rounded"
                     >
-                      <option value="all">All</option>
-                      <option value="single">Single</option>
-                      <option value="album">Album</option>
+                      
+                      {artists.map(artist => <option key={artist.id} value={artist.name}>{artist.name}</option>)}
                     </select>
                   </div>
 
@@ -129,7 +152,7 @@ const SearchPage = () => {
                     </select>
                   </div>
 
-                  <div className="input mt-2">
+                  {/* <div className="input mt-2">
                     <label
                       className="cursor-pointer font-medium"
                       htmlFor="display"
@@ -147,7 +170,7 @@ const SearchPage = () => {
                       <option value="single">Single</option>
                       <option value="album">Album</option>
                     </select>
-                  </div>
+                  </div> */}
 
                   <div className="input mt-2">
                     <label
@@ -164,6 +187,7 @@ const SearchPage = () => {
                       className="w-full my-1 bg-white outline-none px-2 py-2 border-gray-300 text-sm border-2 rounded"
                     >
                       <option value="aToZ">Artist (A-Z)</option>
+                      <option value="zToA">Artist (Z-A)</option>
                       <option value="single">Single</option>
                       <option value="album">Album</option>
                     </select>
@@ -173,135 +197,7 @@ const SearchPage = () => {
 
               <div className="w-4/5">
                 <div className="w-full flex flex-wrap px-5 py-3">
-                  <div className="w-1/3">
-                    <div className="album mx-5 my-5 ">
-                      <div className="image border-green-500 border-b-4">
-                        <Link href="/">
-                          <Image
-                            src="https://pixlr.com/images/index/ai-image-generator-one.webp"
-                            width={200}
-                            height={250}
-                            alt="Album Image"
-                            className="w-full h-[250px] object-cover"
-                          />
-                        </Link>
-                      </div>
-
-                      <div className="content mt-2">
-                        <h4 className="font-medium">Never Loose Without</h4>
-                        <h6 className="text-sm text-gray-500">Artist 420</h6>
-                        <h6 className="text-sm">
-                          <Link className="text-blue-300 font-medium" href="/">
-                            ABC-001
-                          </Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="w-1/3">
-                    <div className="album mx-5 my-5 ">
-                      <div className="image border-green-500 border-b-4">
-                        <Link href="/">
-                          <Image
-                            src="https://pixlr.com/images/index/ai-image-generator-one.webp"
-                            width={200}
-                            height={250}
-                            alt="Album Image"
-                            className="w-full h-[250px] object-cover"
-                          />
-                        </Link>
-                      </div>
-
-                      <div className="content mt-2">
-                        <h4 className="font-medium">Never Loose Without</h4>
-                        <h6 className="text-sm text-gray-500">Artist 420</h6>
-                        <h6 className="text-sm">
-                          <Link className="text-blue-300 font-medium" href="/">
-                            ABC-001
-                          </Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="w-1/3">
-                    <div className="album mx-5 my-5 ">
-                      <div className="image border-green-500 border-b-4">
-                        <Link href="/">
-                          <Image
-                            src="https://pixlr.com/images/index/ai-image-generator-one.webp"
-                            width={200}
-                            height={250}
-                            alt="Album Image"
-                            className="w-full h-[250px] object-cover"
-                          />
-                        </Link>
-                      </div>
-
-                      <div className="content mt-2">
-                        <h4 className="font-medium">Never Loose Without</h4>
-                        <h6 className="text-sm text-gray-500">Artist 420</h6>
-                        <h6 className="text-sm">
-                          <Link className="text-blue-300 font-medium" href="/">
-                            ABC-001
-                          </Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="w-1/3">
-                    <div className="album mx-5 my-5 ">
-                      <div className="image border-green-500 border-b-4">
-                        <Link href="/">
-                          <Image
-                            src="https://pixlr.com/images/index/ai-image-generator-one.webp"
-                            width={200}
-                            height={250}
-                            alt="Album Image"
-                            className="w-full h-[250px] object-cover"
-                          />
-                        </Link>
-                      </div>
-
-                      <div className="content mt-2">
-                        <h4 className="font-medium">Never Loose Without</h4>
-                        <h6 className="text-sm text-gray-500">Artist 420</h6>
-                        <h6 className="text-sm">
-                          <Link className="text-blue-300 font-medium" href="/">
-                            ABC-001
-                          </Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="w-1/3">
-                    <div className="album mx-5 my-5 ">
-                      <div className="image border-green-500 border-b-4">
-                        <Link href="/">
-                          <Image
-                            src="https://pixlr.com/images/index/ai-image-generator-one.webp"
-                            width={200}
-                            height={250}
-                            alt="Album Image"
-                            className="w-full h-[250px] object-cover"
-                          />
-                        </Link>
-                      </div>
-
-                      <div className="content mt-2">
-                        <h4 className="font-medium">Never Loose Without</h4>
-                        <h6 className="text-sm text-gray-500">Artist 420</h6>
-                        <h6 className="text-sm">
-                          <Link className="text-blue-300 font-medium" href="/">
-                            ABC-001
-                          </Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </div>
+                  {albums.map(album => <Album album={album} key={album.id} />)}
                 </div>
               </div>
             </div>

@@ -2,10 +2,7 @@
 
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
-import Image from "next/image";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import dateFormatter from "@/utils/dateFormatter";
 import Pagination from "@/components/shared/Pagination";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
@@ -18,7 +15,8 @@ import { useForm } from "react-hook-form";
 import { axiosPrivateInstance } from "@/config/axios";
 import { useGetAlbumsQuery } from "@/features/albums/albumAPI";
 import { useDispatch } from "react-redux";
-
+import Loader from "../shared/Loader";
+import TableRow from "./TableRow";
 
 const schema = yup
   .object({
@@ -30,21 +28,38 @@ const Main = () => {
   const session = useSession();
   const searchParams = useSearchParams();
   const queryPage = searchParams.get("page");
-  const [albums, setAlbums] = useState([]);
+  // const [albums, setAlbums] = useState([]);
   const [currentPage, setCurrentPage] = useState(
     queryPage ? Number(queryPage) : 1
   );
   const [totalPages, setTotalPages] = useState(1);
 
+  // rtk query req
   const dispatch = useDispatch();
-  const { data, isLoading, isSuccess, isError, error, refetch } =
-    useGetAlbumsQuery(queryPage ? Number(queryPage) : 1);
+  const {
+    data: { data: albums= {} } ={},
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    refetch,
+  } = useGetAlbumsQuery();
 
-    if(isSuccess) {
+  // decide what to render
+  let content = null;
+  if (isLoading) {
+    content = <Loader />;
+  }
 
-      console.log(data, "data in albums rtk query");
-    }
+  if (isError) {
+    content = (
+      <div className="bg-red-400 text-white font-bold">{error.message}</div>
+    );
+  }
 
+  if (isSuccess) {
+    content = albums.map((album) => <TableRow key={album.id} album={album} />);
+  }
 
   const {
     register,
@@ -63,14 +78,13 @@ const Main = () => {
       page: queryPage ? Number(queryPage) : 1,
     });
 
-    setAlbums(data);
     setCurrentPage(currentPage);
     setTotalPages(totalPages);
   };
 
   useEffect(() => {
     if (session?.data?.jwt) {
-      loadData();
+      // loadData();
     }
   }, [queryPage, session]);
 
@@ -126,8 +140,8 @@ const Main = () => {
     <Layout>
       <Header name="All Albums" />
       <main className="px-4 py-3">
-        <div className="top flex items-center justify-between">
-          <h2 className="text-xl mb-3">Album table</h2>
+        <div className="top flex items-center justify-end">
+          {/* <h2 className="text-xl mb-3">Album table</h2> */}
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="relative">
@@ -147,9 +161,9 @@ const Main = () => {
             </div>
           </form>
 
-          <Link href="/albums/add" className="px-10 py-2 rounded bg-gray-200">
+          {/* <Link href="/albums/add" className="px-10 py-2 rounded bg-gray-200">
             Add album
-          </Link>
+          </Link> */}
         </div>
 
         <div className="mt-2 overflow-x-auto">
@@ -166,112 +180,7 @@ const Main = () => {
                 <th className="border p-2 text-left">Action</th>
               </tr>
             </thead>
-            <tbody>
-              {albums?.length ? (
-                albums.map((album) => {
-                  const {
-                    _id,
-                    releaseCover,
-                    releaseGenre,
-                    releaseTitle,
-                    formatType,
-                    artistId,
-                    originalReleaseDate,
-                    releasePrimaryArtist,
-                    tracks,
-                    upcean,
-                  } = album;
-
-                  return (
-                    <tr className="even:bg-gray-100" key={_id}>
-                      <td className="border p-2">
-                        <Link
-                          className="flex items-center flex-col xl:flex-row"
-                          href={`/albums/${_id}`}
-                        >
-                          <Image
-                            src={
-                              releaseCover ||
-                              process.env.NEXT_PUBLIC_DEFAULT_IMAGE
-                            }
-                            alt="Image"
-                            className="w-[40px] h-[40px]"
-                            width={40}
-                            height={40}
-                          />
-                          <span className="ml-2 text-blue-600">
-                            {releaseTitle || "-"}
-                          </span>
-                        </Link>
-                      </td>
-
-                      <td className="border p-2">{upcean}</td>
-
-                      <td className="border p-2">
-                        <Link className="block text-blue-600" href={`/artists`}>
-                          {releasePrimaryArtist[0]?.name || "-"}
-                        </Link>
-                      </td>
-
-                      <td className="border p-2 space-x-1">
-                        {releaseGenre.length
-                          ? releaseGenre
-                              .filter((genre) => genre.status)
-                              .map((genre, index, array) => (
-                                <span
-                                  key={genre._id}
-                                  className={
-                                    index !== array.length - 1
-                                      ? 'after:content-[","]'
-                                      : ""
-                                  }
-                                >
-                                  {genre.name}
-                                </span>
-                              ))
-                          : "-"}
-                      </td>
-
-                      <td className="border p-2">{formatType || "-"}</td>
-
-                      <td className="border p-2">
-                        {dateFormatter(originalReleaseDate, "dd-MMM-yyyy")}
-                      </td>
-
-                      <td className="border p-2">{tracks?.length}</td>
-
-                      <td className="border p-2 flex">
-                        <Link
-                          className="bg-yellow-300 px-3 py-[7px] rounded text-white"
-                          href={`/albums/${_id}/edit`}
-                        >
-                          Edit
-                        </Link>
-
-                        <button
-                          className="bg-red-400 px-3 py-[5px] rounded text-white ml-1"
-                          onClick={() => handleDelete(_id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr className="even:bg-gray-100">
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2 text-center">Albums not found</td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                </tr>
-              )}
-            </tbody>
+            <tbody>{content}</tbody>
           </table>
         </div>
 
