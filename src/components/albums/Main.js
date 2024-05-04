@@ -37,29 +37,13 @@ const Main = () => {
   // rtk query req
   const dispatch = useDispatch();
   const {
-    data: { data: albums= {} } ={},
+    data: { data: albums = {} } = {},
     isLoading,
     isSuccess,
     isError,
     error,
     refetch,
   } = useGetAlbumsQuery();
-
-  // decide what to render
-  let content = null;
-  if (isLoading) {
-    content = <Loader />;
-  }
-
-  if (isError) {
-    content = (
-      <div className="bg-red-400 text-white font-bold">{error.message}</div>
-    );
-  }
-
-  if (isSuccess) {
-    content = albums.map((album) => <TableRow key={album.id} album={album} />);
-  }
 
   const {
     register,
@@ -136,13 +120,22 @@ const Main = () => {
     }
   };
 
-  return (
-    <Layout>
-      <Header name="All Albums" />
+  // decide what to render
+  let content = null;
+  if (isLoading) {
+    content = <Loader />;
+  }
+
+  if (isError) {
+    content = (
+      <div className="bg-red-400 text-white font-bold">{error.message}</div>
+    );
+  }
+
+  if (isSuccess && !albums.length) {
+    content = (
       <main className="px-4 py-3">
         <div className="top flex items-center justify-end">
-          {/* <h2 className="text-xl mb-3">Album table</h2> */}
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="relative">
               <span className="absolute left-3 top-4">
@@ -160,10 +153,6 @@ const Main = () => {
               />
             </div>
           </form>
-
-          {/* <Link href="/albums/add" className="px-10 py-2 rounded bg-gray-200">
-            Add album
-          </Link> */}
         </div>
 
         <div className="mt-2 overflow-x-auto">
@@ -180,7 +169,13 @@ const Main = () => {
                 <th className="border p-2 text-left">Action</th>
               </tr>
             </thead>
-            <tbody>{content}</tbody>
+            <tbody>
+              <tr className="text-center">
+                <td className="border p-2" colSpan={8}>
+                  Albums not found
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
@@ -190,6 +185,67 @@ const Main = () => {
           totalPage={totalPages}
         />
       </main>
+    );
+  }
+
+  if (isSuccess && albums.length) {
+    content = (
+      <main className="px-4 py-3">
+        <div className="top flex items-center justify-end">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="relative">
+              <span className="absolute left-3 top-4">
+                <FaMagnifyingGlass className="z-20 text-primary" />
+              </span>
+
+              <input
+                className="z-10 w-full my-1 bg-white outline-none pl-8 pr-3 py-2 border-gray-300 text-sm border-2 rounded-full"
+                type="text"
+                name="keyword"
+                id="keyword"
+                placeholder="Search album"
+                autoComplete="off"
+                {...register("keyword")}
+              />
+            </div>
+          </form>
+        </div>
+
+        <div className="mt-2 overflow-x-auto">
+          <table className="w-full mt-2 border-collapse">
+            <thead className="bg-gray-700 text-white">
+              <tr>
+                <th className="border p-2 text-left">Title</th>
+                <th className="border p-2 text-left">UPC</th>
+                <th className="border p-2 text-left">Artist Name</th>
+                <th className="border p-2 text-left">Genre</th>
+                <th className="border p-2 text-left">Type</th>
+                <th className="border p-2 text-left">Release Date</th>
+                <th className="border p-2 text-left">Total Tracks</th>
+                <th className="border p-2 text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {albums.map((album) => (
+                <TableRow key={album.id} album={album} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <Pagination
+          route="/albums"
+          currentPage={currentPage}
+          totalPage={totalPages}
+        />
+      </main>
+    );
+  }
+
+  return (
+    <Layout>
+      <Header name="All Albums" />
+      {content}
     </Layout>
   );
 };
