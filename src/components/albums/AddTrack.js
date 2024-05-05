@@ -361,6 +361,8 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
   useEffect(() => {
     if (releasePrimaryArtist && releasePrimaryArtist?.length > 0) {
+      console.log(releasePrimaryArtist, "releasePrimaryArtist");
+
       const resetFormWithPrimaryArtist = (primaryArtist) => {
         const currentFormValues = getValues();
         reset({

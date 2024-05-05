@@ -326,33 +326,36 @@ const AddAlbum = () => {
   };
 
   const onSubmitTrack = (data) => {
-    // get local storage data
-    const savedTracks = JSON.parse(localStorage.getItem("tracks"));
+    console.log(data, "track data");
 
-    if (savedTracks) {
-      // update data
-      localStorage.setItem(
-        "tracks",
-        JSON.stringify([
-          { id: savedTracks.length + 1, ...data },
-          ...savedTracks,
-        ])
-      );
-    } else {
-      // first time save data
-      localStorage.setItem("tracks", JSON.stringify([{ id: 1, ...data }]));
-    }
+    // get local storage data
+    // const savedTracks = JSON.parse(localStorage.getItem("tracks"));
+    // console.log(savedTracks, "savedTracks in submit");
+
+    // if (savedTracks) {
+    //   // update data
+    //   localStorage.setItem(
+    //     "tracks",
+    //     JSON.stringify([
+    //       { id: savedTracks.length + 1, ...data },
+    //       ...savedTracks,
+    //     ])
+    //   );
+    // } else {
+    //   // first time save data
+    //   localStorage.setItem("tracks", JSON.stringify([{ id: 1, ...data }]));
+    // }
 
     // update state data
-    setTracks((prevTracks) => {
-      const updatedTracks = [
-        ...prevTracks,
-        { id: prevTracks.length + 1, ...data },
-      ];
+    // setTracks((prevTracks) => {
+    //   const updatedTracks = [
+    //     ...prevTracks,
+    //     { id: prevTracks.length + 1, ...data },
+    //   ];
 
-      setValue("tracks", updatedTracks);
-      return updatedTracks;
-    });
+    //   setValue("tracks", updatedTracks);
+    //   return updatedTracks;
+    // });
   };
 
   const onSubmit = (data) => {
@@ -377,12 +380,13 @@ const AddAlbum = () => {
       });
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // useEffect(() => {
+  //   // loadData();
+  // }, []);
 
   const loadData = async () => {
     const savedTracks = JSON.parse(localStorage.getItem("tracks"));
+    console.log(savedTracks, "savedTracks");
 
     // update state with track data
     if (savedTracks) {
@@ -407,6 +411,8 @@ const AddAlbum = () => {
       return filteredTracks;
     });
   };
+
+  console.log("Rendering...");
 
   return (
     <Layout>

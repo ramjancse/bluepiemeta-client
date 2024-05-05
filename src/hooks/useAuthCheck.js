@@ -20,10 +20,8 @@ const useAuthCheck = () => {
         dispatch(userLoggedIn(userInfo));
       }
     }
-    
-    setTimeout(() => {
-      setAuthChecked(true);
-    }, 1000);
+
+    setAuthChecked(true);
   }, [dispatch]);
 
   return authChecked;

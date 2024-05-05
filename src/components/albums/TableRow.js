@@ -1,7 +1,9 @@
+import { useDeleteAlbumMutation } from "@/features/albums/albumAPI";
 import dateFormatter from "@/utils/dateFormatter";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { toast } from "react-toastify";
 
 const TableRow = ({ album }) => {
   const {
@@ -16,6 +18,28 @@ const TableRow = ({ album }) => {
     tracks,
     upcean,
   } = album;
+
+  const [
+    deleteAlbum,
+    {
+      isLoading: deleteIsLoading,
+      isSuccess: deleteIsSuccess,
+      isError: deleteIsError,
+      error: deleteError,
+    },
+  ] = useDeleteAlbumMutation();
+
+  const handleDelete = async (albumId) => {
+    try {
+      await deleteAlbum(albumId);
+
+      // show success message
+      toast.success("Album delete successfully");
+    } catch (error) {
+      // show error message
+      toast.error("Something went wrong");
+    }
+  };
 
   return (
     <tr className="even:bg-gray-100" key={_id}>
@@ -79,6 +103,7 @@ const TableRow = ({ album }) => {
         <button
           className="bg-red-400 px-3 py-[5px] rounded text-white ml-1"
           onClick={() => handleDelete(_id)}
+          disabled={deleteIsLoading}
         >
           Delete
         </button>

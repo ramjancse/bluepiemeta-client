@@ -51,17 +51,19 @@ const Login = () => {
       console.log(result, "login result");
 
       if (!result.error && result.ok) {
-
-        const {jwt, user} = await getSession();
+        const { jwt, user } = await getSession();
 
         // save data to local storage
-        localStorage.setItem("auth", JSON.stringify({ accessToken: jwt, user }));
+        localStorage.setItem(
+          "auth",
+          JSON.stringify({ accessToken: jwt, user })
+        );
 
         // save data to redux store
         dispatch(
           userLoggedIn({
             user,
-            accessToken: jwt
+            accessToken: jwt,
           })
         );
 
@@ -70,7 +72,6 @@ const Login = () => {
 
         // redirect to specific path or default path
         router.push(callbackUrl ? callbackUrl : "/");
-        
       } else {
         // show error message
         toast.error("Something went wrong!");

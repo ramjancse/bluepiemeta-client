@@ -28,22 +28,20 @@ const Main = () => {
   const session = useSession();
   const searchParams = useSearchParams();
   const queryPage = searchParams.get("page");
-  // const [albums, setAlbums] = useState([]);
-  const [currentPage, setCurrentPage] = useState(
-    queryPage ? Number(queryPage) : 1
-  );
-  const [totalPages, setTotalPages] = useState(1);
 
   // rtk query req
   const dispatch = useDispatch();
+  const [page, setPage] = useState(queryPage ? Number(queryPage) : 1);
   const {
-    data: { data: albums = {} } = {},
+    data: {
+      data: albums = [],
+      pagination: { currentPage = 1, totalPages = 1 } = {},
+    } = {},
     isLoading,
     isSuccess,
     isError,
     error,
-    refetch,
-  } = useGetAlbumsQuery();
+  } = useGetAlbumsQuery(page);
 
   const {
     register,
@@ -53,24 +51,7 @@ const Main = () => {
     resolver: yupResolver(schema),
   });
 
-  const loadData = async () => {
-    const {
-      data,
-      pagination: { currentPage, totalPages },
-    } = await getAllAlbums({
-      token: session?.data?.jwt,
-      page: queryPage ? Number(queryPage) : 1,
-    });
-
-    setCurrentPage(currentPage);
-    setTotalPages(totalPages);
-  };
-
-  useEffect(() => {
-    if (session?.data?.jwt) {
-      // loadData();
-    }
-  }, [queryPage, session]);
+  useEffect(() => {}, []);
 
   const onSubmit = async (data) => {
     if (data.keyword === "" || data.keyword === " ") {
@@ -94,24 +75,6 @@ const Main = () => {
 
       // show success message
       // toast.success("Album added successfully");
-    } catch (error) {
-      console.log(error, "error in search page");
-
-      // show error message
-      toast.error("Something went wrong");
-    }
-  };
-
-  const handleDelete = async (albumId) => {
-    try {
-      const res = await axiosPrivateInstance(session?.data?.jwt).delete(
-        `/albums/${albumId}`
-      );
-
-      console.log(res, "res");
-
-      // show success message
-      toast.success("Album delete successfully");
     } catch (error) {
       console.log(error, "error in search page");
 
@@ -233,11 +196,7 @@ const Main = () => {
           </table>
         </div>
 
-        <Pagination
-          route="/albums"
-          currentPage={currentPage}
-          totalPage={totalPages}
-        />
+        <Pagination route="/albums" currentPage={page} totalPage={totalPages} />
       </main>
     );
   }

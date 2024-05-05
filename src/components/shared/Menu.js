@@ -10,69 +10,41 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import { useDispatch } from "react-redux";
+import { userLoggedOut } from "@/features/auth/authSlice";
+
+const menus = [
+  {
+    id: 1,
+    name: "Profile",
+    link: "/profile",
+    icon: "User",
+  },
+  {
+    id: 2,
+    name: "Activity Log",
+    link: "/activity",
+    icon: "User",
+  },
+  {
+    id: 3,
+    name: "Log Out",
+    link: "/",
+    icon: "User",
+  },
+];
 
 const Menu = ({ children, side = "bottom", align = "center" }) => {
-  // const menus = [
-  //   {
-  //     id: 1,
-  //     name: "Genre",
-  //     link: "/genre",
-  //     icon: "User",
-  //   },
+  const dispatch = useDispatch();
 
-  //   {
-  //     id: 2,
-  //     name: "Mood",
-  //     link: "/mood",
-  //   },
+  const handleLogout = () => {
+    // logout from next-auth
+    signOut();
 
-  //   {
-  //     id: 3,
-  //     name: "Country",
-  //     link: "/country",
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "Artist",
-  //     link: "/artist",
-  //   },
-  //   {
-  //     id: 5,
-  //     name: "Year",
-  //     link: "/year",
-  //   },
-  //   {
-  //     id: 6,
-  //     name: "Instrumental",
-  //     link: "/instrumental",
-  //   },
-  //   {
-  //     id: 7,
-  //     name: "Advanced",
-  //     link: "/advanced",
-  //   },
-  // ];
+    // clear redux store data
+    dispatch(userLoggedOut());
+  };
 
-  const menus = [
-    {
-      id: 1,
-      name: "Profile",
-      link: "/profile",
-      icon: "User",
-    },
-    {
-      id: 2,
-      name: "Activity Log",
-      link: "/activity",
-      icon: "User",
-    },
-    {
-      id: 3,
-      name: "Log Out",
-      link: "/",
-      icon: "User",
-    },
-  ];
   return (
     <>
       <DropdownMenu>
@@ -85,7 +57,7 @@ const Menu = ({ children, side = "bottom", align = "center" }) => {
                 {menuItem.id === 3 ? (
                   <DropdownMenuItem
                     className="data-[highlighted]:bg-gray-200 data-[highlighted]:text-fill cursor-pointer"
-                    onClick={() => signOut()}
+                    onClick={handleLogout}
                   >
                     <span>{menuItem.name}</span>
                   </DropdownMenuItem>
