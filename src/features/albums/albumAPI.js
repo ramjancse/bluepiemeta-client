@@ -5,10 +5,20 @@ export const albumAPI = apiSlice.injectEndpoints({
     getAlbums: builder.query({
       query: () => `/albums`,
     }),
+    getAlbum: builder.query({
+      query: (albumId) => `/albums/${albumId}`,
+    }),
     addAlbum: builder.mutation({
       query: (data) => ({
         url: `/albums`,
         method: "POST",
+        body: data,
+      }),
+    }),
+    editAlbum: builder.mutation({
+      query: ({ albumId, data }) => ({
+        url: `/albums/${albumId}`,
+        method: "PUT",
         body: data,
       }),
     }),
@@ -39,6 +49,8 @@ export const albumAPI = apiSlice.injectEndpoints({
 
 export const {
   useGetAlbumsQuery,
+  useGetAlbumQuery,
   useAddAlbumMutation,
+  useEditAlbumMutation,
   useDeleteAlbumMutation,
 } = albumAPI;

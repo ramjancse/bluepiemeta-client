@@ -1416,7 +1416,7 @@ const TrackForm = ({ editFormData, onSubmitTrack, setShow }) => {
           <div className="submit mt-10">
             <input
               type="submit"
-              value={`${albumData ? "Edit Track" : "Add Track"}`}
+              value="Edit Track"
               className="px-10 py-2 rounded bg-green-600 uppercase cursor-pointer text-white"
             />
           </div>

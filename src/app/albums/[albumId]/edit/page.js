@@ -8,7 +8,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
-import { axiosPrivateInstance } from "@/config/axios";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import ReactDatePicker from "react-datepicker";
@@ -21,6 +20,14 @@ import Image from "next/image";
 import EditTrack from "@/components/albums/EditTrack";
 import AddTrack from "@/components/albums/AddTrack";
 import TrackForm from "@/components/albums/TrackForm";
+import {
+  useEditAlbumMutation,
+  useGetAlbumQuery,
+} from "@/features/albums/albumAPI";
+import Loader from "@/components/shared/Loader";
+import { size } from "lodash";
+import { useGetArtistsQuery } from "@/features/artists/artistAPI";
+import { useGetLabelsQuery } from "@/features/labels/labelAPI";
 
 const schema = yup
   .object({
@@ -176,12 +183,36 @@ const EditAlbum = () => {
   const session = useSession();
   const router = useRouter();
   const [tracks, setTracks] = useState([]);
-  const [primaryArtists, setPrimaryArtists] = useState([]);
-  const [labels, setLabels] = useState([]);
+  // const [primaryArtists, setPrimaryArtists] = useState([]);
+  // const [labels, setLabels] = useState([]);
   const [show, setShow] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const { albumId } = useParams();
   const [editFormData, setEditFormData] = useState(null);
+
+  const {
+    data: albumData,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useGetAlbumQuery(albumId);
+
+  const {
+    data: { data: artists = [] } = {},
+    isLoading: artistsIsLoading,
+    isSuccess: artistsIsSUccess,
+    isError: artistsIsError,
+    error: artistsError,
+  } = useGetArtistsQuery();
+
+  const {
+    data: { data: labels = [] } = {},
+    isLoading: labelsIsLoading,
+    isSuccess: labelsIsSuccess,
+    isError: labelsIsError,
+    error: labelsError,
+  } = useGetLabelsQuery();
 
   const {
     register,
@@ -201,7 +232,7 @@ const EditAlbum = () => {
       status: "Draft",
       digitalReleaseDate: "",
       albumType: "Album", // ["Album", "EP", "Single", "Audio", "Video"];
-      releaseType: "Audio",
+      // releaseType: "Audio",
       formatType: "",
       originalReleaseDate: new Date(),
       releaseTitle: "",
@@ -248,14 +279,12 @@ const EditAlbum = () => {
         { name: "DashGo", status: false },
         { name: "Ingrooves", status: false },
       ],
-      releaseExplicit: false,
+      // releaseExplicit: true,
       tracks: [],
     },
   });
 
-  const releaseType = watch("releaseType");
-  const formatType = watch("formatType");
-  const primaryArtist = watch("releasePrimaryArtist");
+  const [editAlbum, { isLoading: editIsLoading }] = useEditAlbumMutation();
 
   const { fields, append, remove } = useFieldArray({
     name: "releasePrimaryArtist",
@@ -286,9 +315,72 @@ const EditAlbum = () => {
     control,
   });
 
+  const releaseType = watch("releaseType");
+  const formatType = watch("formatType");
+  const primaryArtist = watch("releasePrimaryArtist");
+
+  useEffect(() => {
+    if (isSuccess) {
+      const currentFormValues = getValues();
+      const updatedData = {
+        ...currentFormValues,
+        ...albumData,
+        releasePrimaryArtist: albumData?.releasePrimaryArtist?.length
+          ? albumData.releasePrimaryArtist
+          : [{ name: "" }],
+        releaseSecondaryArtist: albumData?.releaseSecondaryArtist?.length
+          ? albumData.releaseSecondaryArtist
+          : [{ name: "" }],
+        releaseGenre: albumData?.releaseGenre?.length
+          ? albumData.releaseGenre
+          : [
+              { name: "Indie", status: false },
+              { name: "Singer", status: false },
+              { name: "Artist", status: false },
+              { name: "Lyricist", status: false },
+              { name: "Composer", status: false },
+              { name: "Producer", status: false },
+              { name: "Band", status: false },
+              { name: "Group", status: false },
+            ],
+        releaseSubGenre: albumData?.releaseSubGenre?.length
+          ? albumData.releaseSubGenre
+          : [
+              { name: "Indie", status: false },
+              { name: "Singer", status: false },
+              { name: "Artist", status: false },
+              { name: "Lyricist", status: false },
+              { name: "Composer", status: false },
+              { name: "Producer", status: false },
+              { name: "Band", status: false },
+              { name: "Group", status: false },
+            ],
+        platforms: albumData?.platforms?.length
+          ? albumData.platforms
+          : [
+              { name: "FUGA", status: false },
+              { name: "Believe", status: false },
+              { name: "Ordior", status: false },
+              { name: "Kanjian", status: false },
+              { name: "Too Lost", status: false },
+              { name: "Horus", status: false },
+              { name: "DITTO", status: false },
+              { name: "DashGo", status: false },
+              { name: "Ingrooves", status: false },
+            ],
+        tracks: albumData?.tracks ? albumData.tracks : [],
+      };
+
+      // update form state
+      reset(updatedData);
+
+      // update local tracks state
+      setTracks(albumData.tracks);
+    }
+  }, [isSuccess, albumData, getValues, reset]);
+
   const handleAddTrack = () => {
     // save primary artist for add track
-
     if (formatType !== "compilation" && formatType.length) {
       localStorage.setItem(
         "releasePrimaryArtist",
@@ -336,103 +428,23 @@ const EditAlbum = () => {
   };
 
   const onSubmit = async (data) => {
-    try {
-      const {
-        data: {
-          links: { self },
-        },
-      } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+    editAlbum({ albumId, data })
+      .then((res) => {
+        // show success message
+        toast.success("Album added successfully");
 
-      // show success message
-      toast.success("Album added successfully");
+        // remove local storage saved tracks data
+        localStorage.removeItem("tracks");
 
-      // remove local storage saved tracks data
-      localStorage.removeItem("tracks");
+        // redirect to another route
+        router.push(`/albums`);
+      })
+      .catch((error) => {
+        console.log(error, "error in add album page");
 
-      // redirect to another route
-      router.push(self);
-    } catch (error) {
-      console.log(error, "error in add album page");
-
-      // show error message
-      toast.error("Something went wrong");
-    }
-  };
-
-  useEffect(() => {
-    if (session?.data?.jwt && albumId) {
-      loadData();
-    }
-  }, [session, albumId]);
-
-  const loadData = async () => {
-    const albumData = await getAlbumById({
-      token: session?.data?.jwt,
-      albumId,
-    });
-    const { data } = await getAllArtists(session?.data?.jwt);
-    const { data: allLabels } = await getAllLabel({
-      token: session?.data?.jwt,
-      page: 1,
-    });
-
-    const currentFormValues = getValues();
-    const updatedData = {
-      ...currentFormValues,
-      ...albumData,
-      releasePrimaryArtist: albumData?.releasePrimaryArtist?.length
-        ? albumData.releasePrimaryArtist
-        : [{ name: "" }],
-      releaseSecondaryArtist: albumData?.releaseSecondaryArtist?.length
-        ? albumData.releaseSecondaryArtist
-        : [{ name: "" }],
-      releaseGenre: albumData?.releaseGenre?.length
-        ? albumData.releaseGenre
-        : [
-            { name: "Indie", status: false },
-            { name: "Singer", status: false },
-            { name: "Artist", status: false },
-            { name: "Lyricist", status: false },
-            { name: "Composer", status: false },
-            { name: "Producer", status: false },
-            { name: "Band", status: false },
-            { name: "Group", status: false },
-          ],
-      releaseSubGenre: albumData?.releaseSubGenre?.length
-        ? albumData.releaseSubGenre
-        : [
-            { name: "Indie", status: false },
-            { name: "Singer", status: false },
-            { name: "Artist", status: false },
-            { name: "Lyricist", status: false },
-            { name: "Composer", status: false },
-            { name: "Producer", status: false },
-            { name: "Band", status: false },
-            { name: "Group", status: false },
-          ],
-      platforms: albumData?.platforms?.length
-        ? albumData.platforms
-        : [
-            { name: "FUGA", status: false },
-            { name: "Believe", status: false },
-            { name: "Ordior", status: false },
-            { name: "Kanjian", status: false },
-            { name: "Too Lost", status: false },
-            { name: "Horus", status: false },
-            { name: "DITTO", status: false },
-            { name: "DashGo", status: false },
-            { name: "Ingrooves", status: false },
-          ],
-      tracks: albumData?.tracks ? albumData.tracks : [],
-      releaseExplicit: albumData.releaseExplicit ? true : false,
-    };
-
-    reset(updatedData);
-
-    // update local state
-    setTracks(albumData.tracks);
-    setPrimaryArtists(data);
-    setLabels(allLabels);
+        // show error message
+        toast.error("Something went wrong");
+      });
   };
 
   const handleDelete = (trackId) => {
@@ -466,924 +478,964 @@ const EditAlbum = () => {
     });
   };
 
-  return (
-    <Layout>
-      {show ? (
-        <>
-          <Header name="Edit Track" />
-          <TrackForm
-            editFormData={editFormData}
-            onSubmitTrack={onSubmitTrack}
-            setShow={setShow}
-          />
-        </>
-      ) : (
-        <>
-          <Header name="Edit Album" />
-          <main className="px-4 py-3 border-l border-b">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="album">
-                <div className="releaseInfo">
-                  <h2 className="text-xl">Release Info</h2>
+  // decide what to render
+  let content = null;
+  if (isLoading) {
+    content = (
+      <div>
+        <Header name="Edit Album" />
+        <Loader />
+      </div>
+    );
+  }
 
-                  <div className="inputs  mt-2 border-2 px-4 py-3 grid grid-cols-12 grid-rows-4 gap-3">
-                    <div className="input col-start-1 col-end-13 py-[12px]">
-                      <label
-                        htmlFor="releaseType"
-                        className="cursor-pointer select-none"
-                      >
-                        Release Type
-                      </label>
+  if (isError) {
+    content = (
+      <div>
+        <Header name="Edit Album" />
+        <div className="bg-red-300 text-white rounded text-center py-5 font-semibold text-xl">
+          {error.message || "Something Went Wrong!"}
+        </div>
+      </div>
+    );
+  }
 
-                      <div className="flex mt-1">
-                        <div className="left">
-                          <input
-                            type="radio"
-                            name="releaseType"
-                            id="Audio"
-                            className="mr-1"
-                            value="Audio"
-                            {...register("releaseType")}
-                            defaultChecked={
-                              getValues("releaseType") === "Audio"
-                            }
-                          />
-                          <label
-                            htmlFor="Audio"
-                            className="cursor-pointer select-none"
-                          >
-                            Audio
-                          </label>
-                        </div>
+  if (isSuccess && !size(albumData)) {
+    content = (
+      <div>
+        <Header name="Edit Album" />
+        <div>Album not found</div>
+      </div>
+    );
+  }
 
-                        <div className="right flex items-center">
-                          <input
-                            type="radio"
-                            name="releaseType"
-                            id="Video"
-                            className="ml-5 mr-1"
-                            value="Video"
-                            {...register("releaseType")}
-                            defaultChecked={
-                              getValues("releaseType") === "Video"
-                            }
-                          />
-                          <label
-                            htmlFor="Video"
-                            className="cursor-pointer select-none"
-                          >
-                            Video
-                          </label>
-                        </div>
-                      </div>
+  if (isSuccess) {
+    content = (
+      <div>
+        {show ? (
+          <>
+            <Header name="Edit Track" />
+            <TrackForm
+              editFormData={editFormData}
+              onSubmitTrack={onSubmitTrack}
+              setShow={setShow}
+            />
+          </>
+        ) : (
+          <>
+            <Header name="Edit Album" />
+            <main className="px-4 py-3 border-l border-b">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="album">
+                  <div className="releaseInfo">
+                    <h2 className="text-xl">Release Info</h2>
 
-                      <p
-                        className={`${
-                          errors.releaseType?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.releaseType?.message}
-                      </p>
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-end-7">
-                      <label
-                        htmlFor="formatType"
-                        className="cursor-pointer select-none"
-                      >
-                        Format Type
-                      </label>
-
-                      <select
-                        name="formatType"
-                        id="formatType"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("formatType")}
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          Select format type
-                        </option>
-                        {releaseType === "Audio" && (
-                          <>
-                            <option value="Single">Single</option>
-                            <option value="Album">Album</option>
-                            <option value="Compilation">Compilation</option>
-                          </>
-                        )}
-
-                        {releaseType === "Video" && (
-                          <option value="Music Video">Music Video</option>
-                        )}
-                      </select>
-
-                      {!releaseType && (
-                        <p className="text-red-500 text-[12px]">
-                          {" "}
-                          *** At first select release type
-                        </p>
-                      )}
-
-                      <p
-                        className={`${
-                          errors.formatType?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.formatType?.message}
-                      </p>
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                      <label
-                        htmlFor="releaseDate"
-                        className="cursor-pointer select-none"
-                      >
-                        Original Release Date
-                      </label>
-
-                      <Controller
-                        control={control}
-                        name="originalReleaseDate"
-                        render={({ field }) => (
-                          <ReactDatePicker
-                            selected={field.value}
-                            onChange={(date) => {
-                              field.onChange(date);
-                            }}
-                            showIcon
-                            toggleCalendarOnIconClick
-                            peekNextMonth
-                            showMonthDropdown
-                            showYearDropdown
-                            dropdownMode="select"
-                            dateFormat="dd/MM/yyyy"
-                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          />
-                        )}
-                      />
-
-                      <p
-                        className={`${
-                          errors.originalReleaseDate?.message
-                            ? "block"
-                            : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.originalReleaseDate?.message}
-                      </p>
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-end-7">
-                      <label
-                        htmlFor="releaseTitle"
-                        className="cursor-pointer select-none"
-                      >
-                        Release Title
-                      </label>
-
-                      <input
-                        type="text"
-                        name="releaseTitle"
-                        id="releaseTitle"
-                        placeholder="Enter release title"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("releaseTitle")}
-                      />
-
-                      <p
-                        className={`${
-                          errors.releaseTitle?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.releaseTitle?.message}
-                      </p>
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                      <label
-                        htmlFor="releaseVersion"
-                        className="cursor-pointer select-none"
-                      >
-                        Release Version
-                      </label>
-
-                      <input
-                        type="text"
-                        name="releaseVersion"
-                        id="releaseVersion"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("releaseVersion")}
-                        placeholder="Enter version"
-                      />
-
-                      <p
-                        className={`${
-                          errors.releaseVersion?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.releaseVersion?.message}
-                      </p>
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-end-7">
-                      <label
-                        htmlFor="releaseCover"
-                        className="cursor-pointer select-none"
-                      >
-                        Release Cover Image Link
-                      </label>
-
-                      <input
-                        type="text"
-                        name="releaseCover"
-                        id="releaseCover"
-                        placeholder="Album cover image link"
-                        className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                        {...register("releaseCover")}
-                      />
-
-                      <p
-                        className={`${
-                          errors.releaseCover?.message ? "block" : "hidden"
-                        } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                      >
-                        {errors.releaseCover?.message}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="releaseArtists mt-8">
-                  <h2 className="text-2xl">Release Artists</h2>
-
-                  <div className="input-area border-2 mt-2 grid grid-cols-12 grid-rows-1 gap-3 px-4 py-3">
-                    <div className="input col-start-1 col-end-13 sm:col-end-7">
-                      <label
-                        className="cursor-pointer block select-none"
-                        htmlFor="releasePrimaryArtist"
-                      >
-                        Release Artist (Primary)
-                      </label>
-
-                      {fields.map((filed, index) => (
-                        <div key={filed.id}>
-                          <div className="flex items-center">
-                            {index < 1 && (
-                              <select
-                                name={`releasePrimaryArtist[${index}].name`}
-                                id={`releasePrimaryArtist[${index}].name`}
-                                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(
-                                  `releasePrimaryArtist.${index}.name`
-                                )}
-                              >
-                                <option value="" disabled>
-                                  Select artist
-                                </option>
-
-                                {primaryArtists.map((artist) => {
-                                  const { id, artistName, fullName } = artist;
-                                  return (
-                                    <option key={id} value={artistName}>
-                                      {artistName}
-                                    </option>
-                                  );
-                                })}
-                              </select>
-                            )}
-
-                            {index > 0 && (
-                              <input
-                                type="text"
-                                name={`releasePrimaryArtist[${index}].name`}
-                                id={`releasePrimaryArtist[${index}].name`}
-                                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(
-                                  `releasePrimaryArtist.${index}.name`
-                                )}
-                                placeholder="Type artist name"
-                              />
-                            )}
-
-                            {!index > 0 && (
-                              <FaCirclePlus
-                                onClick={() => append({ name: "" })}
-                                className="ml-2 text-blue-700 text-xl cursor-pointer"
-                              />
-                            )}
-
-                            {index > 0 && (
-                              <IoIosCloseCircle
-                                onClick={() => remove(index)}
-                                className="ml-1 text-red-500 text-2xl cursor-pointer"
-                              />
-                            )}
-                          </div>
-
-                          <p
-                            className={`${
-                              errors.releasePrimaryArtist &&
-                              errors.releasePrimaryArtist[index]?.name
-                                ? "block"
-                                : "hidden"
-                            } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                          >
-                            {errors.releasePrimaryArtist &&
-                              errors.releasePrimaryArtist[index]?.name?.message}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                      <label
-                        className="cursor-pointer block select-none"
-                        htmlFor="releaseSecondaryArtist"
-                      >
-                        Release Artist (Secondary)
-                      </label>
-
-                      {featuringFields.map((filed, index) => (
-                        <div key={filed.id}>
-                          <div className="flex items-center">
-                            {index < 1 && (
-                              <select
-                                name={`releaseSecondaryArtist[${index}].name`}
-                                id={`releaseSecondaryArtist[${index}].name`}
-                                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(
-                                  `releaseSecondaryArtist.${index}.name`
-                                )}
-                              >
-                                <option value="" disabled>
-                                  Select artist
-                                </option>
-                                {primaryArtists.map((artist) => {
-                                  const { id, artistName, fullName } = artist;
-                                  return (
-                                    <option key={id} value={artistName}>
-                                      {artistName}
-                                    </option>
-                                  );
-                                })}
-                              </select>
-                            )}
-
-                            {index > 0 && (
-                              <input
-                                type="text"
-                                name={`releaseSecondaryArtist[${index}].name`}
-                                id={`releaseSecondaryArtist[${index}].name`}
-                                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                                {...register(
-                                  `releaseSecondaryArtist.${index}.name`
-                                )}
-                                placeholder="Type artist name"
-                              />
-                            )}
-
-                            {!index > 0 && (
-                              <FaCirclePlus
-                                onClick={() => featuringAppend({ name: "" })}
-                                className="ml-2 text-blue-700 text-xl cursor-pointer"
-                              />
-                            )}
-
-                            {index > 0 && (
-                              <IoIosCloseCircle
-                                onClick={() => featuringRemove(index)}
-                                className="ml-1 text-red-500 text-2xl cursor-pointer"
-                              />
-                            )}
-                          </div>
-
-                          <p
-                            className={`${
-                              errors.releaseSecondaryArtist &&
-                              errors.releaseSecondaryArtist[index]?.name
-                                ? "block"
-                                : "hidden"
-                            } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                          >
-                            {errors.releaseSecondaryArtist &&
-                              errors.releaseSecondaryArtist[index]?.name
-                                ?.message}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="metadata mt-5">
-                  <h2 className="text-2xl">Metadata</h2>
-
-                  <div className="input-area border-2 mt-1 px-4 py-3">
-                    <div className="grid grid-cols-12 grid-rows-1 gap-3">
-                      <div className="input col-start-1 col-end-13 sm:col-end-7">
+                    <div className="inputs  mt-2 border-2 px-4 py-3 grid grid-cols-12 grid-rows-4 gap-3">
+                      <div className="input col-start-1 col-end-13 py-[12px]">
                         <label
-                          htmlFor="upcean"
+                          htmlFor="releaseType"
                           className="cursor-pointer select-none"
                         >
-                          UPC
-                        </label>
-
-                        <input
-                          type="text"
-                          name="upcean"
-                          id="upcean"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("upcean")}
-                          placeholder="Enter album upc"
-                        />
-
-                        <p
-                          className={`${
-                            errors.upcean?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.upcean?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                        <label
-                          htmlFor="catalogNumber"
-                          className="cursor-pointer select-none"
-                        >
-                          Catalog Number
-                        </label>
-
-                        <input
-                          type="text"
-                          name="catalogNumber"
-                          id="catalogNumber"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("catalogNumber")}
-                          placeholder="Enter catalog number"
-                        />
-
-                        <p
-                          className={`${
-                            errors.catalogNumber?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.catalogNumber?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13 sm:col-end-7">
-                        <label
-                          htmlFor="recordLabel"
-                          className="cursor-pointer select-none"
-                        >
-                          Label
-                        </label>
-
-                        <select
-                          name="recordLabel"
-                          id="recordLabel"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("recordLabel")}
-                          defaultValue=""
-                        >
-                          <option value="" disabled>
-                            Select label
-                          </option>
-
-                          {labels?.map((label) => (
-                            <option value={label.labelName} key={label.id}>
-                              {label.labelName}
-                            </option>
-                          ))}
-                        </select>
-
-                        <p
-                          className={`${
-                            errors.recordLabel?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.recordLabel?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                        <label
-                          htmlFor="releaseLanguage"
-                          className="select-none"
-                        >
-                          Release Language
-                        </label>
-
-                        <select
-                          name="releaseLanguage"
-                          id="releaseLanguage"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("releaseLanguage")}
-                          defaultValue=""
-                        >
-                          <option value="" disabled>
-                            Select language
-                          </option>
-                          <option value="English">English</option>
-                          <option value="Spanish">Spanish</option>
-                          <option value="French">French</option>
-                          <option value="German">German</option>
-                          <option value="Chinese">Chinese</option>
-                          <option value="Japanese">Japanese</option>
-                          <option value="Other">Other</option>
-                        </select>
-
-                        <p
-                          className={`${
-                            errors.releaseLanguage?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.releaseLanguage?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13 sm:col-end-7">
-                        <label
-                          htmlFor="cLineCompany"
-                          className="cursor-pointer select-none"
-                        >
-                          C-Line Company
-                        </label>
-
-                        <input
-                          type="text"
-                          name="cLineCompany"
-                          id="cLineCompany"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("cLineCompany")}
-                        />
-
-                        <p
-                          className={`${
-                            errors.cLineCompany?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.cLineCompany?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                        <label
-                          htmlFor="cLineYear"
-                          className="cursor-pointer select-none"
-                        >
-                          C Line Year
-                        </label>
-
-                        <Controller
-                          control={control}
-                          name="cLineYear"
-                          render={({ field }) => (
-                            <ReactDatePicker
-                              selected={field.value}
-                              onChange={(date) => {
-                                field.onChange(date);
-                              }}
-                              showYearPicker
-                              dropdownMode="select"
-                              dateFormat="yyyy"
-                              yearItemNumber={16}
-                              className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                            />
-                          )}
-                        />
-
-                        <p
-                          className={`${
-                            errors.cLineYear?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.cLineYear?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13 sm:col-end-7">
-                        <label
-                          htmlFor="pLineCompany"
-                          className="cursor-pointer select-none"
-                        >
-                          P-Line Company
-                        </label>
-
-                        <input
-                          type="text"
-                          name="pLineCompany"
-                          id="pLineCompany"
-                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                          {...register("pLineCompany")}
-                        />
-
-                        <p
-                          className={`${
-                            errors.pLineCompany?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.pLineCompany?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
-                        <label
-                          htmlFor="pLineYear"
-                          className="cursor-pointer select-none"
-                        >
-                          P Line Year
-                        </label>
-
-                        <Controller
-                          control={control}
-                          name="pLineYear"
-                          render={({ field }) => (
-                            <ReactDatePicker
-                              selected={field.value}
-                              onChange={(date) => {
-                                field.onChange(date);
-                              }}
-                              showYearPicker
-                              dropdownMode="select"
-                              dateFormat="yyyy"
-                              yearItemNumber={16}
-                              className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
-                            />
-                          )}
-                        />
-
-                        <p
-                          className={`${
-                            errors.pLineYear?.message ? "block" : "hidden"
-                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
-                        >
-                          {errors.pLineYear?.message}
-                        </p>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13">
-                        <label htmlFor="releaseGenre" className="select-none">
-                          Release Genre
-                        </label>
-
-                        <div className="genre mt-2">
-                          <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
-                            {genreFields.map((field, index) => (
-                              <div
-                                className="input px-3 py-1 w-1/6"
-                                key={field.id}
-                              >
-                                <input
-                                  type="checkbox"
-                                  name={`releaseGenre[${index}].name`}
-                                  id={`releaseGenre[${index}].name`}
-                                  {...register(`releaseGenre.${index}.status`)}
-                                />
-                                <label
-                                  htmlFor={`releaseGenre[${index}].name`}
-                                  className="ml-1 cursor-pointer select-none"
-                                >
-                                  {field.name}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-
-                          <p
-                            className={`${
-                              errors.releaseGenre &&
-                              errors.releaseGenre?.root?.message
-                                ? "block"
-                                : "hidden"
-                            } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
-                          >
-                            {errors.releaseGenre &&
-                              errors.releaseGenre?.root?.message}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13">
-                        <label htmlFor="subgenre" className="select-none">
-                          Release Subgenre
-                        </label>
-
-                        <div className="genre mt-2">
-                          <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
-                            {subgenreFields.map((field, index) => (
-                              <div
-                                className="input px-3 py-1 w-1/6"
-                                key={field.id}
-                              >
-                                <input
-                                  type="checkbox"
-                                  name={`releaseSubGenre[${index}].name`}
-                                  id={`releaseSubGenre[${index}].name`}
-                                  {...register(
-                                    `releaseSubGenre.${index}.status`
-                                  )}
-                                />
-
-                                <label
-                                  htmlFor={`releaseSubGenre[${index}].name`}
-                                  className="ml-1 cursor-pointer select-none"
-                                >
-                                  {field.name}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13">
-                        <label htmlFor="platform" className="select-none">
-                          Platform
-                        </label>
-
-                        <div className="platform mt-2">
-                          <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
-                            {platformsFields.map((field, index) => (
-                              <div
-                                className="input px-3 py-1 w-1/6"
-                                key={field.id}
-                              >
-                                <input
-                                  type="checkbox"
-                                  name={`platforms[${index}].name`}
-                                  id={`platforms[${index}].name`}
-                                  {...register(`platforms.${index}.status`)}
-                                />
-                                <label
-                                  htmlFor={`platforms[${index}].name`}
-                                  className="ml-1 cursor-pointer select-none"
-                                >
-                                  {field.name}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="input col-start-1 col-end-13">
-                        <label
-                          htmlFor="releaseExplicit"
-                          className="cursor-pointer select-none"
-                        >
-                          Release Explicit
+                          Release Type
                         </label>
 
                         <div className="flex mt-1">
                           <div className="left">
                             <input
                               type="radio"
-                              name="releaseExplicit"
-                              id="yes"
+                              name="releaseType"
+                              id="Audio"
                               className="mr-1"
-                              value={true}
-                              {...register("releaseExplicit")}
-                              defaultChecked={
-                                getValues("releaseExplicit") === true
-                              }
+                              value="Audio"
+                              {...register("releaseType")}
+                              defaultChecked={albumData.releaseType === "Audio"}
                             />
                             <label
-                              htmlFor="yes"
+                              htmlFor="Audio"
                               className="cursor-pointer select-none"
                             >
-                              Yes
+                              Audio
                             </label>
                           </div>
 
                           <div className="right flex items-center">
                             <input
                               type="radio"
-                              name="releaseExplicit"
-                              id="no"
+                              name="releaseType"
+                              id="Video"
                               className="ml-5 mr-1"
-                              value={false}
-                              {...register("releaseExplicit")}
-                              defaultChecked={
-                                getValues("releaseExplicit") === false
-                              }
+                              value="Video"
+                              {...register("releaseType")}
+                              defaultChecked={albumData.releaseType === "Video"}
                             />
                             <label
-                              htmlFor="no"
+                              htmlFor="Video"
                               className="cursor-pointer select-none"
                             >
-                              No
+                              Video
                             </label>
                           </div>
                         </div>
 
                         <p
                           className={`${
-                            errors.releaseExplicit?.message ? "block" : "hidden"
+                            errors.releaseType?.message ? "block" : "hidden"
                           } text-sm text-red-500 font-semibold mt-1 ml-5`}
                         >
-                          {errors.releaseExplicit?.message}
+                          {errors.releaseType?.message}
+                        </p>
+                      </div>
+
+                      <div className="input col-start-1 col-end-13 sm:col-end-7">
+                        <label
+                          htmlFor="formatType"
+                          className="cursor-pointer select-none"
+                        >
+                          Format Type
+                        </label>
+
+                        <select
+                          name="formatType"
+                          id="formatType"
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register("formatType")}
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Select format type
+                          </option>
+                          {releaseType === "Audio" && (
+                            <>
+                              <option value="Single">Single</option>
+                              <option value="Album">Album</option>
+                              <option value="Compilation">Compilation</option>
+                            </>
+                          )}
+
+                          {releaseType === "Video" && (
+                            <option value="Music Video">Music Video</option>
+                          )}
+                        </select>
+
+                        {!releaseType && (
+                          <p className="text-red-500 text-[12px]">
+                            {" "}
+                            *** At first select release type
+                          </p>
+                        )}
+
+                        <p
+                          className={`${
+                            errors.formatType?.message ? "block" : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.formatType?.message}
+                        </p>
+                      </div>
+
+                      <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                        <label
+                          htmlFor="releaseDate"
+                          className="cursor-pointer select-none"
+                        >
+                          Original Release Date
+                        </label>
+
+                        <Controller
+                          control={control}
+                          name="originalReleaseDate"
+                          render={({ field }) => (
+                            <ReactDatePicker
+                              selected={field.value}
+                              onChange={(date) => {
+                                field.onChange(date);
+                              }}
+                              showIcon
+                              toggleCalendarOnIconClick
+                              peekNextMonth
+                              showMonthDropdown
+                              showYearDropdown
+                              dropdownMode="select"
+                              dateFormat="dd/MM/yyyy"
+                              className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            />
+                          )}
+                        />
+
+                        <p
+                          className={`${
+                            errors.originalReleaseDate?.message
+                              ? "block"
+                              : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.originalReleaseDate?.message}
+                        </p>
+                      </div>
+
+                      <div className="input col-start-1 col-end-13 sm:col-end-7">
+                        <label
+                          htmlFor="releaseTitle"
+                          className="cursor-pointer select-none"
+                        >
+                          Release Title
+                        </label>
+
+                        <input
+                          type="text"
+                          name="releaseTitle"
+                          id="releaseTitle"
+                          placeholder="Enter release title"
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register("releaseTitle")}
+                        />
+
+                        <p
+                          className={`${
+                            errors.releaseTitle?.message ? "block" : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.releaseTitle?.message}
+                        </p>
+                      </div>
+
+                      <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                        <label
+                          htmlFor="releaseVersion"
+                          className="cursor-pointer select-none"
+                        >
+                          Release Version
+                        </label>
+
+                        <input
+                          type="text"
+                          name="releaseVersion"
+                          id="releaseVersion"
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register("releaseVersion")}
+                          placeholder="Enter version"
+                        />
+
+                        <p
+                          className={`${
+                            errors.releaseVersion?.message ? "block" : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.releaseVersion?.message}
+                        </p>
+                      </div>
+
+                      <div className="input col-start-1 col-end-13 sm:col-end-7">
+                        <label
+                          htmlFor="releaseCover"
+                          className="cursor-pointer select-none"
+                        >
+                          Release Cover Image Link
+                        </label>
+
+                        <input
+                          type="text"
+                          name="releaseCover"
+                          id="releaseCover"
+                          placeholder="Album cover image link"
+                          className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                          {...register("releaseCover")}
+                        />
+
+                        <p
+                          className={`${
+                            errors.releaseCover?.message ? "block" : "hidden"
+                          } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                        >
+                          {errors.releaseCover?.message}
                         </p>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="tracks mt-5">
-                  <h2 className="text-2xl">Tracks</h2>
+                  <div className="releaseArtists mt-8">
+                    <h2 className="text-2xl">Release Artists</h2>
 
-                  <div className="input-area mt-1 px-4 py-3 border-2">
-                    {tracks.length ? (
-                      <>
-                        <table className="w-full mt-2 border-collapse">
-                          <thead className="bg-gray-700 text-white">
-                            <tr>
-                              <th className="border p-2 text-left">SL</th>
-                              <th className="border p-2 text-left">
-                                Track Title
-                              </th>
-                              <th className="border p-2 text-left">Artist</th>
-                              <th className="border p-2 text-left">ISRC</th>
-                              <th className="border p-2 text-left">Duration</th>
-                              <th className="border p-2 text-left">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {tracks.map((track, index) => {
-                              const {
-                                id,
-                                trackTitle,
-                                trackArtist,
-                                isrc,
-                                duration,
-                              } = track;
+                    <div className="input-area border-2 mt-2 grid grid-cols-12 grid-rows-1 gap-3 px-4 py-3">
+                      <div className="input col-start-1 col-end-13 sm:col-end-7">
+                        <label
+                          className="cursor-pointer block select-none"
+                          htmlFor="releasePrimaryArtist"
+                        >
+                          Release Artist (Primary)
+                        </label>
 
-                              return (
-                                <tr className="even:bg-gray-100" key={index}>
-                                  <td className="border p-2">{index + 1}</td>
-                                  <td className="border p-2">{trackTitle}</td>
-                                  <td className="border p-2">
-                                    {trackArtist[0]?.name}
-                                  </td>
-                                  <td className="border p-2">{isrc}</td>
-                                  <td className="border p-2">{duration}</td>
-                                  <td className="border p-2">
-                                    <button
-                                      type="button"
-                                      className="bg-yellow-300 px-3 py-1 rounded text-white mr-2"
-                                      onClick={() => handleEdit(track)}
-                                    >
-                                      Edit
-                                    </button>
+                        {fields.map((filed, index) => (
+                          <div key={filed.id}>
+                            <div className="flex items-center">
+                              {index < 1 && (
+                                <select
+                                  name={`releasePrimaryArtist[${index}].name`}
+                                  id={`releasePrimaryArtist[${index}].name`}
+                                  className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                                  {...register(
+                                    `releasePrimaryArtist.${index}.name`
+                                  )}
+                                >
+                                  <option value="" disabled>
+                                    Select artist
+                                  </option>
 
-                                    <button
-                                      type="button"
-                                      className="bg-red-500 px-3 py-1 rounded text-white"
-                                      onClick={() => handleDelete(id)}
-                                    >
-                                      Delete
-                                    </button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </>
-                    ) : (
-                      <>
-                        <h2 className="text-center text-xl">
-                          No tracks has been added
-                        </h2>
-                      </>
-                    )}
+                                  {artists.map((artist) => {
+                                    const { id, name, fullName } = artist;
+                                    return (
+                                      <option key={id} value={name}>
+                                        {name}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+                              )}
 
-                    <div className="add flex mt-16">
-                      <button
-                        className="px-10 py-2 rounded bg-blue-500 uppercase text-white"
-                        onClick={handleAddTrack}
-                      >
-                        + Add Track
-                      </button>
+                              {index > 0 && (
+                                <input
+                                  type="text"
+                                  name={`releasePrimaryArtist[${index}].name`}
+                                  id={`releasePrimaryArtist[${index}].name`}
+                                  className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                                  {...register(
+                                    `releasePrimaryArtist.${index}.name`
+                                  )}
+                                  placeholder="Type artist name"
+                                />
+                              )}
+
+                              {!index > 0 && (
+                                <FaCirclePlus
+                                  onClick={() => append({ name: "" })}
+                                  className="ml-2 text-blue-700 text-xl cursor-pointer"
+                                />
+                              )}
+
+                              {index > 0 && (
+                                <IoIosCloseCircle
+                                  onClick={() => remove(index)}
+                                  className="ml-1 text-red-500 text-2xl cursor-pointer"
+                                />
+                              )}
+                            </div>
+
+                            <p
+                              className={`${
+                                errors.releasePrimaryArtist &&
+                                errors.releasePrimaryArtist[index]?.name
+                                  ? "block"
+                                  : "hidden"
+                              } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                            >
+                              {errors.releasePrimaryArtist &&
+                                errors.releasePrimaryArtist[index]?.name
+                                  ?.message}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                        <label
+                          className="cursor-pointer block select-none"
+                          htmlFor="releaseSecondaryArtist"
+                        >
+                          Release Artist (Secondary)
+                        </label>
+
+                        {featuringFields.map((filed, index) => (
+                          <div key={filed.id}>
+                            <div className="flex items-center">
+                              {index < 1 && (
+                                <select
+                                  name={`releaseSecondaryArtist[${index}].name`}
+                                  id={`releaseSecondaryArtist[${index}].name`}
+                                  className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                                  {...register(
+                                    `releaseSecondaryArtist.${index}.name`
+                                  )}
+                                >
+                                  <option value="" disabled>
+                                    Select artist
+                                  </option>
+                                  {artists.map((artist) => {
+                                    const { id, name, fullName } = artist;
+                                    return (
+                                      <option key={id} value={name}>
+                                        {name}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+                              )}
+
+                              {index > 0 && (
+                                <input
+                                  type="text"
+                                  name={`releaseSecondaryArtist[${index}].name`}
+                                  id={`releaseSecondaryArtist[${index}].name`}
+                                  className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                                  {...register(
+                                    `releaseSecondaryArtist.${index}.name`
+                                  )}
+                                  placeholder="Type artist name"
+                                />
+                              )}
+
+                              {!index > 0 && (
+                                <FaCirclePlus
+                                  onClick={() => featuringAppend({ name: "" })}
+                                  className="ml-2 text-blue-700 text-xl cursor-pointer"
+                                />
+                              )}
+
+                              {index > 0 && (
+                                <IoIosCloseCircle
+                                  onClick={() => featuringRemove(index)}
+                                  className="ml-1 text-red-500 text-2xl cursor-pointer"
+                                />
+                              )}
+                            </div>
+
+                            <p
+                              className={`${
+                                errors.releaseSecondaryArtist &&
+                                errors.releaseSecondaryArtist[index]?.name
+                                  ? "block"
+                                  : "hidden"
+                              } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                            >
+                              {errors.releaseSecondaryArtist &&
+                                errors.releaseSecondaryArtist[index]?.name
+                                  ?.message}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="submit mt-10 flex justify-end">
-                  <input
-                    type="submit"
-                    value="Submit"
-                    className="text-center bg-green-600 px-14 py-2 font-semibold rounded-full text-white cursor-pointer"
-                  />
+                  <div className="metadata mt-5">
+                    <h2 className="text-2xl">Metadata</h2>
+
+                    <div className="input-area border-2 mt-1 px-4 py-3">
+                      <div className="grid grid-cols-12 grid-rows-1 gap-3">
+                        <div className="input col-start-1 col-end-13 sm:col-end-7">
+                          <label
+                            htmlFor="upcean"
+                            className="cursor-pointer select-none"
+                          >
+                            UPC
+                          </label>
+
+                          <input
+                            type="text"
+                            name="upcean"
+                            id="upcean"
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            {...register("upcean")}
+                            placeholder="Enter album upc"
+                          />
+
+                          <p
+                            className={`${
+                              errors.upcean?.message ? "block" : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.upcean?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                          <label
+                            htmlFor="catalogNumber"
+                            className="cursor-pointer select-none"
+                          >
+                            Catalog Number
+                          </label>
+
+                          <input
+                            type="text"
+                            name="catalogNumber"
+                            id="catalogNumber"
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            {...register("catalogNumber")}
+                            placeholder="Enter catalog number"
+                          />
+
+                          <p
+                            className={`${
+                              errors.catalogNumber?.message ? "block" : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.catalogNumber?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13 sm:col-end-7">
+                          <label
+                            htmlFor="recordLabel"
+                            className="cursor-pointer select-none"
+                          >
+                            Label
+                          </label>
+
+                          <select
+                            name="recordLabel"
+                            id="recordLabel"
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            {...register("recordLabel")}
+                            defaultValue=""
+                          >
+                            <option value="" disabled>
+                              Select label
+                            </option>
+
+                            {labels?.map((label) => (
+                              <option value={label.labelName} key={label.id}>
+                                {label.labelName}
+                              </option>
+                            ))}
+                          </select>
+
+                          <p
+                            className={`${
+                              errors.recordLabel?.message ? "block" : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.recordLabel?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                          <label
+                            htmlFor="releaseLanguage"
+                            className="select-none"
+                          >
+                            Release Language
+                          </label>
+
+                          <select
+                            name="releaseLanguage"
+                            id="releaseLanguage"
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            {...register("releaseLanguage")}
+                            defaultValue=""
+                          >
+                            <option value="" disabled>
+                              Select language
+                            </option>
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Other">Other</option>
+                          </select>
+
+                          <p
+                            className={`${
+                              errors.releaseLanguage?.message
+                                ? "block"
+                                : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.releaseLanguage?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13 sm:col-end-7">
+                          <label
+                            htmlFor="cLineCompany"
+                            className="cursor-pointer select-none"
+                          >
+                            C-Line Company
+                          </label>
+
+                          <input
+                            type="text"
+                            name="cLineCompany"
+                            id="cLineCompany"
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            {...register("cLineCompany")}
+                          />
+
+                          <p
+                            className={`${
+                              errors.cLineCompany?.message ? "block" : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.cLineCompany?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                          <label
+                            htmlFor="cLineYear"
+                            className="cursor-pointer select-none"
+                          >
+                            C Line Year
+                          </label>
+
+                          <Controller
+                            control={control}
+                            name="cLineYear"
+                            render={({ field }) => (
+                              <ReactDatePicker
+                                selected={field.value}
+                                onChange={(date) => {
+                                  field.onChange(date);
+                                }}
+                                showYearPicker
+                                dropdownMode="select"
+                                dateFormat="yyyy"
+                                yearItemNumber={16}
+                                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                              />
+                            )}
+                          />
+
+                          <p
+                            className={`${
+                              errors.cLineYear?.message ? "block" : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.cLineYear?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13 sm:col-end-7">
+                          <label
+                            htmlFor="pLineCompany"
+                            className="cursor-pointer select-none"
+                          >
+                            P-Line Company
+                          </label>
+
+                          <input
+                            type="text"
+                            name="pLineCompany"
+                            id="pLineCompany"
+                            className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                            {...register("pLineCompany")}
+                          />
+
+                          <p
+                            className={`${
+                              errors.pLineCompany?.message ? "block" : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.pLineCompany?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13 sm:col-start-7 sm:col-end-13">
+                          <label
+                            htmlFor="pLineYear"
+                            className="cursor-pointer select-none"
+                          >
+                            P Line Year
+                          </label>
+
+                          <Controller
+                            control={control}
+                            name="pLineYear"
+                            render={({ field }) => (
+                              <ReactDatePicker
+                                selected={field.value}
+                                onChange={(date) => {
+                                  field.onChange(date);
+                                }}
+                                showYearPicker
+                                dropdownMode="select"
+                                dateFormat="yyyy"
+                                yearItemNumber={16}
+                                className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
+                              />
+                            )}
+                          />
+
+                          <p
+                            className={`${
+                              errors.pLineYear?.message ? "block" : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.pLineYear?.message}
+                          </p>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13">
+                          <label htmlFor="releaseGenre" className="select-none">
+                            Release Genre
+                          </label>
+
+                          <div className="genre mt-2">
+                            <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
+                              {genreFields.map((field, index) => (
+                                <div
+                                  className="input px-3 py-1 w-1/6"
+                                  key={field.id}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    name={`releaseGenre[${index}].name`}
+                                    id={`releaseGenre[${index}].name`}
+                                    {...register(
+                                      `releaseGenre.${index}.status`
+                                    )}
+                                  />
+                                  <label
+                                    htmlFor={`releaseGenre[${index}].name`}
+                                    className="ml-1 cursor-pointer select-none"
+                                  >
+                                    {field.name}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+
+                            <p
+                              className={`${
+                                errors.releaseGenre &&
+                                errors.releaseGenre?.root?.message
+                                  ? "block"
+                                  : "hidden"
+                              } text-sm text-red-500 font-semibold mt-1 ml-5 mb-3`}
+                            >
+                              {errors.releaseGenre &&
+                                errors.releaseGenre?.root?.message}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13">
+                          <label htmlFor="subgenre" className="select-none">
+                            Release Subgenre
+                          </label>
+
+                          <div className="genre mt-2">
+                            <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
+                              {subgenreFields.map((field, index) => (
+                                <div
+                                  className="input px-3 py-1 w-1/6"
+                                  key={field.id}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    name={`releaseSubGenre[${index}].name`}
+                                    id={`releaseSubGenre[${index}].name`}
+                                    {...register(
+                                      `releaseSubGenre.${index}.status`
+                                    )}
+                                  />
+
+                                  <label
+                                    htmlFor={`releaseSubGenre[${index}].name`}
+                                    className="ml-1 cursor-pointer select-none"
+                                  >
+                                    {field.name}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13">
+                          <label htmlFor="platform" className="select-none">
+                            Platform
+                          </label>
+
+                          <div className="platform mt-2">
+                            <div className="inputs border border-gray-200 px-2 py-4 flex flex-wrap">
+                              {platformsFields.map((field, index) => (
+                                <div
+                                  className="input px-3 py-1 w-1/6"
+                                  key={field.id}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    name={`platforms[${index}].name`}
+                                    id={`platforms[${index}].name`}
+                                    {...register(`platforms.${index}.status`)}
+                                  />
+                                  <label
+                                    htmlFor={`platforms[${index}].name`}
+                                    className="ml-1 cursor-pointer select-none"
+                                  >
+                                    {field.name}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="input col-start-1 col-end-13">
+                          <label
+                            htmlFor="releaseExplicit"
+                            className="cursor-pointer select-none"
+                          >
+                            Release Explicit
+                          </label>
+
+                          <div className="flex mt-1">
+                            <div className="left">
+                              <input
+                                type="radio"
+                                name="releaseExplicit"
+                                id="yes"
+                                className="mr-1"
+                                value={true}
+                                {...register("releaseExplicit")}
+                                defaultChecked={
+                                  albumData.releaseExplicit === true
+                                }
+                              />
+                              <label
+                                htmlFor="yes"
+                                className="cursor-pointer select-none"
+                              >
+                                Yes
+                              </label>
+                            </div>
+
+                            <div className="right flex items-center">
+                              <input
+                                type="radio"
+                                name="releaseExplicit"
+                                id="no"
+                                className="ml-5 mr-1"
+                                value={false}
+                                {...register("releaseExplicit")}
+                                defaultChecked={
+                                  albumData.releaseExplicit === false
+                                }
+                              />
+                              <label
+                                htmlFor="no"
+                                className="cursor-pointer select-none"
+                              >
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          <p
+                            className={`${
+                              errors.releaseExplicit?.message
+                                ? "block"
+                                : "hidden"
+                            } text-sm text-red-500 font-semibold mt-1 ml-5`}
+                          >
+                            {errors.releaseExplicit?.message}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="tracks mt-5">
+                    <h2 className="text-2xl">Tracks</h2>
+
+                    <div className="input-area mt-1 px-4 py-3 border-2">
+                      {tracks.length ? (
+                        <>
+                          <table className="w-full mt-2 border-collapse">
+                            <thead className="bg-gray-700 text-white">
+                              <tr>
+                                <th className="border p-2 text-left">SL</th>
+                                <th className="border p-2 text-left">
+                                  Track Title
+                                </th>
+                                <th className="border p-2 text-left">Artist</th>
+                                <th className="border p-2 text-left">ISRC</th>
+                                <th className="border p-2 text-left">
+                                  Duration
+                                </th>
+                                <th className="border p-2 text-left">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {tracks.map((track, index) => {
+                                const {
+                                  id,
+                                  trackTitle,
+                                  trackArtist,
+                                  isrc,
+                                  duration,
+                                } = track;
+
+                                return (
+                                  <tr className="even:bg-gray-100" key={index}>
+                                    <td className="border p-2">{index + 1}</td>
+                                    <td className="border p-2">{trackTitle}</td>
+                                    <td className="border p-2">
+                                      {trackArtist[0]?.name}
+                                    </td>
+                                    <td className="border p-2">{isrc}</td>
+                                    <td className="border p-2">{duration}</td>
+                                    <td className="border p-2">
+                                      <button
+                                        type="button"
+                                        className="bg-yellow-300 px-3 py-1 rounded text-white mr-2"
+                                        onClick={() => handleEdit(track)}
+                                      >
+                                        Edit
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        className="bg-red-500 px-3 py-1 rounded text-white"
+                                        onClick={() => handleDelete(id)}
+                                      >
+                                        Delete
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="text-center text-xl">
+                            No tracks has been added
+                          </h2>
+                        </>
+                      )}
+
+                      <div className="add flex mt-16">
+                        <button
+                          className="px-10 py-2 rounded bg-blue-500 uppercase text-white"
+                          onClick={handleAddTrack}
+                        >
+                          + Add Track
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="submit mt-10 flex justify-end">
+                    <input
+                      type="submit"
+                      value="Submit"
+                      className="text-center bg-green-600 px-14 py-2 font-semibold rounded-full text-white cursor-pointer"
+                    />
+                  </div>
                 </div>
-              </div>
-            </form>
-          </main>
-        </>
-      )}
-    </Layout>
-  );
+              </form>
+            </main>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return <Layout>{content}</Layout>;
 };
 
 export default EditAlbum;
