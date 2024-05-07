@@ -359,21 +359,21 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
     setShow((prevShow) => !prevShow);
   };
 
-  useEffect(() => {
-    if (releasePrimaryArtist && releasePrimaryArtist?.length > 0) {
-      console.log(releasePrimaryArtist, "releasePrimaryArtist");
+  // useEffect(() => {
+  //   if (releasePrimaryArtist && releasePrimaryArtist?.length > 0) {
+  //     console.log(releasePrimaryArtist, "releasePrimaryArtist");
 
-      const resetFormWithPrimaryArtist = (primaryArtist) => {
-        const currentFormValues = getValues();
-        reset({
-          ...currentFormValues,
-          trackArtist: primaryArtist,
-        });
-      };
+  //     const resetFormWithPrimaryArtist = (primaryArtist) => {
+  //       const currentFormValues = getValues();
+  //       reset({
+  //         ...currentFormValues,
+  //         trackArtist: primaryArtist,
+  //       });
+  //     };
 
-      resetFormWithPrimaryArtist(releasePrimaryArtist);
-    }
-  }, [releasePrimaryArtist, getValues, reset]);
+  //     resetFormWithPrimaryArtist(releasePrimaryArtist);
+  //   }
+  // }, [releasePrimaryArtist, getValues, reset]);
 
   return (
     <>

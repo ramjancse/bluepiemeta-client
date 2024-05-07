@@ -22,8 +22,9 @@ import Image from "next/image";
 import { useAddAlbumMutation } from "@/features/albums/albumAPI";
 import { useGetArtistsQuery } from "@/features/artists/artistAPI";
 import { useDispatch } from "react-redux";
-import { albumSelectedArtist } from "@/features/albums/albumSlice";
+
 import { useGetLabelsQuery } from "@/features/labels/labelAPI";
+import { selectAlbumArtist } from "@/features/albums/albumSlice";
 
 const schema = yup
   .object({
@@ -273,7 +274,7 @@ const AddAlbum = () => {
 
   const releaseType = watch("releaseType");
   const formatType = watch("formatType");
-  const primaryArtist = watch("releasePrimaryArtist");
+  const releasePrimaryArtist = watch("releasePrimaryArtist");
 
   const { fields, append, remove } = useFieldArray({
     name: "releasePrimaryArtist",
@@ -305,15 +306,18 @@ const AddAlbum = () => {
   });
 
   const handleAddTrack = () => {
-    // save primary artist for add track page
-    // if (
-    //   formatType.length &&
-    //   formatType !== "Compilation" &&
-    //   primaryArtist.length > 0 &&
-    //   primaryArtist[0]?.name
-    // ) {
-    //   dispatch(albumSelectedArtist(primaryArtist));
-    // }
+    // save primary artist for add track
+
+    if (
+      formatType !== "compilation" &&
+      formatType.length &&
+      releasePrimaryArtist[0]?.name
+    ) {
+      localStorage.setItem(
+        "releasePrimaryArtist",
+        JSON.stringify(releasePrimaryArtist)
+      );
+    }
 
     // show add track form
     setShow((prevShow) => !prevShow);
@@ -326,12 +330,10 @@ const AddAlbum = () => {
   };
 
   const onSubmitTrack = (data) => {
-    console.log(data, "track data");
-
+    // console.log(data, "track data");
     // get local storage data
     // const savedTracks = JSON.parse(localStorage.getItem("tracks"));
     // console.log(savedTracks, "savedTracks in submit");
-
     // if (savedTracks) {
     //   // update data
     //   localStorage.setItem(
@@ -345,14 +347,12 @@ const AddAlbum = () => {
     //   // first time save data
     //   localStorage.setItem("tracks", JSON.stringify([{ id: 1, ...data }]));
     // }
-
     // update state data
     // setTracks((prevTracks) => {
     //   const updatedTracks = [
     //     ...prevTracks,
     //     { id: prevTracks.length + 1, ...data },
     //   ];
-
     //   setValue("tracks", updatedTracks);
     //   return updatedTracks;
     // });
@@ -411,8 +411,6 @@ const AddAlbum = () => {
       return filteredTracks;
     });
   };
-
-  console.log("Rendering...");
 
   return (
     <Layout>

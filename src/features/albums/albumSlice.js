@@ -17,11 +17,11 @@ const albumSlice = createSlice({
     //   state.user = undefined;
     //   localStorage.clear();
     // },
-    albumSelectedArtist: (state, action) => {
-      state.releasePrimaryArtist = action.payload;
+    selectAlbumArtist: (state, action) => {
+      state.releasePrimaryArtist = action.payload.artist;
     },
   },
 });
 
-export const { albumSelectedArtist } = albumSlice.actions;
+export const { selectAlbumArtist } = albumSlice.actions;
 export default albumSlice.reducer;
