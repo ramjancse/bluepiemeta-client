@@ -22,7 +22,7 @@ const page = async ({ params: { artistId } }) => {
     artistLinks,
     socialMedia,
     artistImage,
-    artistName,
+    name,
     fullName,
     artistType,
     nameOfType,
@@ -55,7 +55,7 @@ const page = async ({ params: { artistId } }) => {
                 <div className="one w-1/2 mr-3">
                   <div className="info border-b py-2">
                     <p className="font-semibold">Artist name</p>
-                    <p className="text-sm">{artistName}</p>
+                    <p className="text-sm">{name}</p>
                   </div>
 
                   <div className="info border-b py-2">

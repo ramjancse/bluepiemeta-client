@@ -306,14 +306,14 @@ const AddAlbum = () => {
 
   const handleAddTrack = () => {
     // save primary artist for add track page
-    if (
-      formatType.length &&
-      formatType !== "Compilation" &&
-      primaryArtist.length > 0 &&
-      primaryArtist[0]?.name
-    ) {
-      dispatch(albumSelectedArtist(primaryArtist));
-    }
+    // if (
+    //   formatType.length &&
+    //   formatType !== "Compilation" &&
+    //   primaryArtist.length > 0 &&
+    //   primaryArtist[0]?.name
+    // ) {
+    //   dispatch(albumSelectedArtist(primaryArtist));
+    // }
 
     // show add track form
     setShow((prevShow) => !prevShow);

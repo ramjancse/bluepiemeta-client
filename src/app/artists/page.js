@@ -9,7 +9,6 @@ import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import Button from "@/components/artist/Button";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 
-
 const page = async () => {
   const session = await getServerSession(authOptions);
   const { data: artists = [] } = await getAllArtists(session?.jwt);
@@ -18,10 +17,10 @@ const page = async () => {
     <Layout>
       <Header name="All Artists" />
       <main className="px-4 py-3">
-      <div className="top flex items-center justify-end">
+        <div className="top flex items-center justify-end">
           {/* <h2 className="text-xl mb-3">Album table</h2> */}
 
-          <form >
+          <form>
             <div className="relative">
               <span className="absolute left-3 top-4">
                 <FaMagnifyingGlass className="z-20 text-primary" />
@@ -34,7 +33,6 @@ const page = async () => {
                 id="keyword"
                 placeholder="Search artist"
                 autoComplete="off"
-                
               />
             </div>
           </form>
@@ -61,7 +59,7 @@ const page = async () => {
                 artists.map((artist) => {
                   const {
                     _id,
-                    artistName,
+                    name,
                     artistImage,
                     artistType,
                     fullName,
@@ -90,7 +88,7 @@ const page = async () => {
                           className="block text-blue-600"
                           href={`/artists/${_id}`}
                         >
-                          {artistName}
+                          {name}
                         </Link>
                       </td>
 

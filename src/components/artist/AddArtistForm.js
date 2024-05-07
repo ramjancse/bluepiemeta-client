@@ -101,12 +101,10 @@ const schema = yup
   })
   .required();
 
-const ArtistForm = ({ artistData }) => {
+const AddArtistForm = () => {
   const session = useSession();
   const router = useRouter();
-  const [artistType, setArtistType] = useState(
-    artistData ? artistData.artistType : "Single"
-  );
+  const [artistType, setArtistType] = useState("Single");
 
   const singleTypes = [
     { name: "Indie", status: false },
@@ -117,57 +115,6 @@ const ArtistForm = ({ artistData }) => {
     { name: "Producer", status: false },
   ];
 
-  const defaultValues = artistData
-    ? {
-        ...artistData,
-        singleTypes:
-          artistData.artistType === "Single"
-            ? artistData?.nameOfType
-            : singleTypes,
-        multiTypes:
-          artistData.artistType === "Multiple"
-            ? artistData?.nameOfType[0]?.name
-            : "",
-      }
-    : {
-        artistDescription: "",
-        status: "Pending Approval",
-        name: "",
-        fullName: "",
-        sex: "",
-        email: "",
-        areaCode: "",
-        phoneNumber: "",
-        address: "",
-        region: "",
-        artistImage: "",
-        artistType: "Single",
-        singleTypes,
-        artistLinks: [
-          {
-            name: "qq music",
-            link: "",
-          },
-          {
-            name: "music",
-            link: "",
-          },
-        ],
-        socialMedia: [
-          { name: "website", link: "" },
-          { name: "facebook", link: "" },
-          { name: "youtube", link: "" },
-          { name: "instagram", link: "" },
-          { name: "twitter", link: "" },
-          { name: "tiktok", link: "" },
-          { name: "iTunes", link: "" },
-          { name: "vimeo", link: "" },
-          { name: "deezer", link: "" },
-          { name: "spotify", link: "" },
-          { name: "daily motion", link: "" },
-        ],
-      };
-
   const {
     register,
     handleSubmit,
@@ -176,7 +123,44 @@ const ArtistForm = ({ artistData }) => {
     control,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues,
+    defaultValues: {
+      artistDescription: "",
+      status: "Pending Approval",
+      name: "",
+      fullName: "",
+      sex: "",
+      email: "",
+      areaCode: "",
+      phoneNumber: "",
+      address: "",
+      region: "",
+      artistImage: "",
+      artistType: "Single",
+      singleTypes,
+      artistLinks: [
+        {
+          name: "qq music",
+          link: "",
+        },
+        {
+          name: "music",
+          link: "",
+        },
+      ],
+      socialMedia: [
+        { name: "website", link: "" },
+        { name: "facebook", link: "" },
+        { name: "youtube", link: "" },
+        { name: "instagram", link: "" },
+        { name: "twitter", link: "" },
+        { name: "tiktok", link: "" },
+        { name: "iTunes", link: "" },
+        { name: "vimeo", link: "" },
+        { name: "deezer", link: "" },
+        { name: "spotify", link: "" },
+        { name: "daily motion", link: "" },
+      ],
+    },
   });
 
   const [addArtist, { isLoading, isSuccess, isError, error }] =
@@ -206,55 +190,20 @@ const ArtistForm = ({ artistData }) => {
   });
 
   const onSubmit = async (data) => {
-    addAlbum(data)
+    addArtist(data)
       .then((res) => {
-        console.log(res, "res");
-
-        // show success message
-        toast.success("Album added successfully");
-
-        // remove local storage saved tracks data
-        localStorage.removeItem("tracks");
-
-        // redirect to another route
-        router.push(res.links.self);
-      })
-      .catch((error) => {
-        console.log(error, "add error");
-
-        // show error message
-        toast.error("Something went wrong");
-      });
-
-    try {
-      // update req
-      if (artistData) {
-        await axiosPrivateInstance(session?.data?.jwt).put(
-          `/artists/${artistData._id}`,
-          data
-        );
-
-        // show success message
-        toast.success("Artist updated successfully");
-
-        // redirect to another route
-        router.push(`/artists/${artistData._id}`);
-      } else {
-        // add req
-        await axiosPrivateInstance(session?.data?.jwt).post("/artists", data);
-
         // show success message
         toast.success("Artist added successfully");
 
         // redirect to another route
         router.push(`/artists`);
-      }
-    } catch (error) {
-      console.log(error, "error in add artist page");
+      })
+      .catch((error) => {
+        console.log(error, "add artist error");
 
-      // show error message
-      toast.error("Something went wrong");
-    }
+        // show error message
+        toast.error("Something went wrong");
+      });
   };
 
   const handleChangeArtistsType = (aType) => {
@@ -710,7 +659,7 @@ const ArtistForm = ({ artistData }) => {
               type="submit"
               name="submit"
               id="submit"
-              value={`${artistData ? "Update" : "Submit"}`}
+              value="Submit"
               className="float-right cursor-pointer rounded bg-gray-700 px-5 py-2 font-semibold tracking-widest text-white"
             />
           </div>
@@ -720,4 +669,4 @@ const ArtistForm = ({ artistData }) => {
   );
 };
 
-export default ArtistForm;
+export default AddArtistForm;

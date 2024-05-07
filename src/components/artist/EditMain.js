@@ -2,8 +2,9 @@ import Image from "next/image";
 import mainBanner from "@/assets/images/main_banner.jpg";
 import ArtistForm from "./ArtistForm";
 import AddArtistForm from "./AddArtistForm";
+import EditForm from "./EditForm";
 
-const Main = () => {
+const EditMain = ({ artist }) => {
   return (
     <main>
       <div className="intro">
@@ -19,10 +20,10 @@ const Main = () => {
       <div className="info">
         <h3 className="py-2 text-center text-xl font-bold"> Add Artist Info</h3>
 
-        <AddArtistForm />
+        <EditForm artist={artist} />
       </div>
     </main>
   );
 };
 
-export default Main;
+export default EditMain;
