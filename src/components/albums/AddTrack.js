@@ -224,7 +224,9 @@ const schema = yup
   .required();
 
 const AddTrack = ({ onSubmitTrack, setShow }) => {
-  const { releasePrimaryArtist } = useSelector((state) => state.album);
+  const session = useSession();
+  // const { releasePrimaryArtist } = useSelector((state) => state.album);
+  const [releaseArtists, setReleaseArtists] = useState([]);
   const {
     data: { data: artists = [] } = {},
     isLoading: artistsIsLoading,
@@ -374,6 +376,25 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
   //     resetFormWithPrimaryArtist(releasePrimaryArtist);
   //   }
   // }, [releasePrimaryArtist, getValues, reset]);
+
+  useEffect(() => {
+    const loadArtistsData = async () => {
+      const releasePrimaryArtist = JSON.parse(
+        localStorage.getItem("releasePrimaryArtist")
+      );
+
+      if (releasePrimaryArtist && releasePrimaryArtist.length > 0) {
+        const currentFormValues = getValues();
+
+        reset({
+          ...currentFormValues,
+          trackArtist: releasePrimaryArtist,
+        });
+      }
+    };
+
+    loadArtistsData();
+  }, [getValues, reset]);
 
   return (
     <>

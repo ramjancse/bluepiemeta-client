@@ -8,23 +8,17 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
-import { axiosPrivateInstance } from "@/config/axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import AddTrack from "@/components/albums/AddTrack";
 import ReactDatePicker from "react-datepicker";
-import { getAllArtists } from "@/lib/artist";
-import { getAllLabel } from "@/lib/albums";
 import Layout from "@/components/dashboard/Layout";
 import Header from "@/components/dashboard/Header";
 import UploadImage from "@/assets/images/main_banner.jpg";
 import Image from "next/image";
 import { useAddAlbumMutation } from "@/features/albums/albumAPI";
 import { useGetArtistsQuery } from "@/features/artists/artistAPI";
-import { useDispatch } from "react-redux";
-
 import { useGetLabelsQuery } from "@/features/labels/labelAPI";
-import { selectAlbumArtist } from "@/features/albums/albumSlice";
 
 const schema = yup
   .object({
@@ -201,7 +195,6 @@ const AddAlbum = () => {
 
   const [addAlbum, { data, isLoading, isSuccess, isError, error }] =
     useAddAlbumMutation();
-  const dispatch = useDispatch();
 
   const {
     register,
@@ -272,10 +265,6 @@ const AddAlbum = () => {
     },
   });
 
-  const releaseType = watch("releaseType");
-  const formatType = watch("formatType");
-  const releasePrimaryArtist = watch("releasePrimaryArtist");
-
   const { fields, append, remove } = useFieldArray({
     name: "releasePrimaryArtist",
     control,
@@ -305,6 +294,10 @@ const AddAlbum = () => {
     control,
   });
 
+  const releaseType = watch("releaseType");
+  const formatType = watch("formatType");
+  const releasePrimaryArtist = watch("releasePrimaryArtist");
+
   const handleAddTrack = () => {
     // save primary artist for add track
 
@@ -330,47 +323,48 @@ const AddAlbum = () => {
   };
 
   const onSubmitTrack = (data) => {
-    // console.log(data, "track data");
     // get local storage data
-    // const savedTracks = JSON.parse(localStorage.getItem("tracks"));
-    // console.log(savedTracks, "savedTracks in submit");
-    // if (savedTracks) {
-    //   // update data
-    //   localStorage.setItem(
-    //     "tracks",
-    //     JSON.stringify([
-    //       { id: savedTracks.length + 1, ...data },
-    //       ...savedTracks,
-    //     ])
-    //   );
-    // } else {
-    //   // first time save data
-    //   localStorage.setItem("tracks", JSON.stringify([{ id: 1, ...data }]));
-    // }
+    const savedTracks = JSON.parse(localStorage.getItem("tracks"));
+
+    if (savedTracks) {
+      // update data
+      localStorage.setItem(
+        "tracks",
+        JSON.stringify([
+          { id: savedTracks.length + 1, ...data },
+          ...savedTracks,
+        ])
+      );
+    } else {
+      // first time save data
+      localStorage.setItem("tracks", JSON.stringify([{ id: 1, ...data }]));
+    }
+
     // update state data
-    // setTracks((prevTracks) => {
-    //   const updatedTracks = [
-    //     ...prevTracks,
-    //     { id: prevTracks.length + 1, ...data },
-    //   ];
-    //   setValue("tracks", updatedTracks);
-    //   return updatedTracks;
-    // });
+    setTracks((prevTracks) => {
+      const updatedTracks = [
+        ...prevTracks,
+        { id: prevTracks.length + 1, ...data },
+      ];
+      setValue("tracks", updatedTracks);
+      return updatedTracks;
+    });
   };
 
   const onSubmit = (data) => {
     addAlbum(data)
       .then((res) => {
-        console.log(res, "res");
-
         // show success message
         toast.success("Album added successfully");
 
         // remove local storage saved tracks data
         localStorage.removeItem("tracks");
 
+        // remove local storage saved primary artist
+        localStorage.removeItem("releasePrimaryArtist");
+
         // redirect to another route
-        router.push(res.links.self);
+        router.push(`/albums`);
       })
       .catch((error) => {
         console.log(error, "add error");
@@ -378,21 +372,6 @@ const AddAlbum = () => {
         // show error message
         toast.error("Something went wrong");
       });
-  };
-
-  // useEffect(() => {
-  //   // loadData();
-  // }, []);
-
-  const loadData = async () => {
-    const savedTracks = JSON.parse(localStorage.getItem("tracks"));
-    console.log(savedTracks, "savedTracks");
-
-    // update state with track data
-    if (savedTracks) {
-      setTracks(savedTracks);
-      setValue("tracks", savedTracks);
-    }
   };
 
   const handleDelete = (trackId) => {
@@ -411,6 +390,20 @@ const AddAlbum = () => {
       return filteredTracks;
     });
   };
+
+  useEffect(() => {
+    const loadData = async () => {
+      const savedTracks = JSON.parse(localStorage.getItem("tracks"));
+
+      // update state with track data
+      if (savedTracks) {
+        setTracks(savedTracks);
+        setValue("tracks", savedTracks);
+      }
+    };
+
+    loadData();
+  }, [setValue]);
 
   return (
     <Layout>
