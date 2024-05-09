@@ -28,6 +28,9 @@ import Loader from "@/components/shared/Loader";
 import { size } from "lodash";
 import { useGetArtistsQuery } from "@/features/artists/artistAPI";
 import { useGetLabelsQuery } from "@/features/labels/labelAPI";
+import { useDispatch } from "react-redux";
+import { selectAlbumArtist, setEditTrack } from "@/features/albums/albumSlice";
+import EditTrackForm from "@/components/albums/EditTrackForm";
 
 const schema = yup
   .object({
@@ -180,16 +183,15 @@ const schema = yup
   .required();
 
 const EditAlbum = () => {
+  const dispatch = useDispatch();
   const session = useSession();
   const router = useRouter();
   const [tracks, setTracks] = useState([]);
-  // const [primaryArtists, setPrimaryArtists] = useState([]);
-  // const [labels, setLabels] = useState([]);
   const [show, setShow] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
   const { albumId } = useParams();
-  const [editFormData, setEditFormData] = useState(null);
 
+  // RTK Query API
+  const [editAlbum, { isLoading: editIsLoading }] = useEditAlbumMutation();
   const {
     data: albumData,
     isLoading,
@@ -227,7 +229,7 @@ const EditAlbum = () => {
     resolver: yupResolver(schema),
     defaultValues: {
       albumId: "",
-      userId: session?.data?.user?.id,
+      userId: "",
       artistId: "",
       status: "Draft",
       digitalReleaseDate: "",
@@ -284,8 +286,6 @@ const EditAlbum = () => {
     },
   });
 
-  const [editAlbum, { isLoading: editIsLoading }] = useEditAlbumMutation();
-
   const { fields, append, remove } = useFieldArray({
     name: "releasePrimaryArtist",
     control,
@@ -317,13 +317,11 @@ const EditAlbum = () => {
 
   const releaseType = watch("releaseType");
   const formatType = watch("formatType");
-  const primaryArtist = watch("releasePrimaryArtist");
+  const releasePrimaryArtist = watch("releasePrimaryArtist");
 
   useEffect(() => {
-    if (isSuccess) {
-      const currentFormValues = getValues();
+    if (isSuccess && artistsIsSUccess) {
       const updatedData = {
-        ...currentFormValues,
         ...albumData,
         releasePrimaryArtist: albumData?.releasePrimaryArtist?.length
           ? albumData.releasePrimaryArtist
@@ -371,23 +369,72 @@ const EditAlbum = () => {
         tracks: albumData?.tracks ? albumData.tracks : [],
       };
 
-      // update form state
+      // update form state with default data
       reset(updatedData);
 
       // update local tracks state
       setTracks(albumData.tracks);
     }
-  }, [isSuccess, albumData, getValues, reset]);
+  }, [isSuccess, artistsIsSUccess, albumData, reset]);
+
+  // useEffect(() => {
+  //   console.log(releasePrimaryArtist, "outside ");
+  //   if (
+  //     formatType !== "compilation" &&
+  //     formatType.length &&
+  //     releasePrimaryArtist.length
+  //   ) {
+  //     console.log(releasePrimaryArtist, "releasePrimaryArtist");
+  //     dispatch(selectAlbumArtist({ artist: [] }));
+  //   }
+  // }, [formatType, releasePrimaryArtist, dispatch]);
+
+  const handleEdit = (trackData) => {
+    // show edit form
+    setShow((prevShow) => !prevShow);
+
+    // set data for edit track
+    dispatch(setEditTrack({ track: trackData }));
+
+    // scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleDelete = (trackId) => {
+    // update local state
+    setTracks((prevTracks) => {
+      const filteredTracks = prevTracks.filter((track) => track.id !== trackId);
+
+      // update form state
+      setValue("tracks", filteredTracks);
+      return filteredTracks;
+    });
+  };
 
   const handleAddTrack = () => {
     // save primary artist for add track
-    if (formatType !== "compilation" && formatType.length) {
+    if (
+      formatType !== "compilation" &&
+      formatType.length &&
+      releasePrimaryArtist[0]?.name
+    ) {
       localStorage.setItem(
         "releasePrimaryArtist",
-        JSON.stringify(primaryArtist)
+        JSON.stringify(releasePrimaryArtist)
       );
     }
 
+    console.log(releasePrimaryArtist, "releasePrimaryArtist");
+
+    dispatch(selectAlbumArtist({ artist: [] }));
+
+    // null action fire for we can know TrackForm form is create form
+    dispatch(setEditTrack({ track: null }));
+
+    // show modal
     setShow((prevShow) => !prevShow);
 
     // scroll to top
@@ -398,29 +445,18 @@ const EditAlbum = () => {
   };
 
   const onSubmitTrack = (data) => {
-    // get local storage data
-    const savedTracks = JSON.parse(localStorage.getItem("tracks"));
-
-    if (savedTracks) {
-      // update data
-      localStorage.setItem(
-        "tracks",
-        JSON.stringify([
-          { id: savedTracks.length + 1, ...data },
-          ...savedTracks,
-        ])
-      );
-    } else {
-      // first time save data
-      localStorage.setItem("tracks", JSON.stringify([{ id: 1, ...data }]));
-    }
-
-    // update state data
+    console.log(data, "data");
+    // update state data with edited track
     setTracks((prevTracks) => {
-      const updatedTracks = [
-        ...prevTracks,
-        { id: prevTracks.length + 1, ...data },
-      ];
+      const updatedTracks = prevTracks.map((track) => {
+        if (track.id === data.id) {
+          return { ...track, ...data };
+        } else {
+          return { ...track };
+        }
+      });
+
+      console.log(updatedTracks, "updatedTracks");
 
       setValue("tracks", updatedTracks);
       return updatedTracks;
@@ -431,56 +467,22 @@ const EditAlbum = () => {
     editAlbum({ albumId, data })
       .then((res) => {
         // show success message
-        toast.success("Album added successfully");
-
-        // remove local storage saved tracks data
-        localStorage.removeItem("tracks");
+        toast.success("Album updated successfully");
 
         // redirect to another route
         router.push(`/albums`);
       })
       .catch((error) => {
-        console.log(error, "error in add album page");
+        console.log(error, "error occurred in edit album");
 
         // show error message
         toast.error("Something went wrong");
       });
   };
 
-  const handleDelete = (trackId) => {
-    // remove from local storage
-    const savedTracks = JSON.parse(localStorage.getItem("tracks"));
-    const filteredTracks = savedTracks.filter((track) => track.id !== trackId);
-
-    if (savedTracks) {
-      // update data
-      localStorage.setItem("tracks", JSON.stringify(filteredTracks));
-    }
-
-    // update state data
-    setTracks((prevTracks) => {
-      setValue("tracks", filteredTracks);
-      return filteredTracks;
-    });
-  };
-
-  const handleEdit = (trackData) => {
-    // show edit form
-    setShow((prevShow) => !prevShow);
-
-    // update local state by edit data
-    setEditFormData(trackData);
-
-    // scroll to top
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
   // decide what to render
   let content = null;
-  if (isLoading) {
+  if (isLoading || artistsIsLoading) {
     content = (
       <div>
         <Header name="Edit Album" />
@@ -489,37 +491,35 @@ const EditAlbum = () => {
     );
   }
 
-  if (isError) {
+  if (isError || artistsIsError) {
     content = (
       <div>
         <Header name="Edit Album" />
         <div className="bg-red-300 text-white rounded text-center py-5 font-semibold text-xl">
-          {error.message || "Something Went Wrong!"}
+          {error.message || artistsError.message || "Something Went Wrong!"}
         </div>
       </div>
     );
   }
 
-  if (isSuccess && !size(albumData)) {
+  if ((isSuccess && !size(albumData)) || (artistsIsSUccess && !size(artists))) {
     content = (
       <div>
         <Header name="Edit Album" />
-        <div>Album not found</div>
+        <div className="bg-red-300 text-white rounded text-center py-5 font-semibold text-xl">
+          Data Not Found
+        </div>
       </div>
     );
   }
 
-  if (isSuccess) {
+  if (isSuccess && artistsIsSUccess) {
     content = (
       <div>
         {show ? (
           <>
             <Header name="Edit Track" />
-            <TrackForm
-              editFormData={editFormData}
-              onSubmitTrack={onSubmitTrack}
-              setShow={setShow}
-            />
+            <TrackForm onSubmitTrack={onSubmitTrack} setShow={setShow} />
           </>
         ) : (
           <>
@@ -776,15 +776,16 @@ const EditAlbum = () => {
                                   {...register(
                                     `releasePrimaryArtist.${index}.name`
                                   )}
+                                  defaultValue={filed.name.trim()}
                                 >
                                   <option value="" disabled>
                                     Select artist
                                   </option>
 
                                   {artists.map((artist) => {
-                                    const { id, name, fullName } = artist;
+                                    const { id, name } = artist;
                                     return (
-                                      <option key={id} value={name}>
+                                      <option key={id} value={name.trim()}>
                                         {name}
                                       </option>
                                     );
@@ -855,6 +856,7 @@ const EditAlbum = () => {
                                   {...register(
                                     `releaseSecondaryArtist.${index}.name`
                                   )}
+                                  defaultValue={filed.name.trim()}
                                 >
                                   <option value="" disabled>
                                     Select artist
@@ -862,7 +864,7 @@ const EditAlbum = () => {
                                   {artists.map((artist) => {
                                     const { id, name, fullName } = artist;
                                     return (
-                                      <option key={id} value={name}>
+                                      <option key={id} value={name.trim()}>
                                         {name}
                                       </option>
                                     );
@@ -1422,7 +1424,7 @@ const EditAlbum = () => {
                   <div className="submit mt-10 flex justify-end">
                     <input
                       type="submit"
-                      value="Submit"
+                      value="Update"
                       className="text-center bg-green-600 px-14 py-2 font-semibold rounded-full text-white cursor-pointer"
                     />
                   </div>

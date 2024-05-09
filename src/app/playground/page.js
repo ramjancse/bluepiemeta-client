@@ -1,7 +1,7 @@
 import React from "react";
 
 const Playground = () => {
-  return <div>page</div>;
+  return <div>Playground</div>;
 };
 
 export default Playground;

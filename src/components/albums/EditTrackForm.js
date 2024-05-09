@@ -223,67 +223,25 @@ const schema = yup
   })
   .required();
 
-const TrackForm = ({ onSubmitTrack, setShow }) => {
-  const { editTrackData, releasePrimaryArtist } = useSelector(
-    (state) => state.album
-  );
-
-  const defaultValues = editTrackData
-    ? {
-        ...editTrackData,
-        minute: editTrackData?.duration.split(":")[0],
-        second: editTrackData?.duration.split(":")[1],
-      }
-    : {
-        trackType: "Lyrical",
-        trackTitle: "",
-        trackVersion: "",
-        trackArtist: releasePrimaryArtist.length
-          ? releasePrimaryArtist
-          : [{ name: "" }],
-        trackArtistAdditional: [{ name: "" }],
-        trackArtistFeaturing: [{ name: "" }],
-        producer: [{ name: "" }],
-        composer: [{ name: "" }],
-        remixer: [{ name: "" }],
-        lyricist: [{ name: "" }],
-        trackGenre: [
-          { name: "Indie", status: true },
-          { name: "Singer", status: false },
-          { name: "Artist", status: false },
-          { name: "Lyricist", status: false },
-          { name: "Composer", status: false },
-          { name: "Producer", status: false },
-          { name: "Band", status: false },
-          { name: "Group", status: false },
-        ],
-        trackSubGenre: [
-          { name: "Indie", status: true },
-          { name: "Singer", status: false },
-          { name: "Artist", status: false },
-          { name: "Lyricist", status: false },
-          { name: "Composer", status: false },
-          { name: "Producer", status: false },
-          { name: "Band", status: false },
-          { name: "Group", status: false },
-        ],
-        trackLanguage: "",
-        audioLanguage: "",
-        isrc: "",
-        minute: "", // minute and second modify to duration
-        second: "",
-        explicit: true,
-      };
+const EditTrackForm = ({ onSubmitTrack, setShow }) => {
+  const { editTrackData } = useSelector((state) => state.album);
+  const router = useRouter();
+  const session = useSession();
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
+    reset,
     getValues,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues,
+    defaultValues: {
+      ...editTrackData,
+      minute: editTrackData?.duration.split(":")[0],
+      second: editTrackData?.duration.split(":")[1],
+    },
   });
 
   const {
@@ -460,13 +418,12 @@ const TrackForm = ({ onSubmitTrack, setShow }) => {
                             id={`trackArtist[${index}].name`}
                             className="w-full my-1 bg-gray-200 outline-none px-2 py-3 border-l-8 border-blue-700 text-sm"
                             {...register(`trackArtist.${index}.name`)}
-                            defaultValue={filed.name.trim()}
                           >
                             <option value="">Select artist</option>
                             {artists.map((artist, index) => {
-                              const { id, name } = artist;
+                              const { id, fullName, name } = artist;
                               return (
-                                <option key={id} value={name.trim()}>
+                                <option key={id ? id : index} value={name}>
                                   {name}
                                 </option>
                               );
@@ -1390,7 +1347,7 @@ const TrackForm = ({ onSubmitTrack, setShow }) => {
           <div className="submit mt-10">
             <input
               type="submit"
-              value={editTrackData ? "Edit Track" : "Add Track"}
+              value="Edit Track"
               className="px-10 py-2 rounded bg-green-600 uppercase cursor-pointer text-white"
             />
           </div>
@@ -1400,4 +1357,4 @@ const TrackForm = ({ onSubmitTrack, setShow }) => {
   );
 };
 
-export default TrackForm;
+export default EditTrackForm;

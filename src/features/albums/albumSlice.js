@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  releasePrimaryArtist: [],
+  releasePrimaryArtist: null,
+  editTrackData: null,
 };
 
 const albumSlice = createSlice({
@@ -11,8 +12,11 @@ const albumSlice = createSlice({
     selectAlbumArtist: (state, action) => {
       state.releasePrimaryArtist = action.payload.artist;
     },
+    setEditTrack: (state, action) => {
+      state.editTrackData = action.payload.track;
+    },
   },
 });
 
-export const { selectAlbumArtist } = albumSlice.actions;
+export const { selectAlbumArtist, setEditTrack } = albumSlice.actions;
 export default albumSlice.reducer;
