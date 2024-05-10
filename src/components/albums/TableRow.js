@@ -29,9 +29,9 @@ const TableRow = ({ album }) => {
     },
   ] = useDeleteAlbumMutation();
 
-  const handleDelete = async (albumId) => {
+  const handleDelete = async ({ albumId, data }) => {
     try {
-      await deleteAlbum(albumId);
+      await deleteAlbum({ albumId, data });
 
       // show success message
       toast.success("Album delete successfully");
@@ -102,7 +102,7 @@ const TableRow = ({ album }) => {
 
         <button
           className="bg-red-400 px-3 py-[5px] rounded text-white ml-1"
-          onClick={() => handleDelete(_id)}
+          onClick={() => handleDelete({ albumId: _id, data: album })}
           disabled={deleteIsLoading}
         >
           Delete

@@ -4,12 +4,11 @@ import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
 import React, { useEffect, useState } from "react";
 import Pagination from "@/components/shared/Pagination";
-import { FaMagnifyingGlass } from "react-icons/fa6";
+
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { getAllAlbums } from "@/lib/albums";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { axiosPrivateInstance } from "@/config/axios";
@@ -17,20 +16,13 @@ import { useGetAlbumsQuery } from "@/features/albums/albumAPI";
 import { useDispatch } from "react-redux";
 import Loader from "../shared/Loader";
 import TableRow from "./TableRow";
-
-const schema = yup
-  .object({
-    keyword: yup.string().trim(),
-  })
-  .required();
+import Search from "./Search";
 
 const Main = () => {
-  const session = useSession();
   const searchParams = useSearchParams();
   const queryPage = searchParams.get("page");
 
   // rtk query req
-  const dispatch = useDispatch();
   const [page, setPage] = useState(queryPage ? Number(queryPage) : 1);
   const {
     data: {
@@ -42,46 +34,6 @@ const Main = () => {
     isError,
     error,
   } = useGetAlbumsQuery(page);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  useEffect(() => {}, []);
-
-  const onSubmit = async (data) => {
-    if (data.keyword === "" || data.keyword === " ") {
-      loadData();
-      return false;
-    }
-
-    try {
-      const encoded = encodeURI(data.keyword);
-      const {
-        data: { data: albums, pagination },
-      } = await axiosPrivateInstance(session?.data?.jwt).get(
-        `/albums?search=${encoded}`
-      );
-      // console.log(albums, "search res");
-      // console.log(pagination, "search res");
-
-      setAlbums(albums);
-      // setCurrentPage(currentPage);
-      // setTotalPages(totalPages);
-
-      // show success message
-      // toast.success("Album added successfully");
-    } catch (error) {
-      console.log(error, "error in search page");
-
-      // show error message
-      toast.error("Something went wrong");
-    }
-  };
 
   // decide what to render
   let content = null;
@@ -98,25 +50,7 @@ const Main = () => {
   if (isSuccess && !albums.length) {
     content = (
       <main className="px-4 py-3">
-        <div className="top flex items-center justify-end">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="relative">
-              <span className="absolute left-3 top-4">
-                <FaMagnifyingGlass className="z-20 text-primary" />
-              </span>
-
-              <input
-                className="z-10 w-full my-1 bg-white outline-none pl-8 pr-3 py-2 border-gray-300 text-sm border-2 rounded-full"
-                type="text"
-                name="keyword"
-                id="keyword"
-                placeholder="Search album"
-                autoComplete="off"
-                {...register("keyword")}
-              />
-            </div>
-          </form>
-        </div>
+        <Search />
 
         <div className="mt-2 overflow-x-auto">
           <table className="w-full mt-2 border-collapse">
@@ -154,25 +88,7 @@ const Main = () => {
   if (isSuccess && albums.length) {
     content = (
       <main className="px-4 py-3">
-        <div className="top flex items-center justify-end">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="relative">
-              <span className="absolute left-3 top-4">
-                <FaMagnifyingGlass className="z-20 text-primary" />
-              </span>
-
-              <input
-                className="z-10 w-full my-1 bg-white outline-none pl-8 pr-3 py-2 border-gray-300 text-sm border-2 rounded-full"
-                type="text"
-                name="keyword"
-                id="keyword"
-                placeholder="Search album"
-                autoComplete="off"
-                {...register("keyword")}
-              />
-            </div>
-          </form>
-        </div>
+        <Search />
 
         <div className="mt-2 overflow-x-auto">
           <table className="w-full mt-2 border-collapse">

@@ -3,6 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   releasePrimaryArtist: null,
   editTrackData: null,
+  albums: [],
+  keyword: "",
+  page: 1,
 };
 
 const albumSlice = createSlice({
@@ -15,8 +18,11 @@ const albumSlice = createSlice({
     setEditTrack: (state, action) => {
       state.editTrackData = action.payload.track;
     },
+    searched(state, action) {
+      state.keyword = action.payload.keyword;
+    },
   },
 });
 
-export const { setAlbumArtist, setEditTrack } = albumSlice.actions;
+export const { setAlbumArtist, setEditTrack, searched } = albumSlice.actions;
 export default albumSlice.reducer;
