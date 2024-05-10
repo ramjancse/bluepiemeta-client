@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import { IoIosCloseCircle } from "react-icons/io";
-import { MdCloudUpload } from "react-icons/md";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
@@ -11,14 +10,8 @@ import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import ReactDatePicker from "react-datepicker";
-import { getAllArtists } from "@/lib/artist";
-import { getAlbumById, getAllLabel } from "@/lib/albums";
 import Layout from "@/components/dashboard/Layout";
 import Header from "@/components/dashboard/Header";
-import UploadImage from "@/assets/images/main_banner.jpg";
-import Image from "next/image";
-import EditTrack from "@/components/albums/EditTrack";
-import AddTrack from "@/components/albums/AddTrack";
 import TrackForm from "@/components/albums/TrackForm";
 import {
   useEditAlbumMutation,
@@ -29,8 +22,7 @@ import { size } from "lodash";
 import { useGetArtistsQuery } from "@/features/artists/artistAPI";
 import { useGetLabelsQuery } from "@/features/labels/labelAPI";
 import { useDispatch } from "react-redux";
-import { selectAlbumArtist, setEditTrack } from "@/features/albums/albumSlice";
-import EditTrackForm from "@/components/albums/EditTrackForm";
+import { setEditTrack } from "@/features/albums/albumSlice";
 
 const schema = yup
   .object({
@@ -377,18 +369,6 @@ const EditAlbum = () => {
     }
   }, [isSuccess, artistsIsSUccess, albumData, reset]);
 
-  // useEffect(() => {
-  //   console.log(releasePrimaryArtist, "outside ");
-  //   if (
-  //     formatType !== "compilation" &&
-  //     formatType.length &&
-  //     releasePrimaryArtist.length
-  //   ) {
-  //     console.log(releasePrimaryArtist, "releasePrimaryArtist");
-  //     dispatch(selectAlbumArtist({ artist: [] }));
-  //   }
-  // }, [formatType, releasePrimaryArtist, dispatch]);
-
   const handleEdit = (trackData) => {
     // show edit form
     setShow((prevShow) => !prevShow);
@@ -406,7 +386,9 @@ const EditAlbum = () => {
   const handleDelete = (trackId) => {
     // update local state
     setTracks((prevTracks) => {
-      const filteredTracks = prevTracks.filter((track) => track.id !== trackId);
+      const filteredTracks = prevTracks.filter(
+        (track) => track._id !== trackId
+      );
 
       // update form state
       setValue("tracks", filteredTracks);
@@ -427,10 +409,6 @@ const EditAlbum = () => {
       );
     }
 
-    console.log(releasePrimaryArtist, "releasePrimaryArtist");
-
-    dispatch(selectAlbumArtist({ artist: [] }));
-
     // null action fire for we can know TrackForm form is create form
     dispatch(setEditTrack({ track: null }));
 
@@ -444,19 +422,29 @@ const EditAlbum = () => {
     });
   };
 
-  const onSubmitTrack = (data) => {
-    console.log(data, "data");
+  const onSubmitEditTrack = (data) => {
     // update state data with edited track
     setTracks((prevTracks) => {
       const updatedTracks = prevTracks.map((track) => {
         if (track.id === data.id) {
-          return { ...track, ...data };
+          return { ...data };
         } else {
           return { ...track };
         }
       });
 
-      console.log(updatedTracks, "updatedTracks");
+      setValue("tracks", updatedTracks);
+      return updatedTracks;
+    });
+  };
+
+  const onSubmitAddTrack = (data) => {
+    // update state data with new add track
+    setTracks((prevTracks) => {
+      const updatedTracks = [
+        ...prevTracks,
+        { _id: prevTracks.length, ...data },
+      ];
 
       setValue("tracks", updatedTracks);
       return updatedTracks;
@@ -519,7 +507,11 @@ const EditAlbum = () => {
         {show ? (
           <>
             <Header name="Edit Track" />
-            <TrackForm onSubmitTrack={onSubmitTrack} setShow={setShow} />
+            <TrackForm
+              onSubmitEditTrack={onSubmitEditTrack}
+              onSubmitAddTrack={onSubmitAddTrack}
+              setShow={setShow}
+            />
           </>
         ) : (
           <>
@@ -1363,7 +1355,7 @@ const EditAlbum = () => {
                             <tbody>
                               {tracks.map((track, index) => {
                                 const {
-                                  id,
+                                  _id,
                                   trackTitle,
                                   trackArtist,
                                   isrc,
@@ -1391,7 +1383,7 @@ const EditAlbum = () => {
                                       <button
                                         type="button"
                                         className="bg-red-500 px-3 py-1 rounded text-white"
-                                        onClick={() => handleDelete(id)}
+                                        onClick={() => handleDelete(_id)}
                                       >
                                         Delete
                                       </button>

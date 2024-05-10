@@ -9,7 +9,7 @@ const albumSlice = createSlice({
   name: "album",
   initialState,
   reducers: {
-    selectAlbumArtist: (state, action) => {
+    setAlbumArtist: (state, action) => {
       state.releasePrimaryArtist = action.payload.artist;
     },
     setEditTrack: (state, action) => {
@@ -18,5 +18,5 @@ const albumSlice = createSlice({
   },
 });
 
-export const { selectAlbumArtist, setEditTrack } = albumSlice.actions;
+export const { setAlbumArtist, setEditTrack } = albumSlice.actions;
 export default albumSlice.reducer;

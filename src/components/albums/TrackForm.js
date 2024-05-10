@@ -223,9 +223,11 @@ const schema = yup
   })
   .required();
 
-const TrackForm = ({ onSubmitTrack, setShow }) => {
-  const { editTrackData, releasePrimaryArtist } = useSelector(
-    (state) => state.album
+const TrackForm = ({ onSubmitAddTrack, onSubmitEditTrack, setShow }) => {
+  const { editTrackData } = useSelector((state) => state.album);
+
+  const releasePrimaryArtist = JSON.parse(
+    localStorage.getItem("releasePrimaryArtist")
   );
 
   const defaultValues = editTrackData
@@ -365,7 +367,11 @@ const TrackForm = ({ onSubmitTrack, setShow }) => {
 
   const onSubmit = async (data) => {
     // submitted data to parent
-    onSubmitTrack(data);
+    if (editTrackData) {
+      onSubmitEditTrack(data);
+    } else {
+      onSubmitAddTrack(data);
+    }
 
     // show album form
     setShow((prevShow) => !prevShow);
