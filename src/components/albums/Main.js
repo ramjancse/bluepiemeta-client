@@ -34,7 +34,9 @@ const Main = () => {
 
   if (isError) {
     content = (
-      <div className="bg-red-400 text-white font-bold">{error.message}</div>
+      <div className="bg-red-300 text-white rounded text-center py-5 font-semibold text-xl">
+        {error?.message || "Something Went Wrong!"}
+      </div>
     );
   }
 
@@ -66,12 +68,6 @@ const Main = () => {
             </tbody>
           </table>
         </div>
-
-        {/* <Pagination
-          route="/albums"
-          currentPage={currentPage}
-          totalPage={totalPages}
-        /> */}
       </main>
     );
   }

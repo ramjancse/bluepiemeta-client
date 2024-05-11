@@ -3,9 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   releasePrimaryArtist: null,
   editTrackData: null,
-  albums: [],
   keyword: "",
-  page: 1,
 };
 
 const albumSlice = createSlice({

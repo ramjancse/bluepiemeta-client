@@ -38,7 +38,7 @@ export const getAlbumById = async ({ token, albumId }) => {
     return data;
   } catch (error) {
     console.log(error, "error");
-    return new Error("Something went wrong");
+    new Error("Something went wrong");
   }
 };
 

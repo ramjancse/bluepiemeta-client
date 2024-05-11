@@ -51,7 +51,9 @@ const page = async ({ params: { albumId } }) => {
                   <div className="info border-b py-2">
                     <p className="font-semibold">Artist</p>
                     <p className="text-sm">
-                      {releasePrimaryArtist[0]?.name || "-"}
+                      {releasePrimaryArtist?.length
+                        ? releasePrimaryArtist[0]?.name
+                        : "-"}
                     </p>
                   </div>
 
@@ -64,7 +66,7 @@ const page = async ({ params: { albumId } }) => {
 
                   <div className="info border-b py-2">
                     <p className="font-semibold">Total tracks</p>
-                    <p className="text-sm">{tracks.length}</p>
+                    <p className="text-sm">{tracks?.length}</p>
                   </div>
                 </div>
 
@@ -72,7 +74,7 @@ const page = async ({ params: { albumId } }) => {
                   <div className="info border-b py-2">
                     <p className="font-semibold">Genre</p>
                     <p className="text-sm space-x-1">
-                      {releaseGenre.length
+                      {releaseGenre?.length
                         ? releaseGenre
                             .filter((genre) => genre.status)
                             .map((genre, index, array) => (
@@ -123,7 +125,7 @@ const page = async ({ params: { albumId } }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {tracks.length ? (
+                    {tracks?.length ? (
                       tracks.map((track, index) => {
                         const { _id, trackArtist, trackTitle, isrc, duration } =
                           track;

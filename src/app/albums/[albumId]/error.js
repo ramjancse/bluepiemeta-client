@@ -1,7 +1,7 @@
 "use client";
 
 export default function Error({ error, reset }) {
-  console.log(error, "error in error handling page");
+  console.log(error, "error in album details");
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center">
       <h2 className="text-center text-2xl">Something went wrong</h2>
