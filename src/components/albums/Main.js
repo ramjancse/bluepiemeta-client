@@ -2,18 +2,10 @@
 
 import Header from "@/components/dashboard/Header";
 import Layout from "@/components/dashboard/Layout";
-import React, { useEffect, useState } from "react";
 import Pagination from "@/components/shared/Pagination";
-
-import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { getAllAlbums } from "@/lib/albums";
-
-import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
-import { axiosPrivateInstance } from "@/config/axios";
 import { useGetAlbumsQuery } from "@/features/albums/albumAPI";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Loader from "../shared/Loader";
 import TableRow from "./TableRow";
 import Search from "./Search";
