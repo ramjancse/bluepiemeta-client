@@ -454,6 +454,7 @@ const EditAlbum = () => {
 
   const onSubmit = async (data) => {
     editAlbum({ albumId, data })
+      .unwrap()
       .then((res) => {
         // show success message
         toast.success("Album updated successfully");

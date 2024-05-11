@@ -166,32 +166,26 @@ const AddArtistForm = () => {
   const [addArtist, { isLoading, isSuccess, isError, error }] =
     useAddArtistMutation();
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields } = useFieldArray({
     name: "singleTypes",
     control,
   });
 
-  const {
-    fields: artistLinksFields,
-    append: artistAppend,
-    remove: artistRemove,
-  } = useFieldArray({
+  const { fields: artistLinksFields } = useFieldArray({
     name: "artistLinks",
     control,
   });
 
-  const {
-    fields: socialMediaFields,
-    append: socialMediaAppend,
-    remove: socialMediaRemove,
-  } = useFieldArray({
+  const { fields: socialMediaFields } = useFieldArray({
     name: "socialMedia",
     control,
   });
 
   const onSubmit = async (data) => {
     addArtist(data)
+      .unwrap()
       .then((res) => {
+        console.log(res, "res");
         // show success message
         toast.success("Artist added successfully");
 

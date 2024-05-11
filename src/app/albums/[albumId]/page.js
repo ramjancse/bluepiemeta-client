@@ -1,6 +1,7 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import Footer from "@/components/artist/Footer";
-import Header from "@/components/artist/Header";
+import Header from "@/components/dashboard/Header";
+import Layout from "@/components/dashboard/Layout";
 import { getAlbumById } from "@/lib/albums";
 import dateFormatter from "@/utils/dateFormatter";
 import { getServerSession } from "next-auth";
@@ -23,9 +24,10 @@ const page = async ({ params: { albumId } }) => {
   } = await getAlbumById({ token: session?.jwt, albumId });
 
   return (
-    <>
-      <Header />
-      <div className="px-3 py-2 md:py-5 xl:px-20 xl:py-10">
+    <Layout>
+      <Header name="Album Details" />
+
+      <div className="px-3 py-2 border-l border-b">
         <div className="top">
           <div className="flex flex-col md:flex-row">
             <div className="left md:w-1/5 flex flex-col">
@@ -175,9 +177,7 @@ const page = async ({ params: { albumId } }) => {
           </div>
         </div>
       </div>
-
-      <Footer />
-    </>
+    </Layout>
   );
 };
 

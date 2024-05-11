@@ -1,5 +1,6 @@
 import albumSliceReducer from "@/features/albums/albumSlice";
 import { apiSlice } from "@/features/api/apiSlice";
+import artistSliceReducer from "@/features/artists/artistSlice";
 import authSliceReducer from "@/features/auth/authSlice";
 import { configureStore } from "@reduxjs/toolkit";
 // import { apiSlice } from "features/api/apiSlice";
@@ -12,6 +13,7 @@ export const store = configureStore({
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authSliceReducer,
     album: albumSliceReducer,
+    artist: artistSliceReducer,
   },
   devTools: process.env.NODE_ENV !== "production",
   middleware: (getDefaultMiddleware) =>

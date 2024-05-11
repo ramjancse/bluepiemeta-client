@@ -8,6 +8,7 @@ import React from "react";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import Button from "@/components/artist/Button";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import Search from "@/components/artist/Search";
 
 const page = async () => {
   const session = await getServerSession(authOptions);
@@ -17,30 +18,7 @@ const page = async () => {
     <Layout>
       <Header name="All Artists" />
       <main className="px-4 py-3">
-        <div className="top flex items-center justify-end">
-          {/* <h2 className="text-xl mb-3">Album table</h2> */}
-
-          <form>
-            <div className="relative">
-              <span className="absolute left-3 top-4">
-                <FaMagnifyingGlass className="z-20 text-primary" />
-              </span>
-
-              <input
-                className="z-10 w-full my-1 bg-white outline-none pl-8 pr-3 py-2 border-gray-300 text-sm border-2 rounded-full"
-                type="text"
-                name="keyword"
-                id="keyword"
-                placeholder="Search artist"
-                autoComplete="off"
-              />
-            </div>
-          </form>
-
-          {/* <Link href="/albums/add" className="px-10 py-2 rounded bg-gray-200">
-            Add album
-          </Link> */}
-        </div>
+        <Search />
 
         <div className="overflow-x-auto mt-5">
           <table className="w-full border-collapse">

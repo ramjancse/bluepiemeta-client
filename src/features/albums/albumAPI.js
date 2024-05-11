@@ -3,10 +3,10 @@ import { apiSlice } from "../api/apiSlice";
 export const albumAPI = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAlbums: builder.query({
-      query: ({ page, keyword }) => {
+      query: ({ keyword, page, limit }) => {
         const encoded = encodeURI(keyword);
         return {
-          url: `/albums?search=${encoded}&page=${page}`,
+          url: `/albums?search=${encoded}&page=${page}&limit=${limit}`,
         };
       },
       transformResponse: (response) => {
