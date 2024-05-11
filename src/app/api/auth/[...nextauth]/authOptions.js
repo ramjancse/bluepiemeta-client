@@ -25,7 +25,6 @@ export const authOptions = {
             jwt: access_token,
           };
 
-          return {};
         } catch (error) {
           throw new Error(JSON.stringify(error?.response?.data, 2));
         }

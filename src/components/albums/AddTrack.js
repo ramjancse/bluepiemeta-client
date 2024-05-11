@@ -12,6 +12,8 @@ import "./AddTrack.css";
 import { getAllArtists } from "@/lib/artist";
 import Header from "../dashboard/Header";
 import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { useGetArtistsQuery } from "@/features/artists/artistAPI";
 
 const schema = yup
   .object({
@@ -222,9 +224,16 @@ const schema = yup
   .required();
 
 const AddTrack = ({ onSubmitTrack, setShow }) => {
-  const [releaseArtists, setReleaseArtists] = useState([]);
-  const router = useRouter();
   const session = useSession();
+  // const { releasePrimaryArtist } = useSelector((state) => state.album);
+  const [releaseArtists, setReleaseArtists] = useState([]);
+  const {
+    data: { data: artists = [] } = {},
+    isLoading: artistsIsLoading,
+    isSuccess: artistsIsSUccess,
+    isError: artistsIsError,
+    error: artistsError,
+  } = useGetArtistsQuery();
 
   const {
     register,
@@ -350,37 +359,42 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
 
     // show album form
     setShow((prevShow) => !prevShow);
-
-    // remove artist from local storage
-    localStorage.removeItem("releasePrimaryArtist");
   };
 
+  // useEffect(() => {
+  //   if (releasePrimaryArtist && releasePrimaryArtist?.length > 0) {
+  //     console.log(releasePrimaryArtist, "releasePrimaryArtist");
+
+  //     const resetFormWithPrimaryArtist = (primaryArtist) => {
+  //       const currentFormValues = getValues();
+  //       reset({
+  //         ...currentFormValues,
+  //         trackArtist: primaryArtist,
+  //       });
+  //     };
+
+  //     resetFormWithPrimaryArtist(releasePrimaryArtist);
+  //   }
+  // }, [releasePrimaryArtist, getValues, reset]);
+
   useEffect(() => {
-    if (session?.data?.jwt) {
-      const loadArtistsData = async () => {
-        const { data } = await getAllArtists(session?.data?.jwt);
-        const releasePrimaryArtist = JSON.parse(
-          localStorage.getItem("releasePrimaryArtist")
-        );
+    const loadArtistsData = async () => {
+      const releasePrimaryArtist = JSON.parse(
+        localStorage.getItem("releasePrimaryArtist")
+      );
 
-        if (releasePrimaryArtist && releasePrimaryArtist.length > 0) {
-          const currentFormValues = getValues();
+      if (releasePrimaryArtist && releasePrimaryArtist.length > 0) {
+        const currentFormValues = getValues();
 
-          reset({
-            ...currentFormValues,
-            trackArtist: releasePrimaryArtist,
-          });
-        }
+        reset({
+          ...currentFormValues,
+          trackArtist: releasePrimaryArtist,
+        });
+      }
+    };
 
-        // update local state by all data
-        setReleaseArtists(data);
-      };
-
-      loadArtistsData();
-
-      console.log("rendering...");
-    }
-  }, [session, getValues, reset]);
+    loadArtistsData();
+  }, [getValues, reset]);
 
   return (
     <>
@@ -473,14 +487,11 @@ const AddTrack = ({ onSubmitTrack, setShow }) => {
                             {...register(`trackArtist.${index}.name`)}
                           >
                             <option value="">Select artist</option>
-                            {releaseArtists.map((artist, index) => {
-                              const { id, artistName, fullName, name } = artist;
+                            {artists.map((artist, index) => {
+                              const { id, fullName, name } = artist;
                               return (
-                                <option
-                                  key={id ? id : index}
-                                  value={artistName ? artistName : name}
-                                >
-                                  {artistName ? artistName : name}
+                                <option key={id ? id : index} value={name}>
+                                  {name}
                                 </option>
                               );
                             })}

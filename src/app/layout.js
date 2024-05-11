@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthProvider from "@/context/AuthProvider";
 import "react-datepicker/dist/react-datepicker.css";
+import ReduxProvider from "@/context/ReduxProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -15,20 +16,22 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-          {children}
-        </AuthProvider>
+        <ReduxProvider>
+          <AuthProvider>
+            <ToastContainer
+              position="top-right"
+              autoClose={2000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
+            {children}
+          </AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

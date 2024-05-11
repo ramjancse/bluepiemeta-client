@@ -8,14 +8,15 @@ import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAddArtistMutation } from "@/features/artists/artistAPI";
 
 const schema = yup
   .object({
-    artistName: yup
+    name: yup
       .string()
       .trim()
-      .required("Artist name is required")
-      .min(3, "Artist name must be at least 3 character"),
+      .required("Name is required")
+      .min(3, "Name must be at least 3 character"),
     fullName: yup
       .string()
       .trim()
@@ -131,7 +132,7 @@ const ArtistForm = ({ artistData }) => {
     : {
         artistDescription: "",
         status: "Pending Approval",
-        artistName: "",
+        name: "",
         fullName: "",
         sex: "",
         email: "",
@@ -178,6 +179,9 @@ const ArtistForm = ({ artistData }) => {
     defaultValues,
   });
 
+  const [addArtist, { isLoading, isSuccess, isError, error }] =
+    useAddArtistMutation();
+
   const { fields, append, remove } = useFieldArray({
     name: "singleTypes",
     control,
@@ -202,6 +206,26 @@ const ArtistForm = ({ artistData }) => {
   });
 
   const onSubmit = async (data) => {
+    addAlbum(data)
+      .then((res) => {
+        console.log(res, "res");
+
+        // show success message
+        toast.success("Album added successfully");
+
+        // remove local storage saved tracks data
+        localStorage.removeItem("tracks");
+
+        // redirect to another route
+        router.push(res.links.self);
+      })
+      .catch((error) => {
+        console.log(error, "add error");
+
+        // show error message
+        toast.error("Something went wrong");
+      });
+
     try {
       // update req
       if (artistData) {
@@ -245,7 +269,7 @@ const ArtistForm = ({ artistData }) => {
           <div className="sm:flex">
             <div className="label hidden sm:block sm:w-1/3">
               <label
-                htmlFor="artistName"
+                htmlFor="name"
                 className="block cursor-pointer rounded bg-white px-5 py-2 font-semibold"
               >
                 Artist Name
@@ -255,19 +279,19 @@ const ArtistForm = ({ artistData }) => {
             <div className="input mt-2 sm:ml-2 sm:mt-0 sm:w-2/3">
               <input
                 type="text"
-                name="artistName"
-                id="artistName"
-                placeholder="Artist Name"
+                name="name"
+                id="name"
+                placeholder="Name"
                 className="w-full rounded border-none px-5 py-2 focus:outline-none"
-                {...register("artistName")}
+                {...register("name")}
               />
 
               <p
                 className={`${
-                  errors.artistName?.message ? "block" : "hidden"
+                  errors.name?.message ? "block" : "hidden"
                 } text-sm text-red-500 font-semibold mt-1 ml-5`}
               >
-                {errors.artistName?.message}
+                {errors.name?.message}
               </p>
             </div>
           </div>

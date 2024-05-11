@@ -1,28 +1,22 @@
 import Layout from "@/components/dashboard/Layout";
 import Image from "next/image";
 
-// Import css files
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
 import Link from "next/link";
-import albumImage2 from "@/assets/images/dashboard/dashboard-asset-images/albums-cover/album-cover-02.jpg";
 import { MdDownloadForOffline } from "react-icons/md";
 import { SlOptionsVertical } from "react-icons/sl";
-import albumImage from "@/assets/images/poster/poster-13.jpg";
 import ChainIcon from "@/assets/images/dashboard/Chain-icon.svg";
 import { getAllAlbums } from "@/lib/albums";
-import DashboardIntro from "@/components/dashboard/DashboardIntro";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/authOptions";
+import Header from "@/components/dashboard/Header";
 
-const Dashboard = async () => {
+const Home = async () => {
   const session = await getServerSession(authOptions);
   const { data: albums } = await getAllAlbums({ token: session?.jwt, page: 1 });
 
   return (
     <Layout>
-      <DashboardIntro albums={albums} />
+      <Header name="Home" />
 
       <div className="bottom bg-[#F5F6FA] flex justify-between">
         <div className="recent-list w-1/3 px-5 pt-3 overflow-hidden shadow-md">
@@ -98,50 +92,6 @@ const Dashboard = async () => {
           </h3>
 
           <div className="songs">
-            {/* <div className="song bg-white flex mt-4">
-              <div className="cover w-[50px]">
-                <Image
-                  src={albumImage}
-                  className="w-full"
-                  alt="Album"
-                  width={50}
-                  height={50}
-                />
-              </div>
-
-              <div className="right w-[calc(100%-50px)] flex items-center justify-between px-3">
-                <div className="name">
-                  <h6 className="text-sm font-medium">
-                    <a href="/" className="hover:text-fill">
-                      Can I Have Forever with You{" "}
-                    </a>
-
-                    <a className="text-xs italic hover:text-fill" href="/">
-                      - Graham Cotton
-                    </a>
-                  </h6>
-
-                  <p className="text-[11px] hidden sm:flex sm:justify-between ">
-                    Folk, Indie, Song-Songwriter
-                  </p>
-                </div>
-
-                <div className="count h-4 w-4 items-center justify-center rounded border border-slate-400 text-center text-[10px] font-bold hidden lg:block mx-5">
-                  +1
-                </div>
-
-                <div className="action flex">
-                  <button className="mr-3 rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">Edit</a>
-                  </button>
-
-                  <button className="rounded-full bg-[#205CA8] px-6 py-1 text-xs font-medium uppercase text-white">
-                    <a href="/">License</a>
-                  </button>
-                </div>
-              </div>
-            </div> */}
-
             {albums
               .slice(0, process.env.TRACK_LIST_SHOW)
               .map((album, index) => {
@@ -221,8 +171,10 @@ const Dashboard = async () => {
           </div>
         </div>
       </div>
+
+      {/* <Pagination route="/albums" currentPage={1} totalPage={1} /> */}
     </Layout>
   );
 };
 
-export default Dashboard;
+export default Home;

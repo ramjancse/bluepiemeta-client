@@ -8,17 +8,17 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
-import { axiosPrivateInstance } from "@/config/axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import AddTrack from "@/components/albums/AddTrack";
 import ReactDatePicker from "react-datepicker";
-import { getAllArtists } from "@/lib/artist";
-import { getAllLabel } from "@/lib/albums";
 import Layout from "@/components/dashboard/Layout";
 import Header from "@/components/dashboard/Header";
 import UploadImage from "@/assets/images/main_banner.jpg";
 import Image from "next/image";
+import { useAddAlbumMutation } from "@/features/albums/albumAPI";
+import { useGetArtistsQuery } from "@/features/artists/artistAPI";
+import { useGetLabelsQuery } from "@/features/labels/labelAPI";
 
 const schema = yup
   .object({
@@ -175,8 +175,26 @@ const AddAlbum = () => {
   const router = useRouter();
   const [show, setShow] = useState(false);
   const [tracks, setTracks] = useState([]);
-  const [primaryArtists, setPrimaryArtists] = useState([]);
-  const [labels, setLabels] = useState([]);
+
+  // rtk req
+  const {
+    data: { data: artists = [] } = {},
+    isLoading: artistsIsLoading,
+    isSuccess: artistsIsSUccess,
+    isError: artistsIsError,
+    error: artistsError,
+  } = useGetArtistsQuery();
+
+  const {
+    data: { data: labels = [] } = {},
+    isLoading: labelsIsLoading,
+    isSuccess: labelsIsSuccess,
+    isError: labelsIsError,
+    error: labelsError,
+  } = useGetLabelsQuery();
+
+  const [addAlbum, { data, isLoading, isSuccess, isError, error }] =
+    useAddAlbumMutation();
 
   const {
     register,
@@ -247,10 +265,6 @@ const AddAlbum = () => {
     },
   });
 
-  const releaseType = watch("releaseType");
-  const formatType = watch("formatType");
-  const primaryArtist = watch("releasePrimaryArtist");
-
   const { fields, append, remove } = useFieldArray({
     name: "releasePrimaryArtist",
     control,
@@ -280,16 +294,25 @@ const AddAlbum = () => {
     control,
   });
 
+  const releaseType = watch("releaseType");
+  const formatType = watch("formatType");
+  const releasePrimaryArtist = watch("releasePrimaryArtist");
+
   const handleAddTrack = () => {
     // save primary artist for add track
 
-    if (formatType !== "compilation" && formatType.length) {
+    if (
+      formatType !== "compilation" &&
+      formatType.length &&
+      releasePrimaryArtist[0]?.name
+    ) {
       localStorage.setItem(
         "releasePrimaryArtist",
-        JSON.stringify(primaryArtist)
+        JSON.stringify(releasePrimaryArtist)
       );
     }
 
+    // show add track form
     setShow((prevShow) => !prevShow);
 
     // scroll to top
@@ -323,60 +346,32 @@ const AddAlbum = () => {
         ...prevTracks,
         { id: prevTracks.length + 1, ...data },
       ];
-
       setValue("tracks", updatedTracks);
       return updatedTracks;
     });
   };
 
-  const onSubmit = async (data) => {
-    try {
-      const {
-        data: {
-          links: { self },
-        },
-      } = await axiosPrivateInstance(session?.data?.jwt).post("/albums", data);
+  const onSubmit = (data) => {
+    addAlbum(data)
+      .then((res) => {
+        // show success message
+        toast.success("Album added successfully");
 
-      // show success message
-      toast.success("Album added successfully");
+        // remove local storage saved tracks data
+        localStorage.removeItem("tracks");
 
-      // remove local storage saved tracks data
-      localStorage.removeItem("tracks");
+        // remove local storage saved primary artist
+        localStorage.removeItem("releasePrimaryArtist");
 
-      // redirect to another route
-      router.push(self);
-    } catch (error) {
-      console.log(error, "error in add album page");
+        // redirect to another route
+        router.push(`/albums`);
+      })
+      .catch((error) => {
+        console.log(error, "add error");
 
-      // show error message
-      toast.error("Something went wrong");
-    }
-  };
-
-  useEffect(() => {
-    if (session?.data?.jwt) {
-      loadData();
-    }
-  }, [session]);
-
-  const loadData = async () => {
-    const { data } = await getAllArtists(session?.data?.jwt);
-    const { data: allLabels } = await getAllLabel({
-      token: session?.data?.jwt,
-      page: 1,
-    });
-
-    // get local storage data
-    const savedTracks = JSON.parse(localStorage.getItem("tracks"));
-
-    // update state with track data
-    if (savedTracks) {
-      setTracks(savedTracks);
-      setValue("tracks", savedTracks);
-    }
-
-    setPrimaryArtists(data);
-    setLabels(allLabels);
+        // show error message
+        toast.error("Something went wrong");
+      });
   };
 
   const handleDelete = (trackId) => {
@@ -395,6 +390,20 @@ const AddAlbum = () => {
       return filteredTracks;
     });
   };
+
+  useEffect(() => {
+    const loadData = async () => {
+      const savedTracks = JSON.parse(localStorage.getItem("tracks"));
+
+      // update state with track data
+      if (savedTracks) {
+        setTracks(savedTracks);
+        setValue("tracks", savedTracks);
+      }
+    };
+
+    loadData();
+  }, [setValue]);
 
   return (
     <Layout>
@@ -674,11 +683,11 @@ const AddAlbum = () => {
                                 )}
                               >
                                 <option value="">Select artist</option>
-                                {primaryArtists.map((artist) => {
-                                  const { id, artistName, fullName } = artist;
+                                {artists.map((artist) => {
+                                  const { id, name, fullName } = artist;
                                   return (
-                                    <option key={id} value={artistName}>
-                                      {artistName}
+                                    <option key={id} value={name}>
+                                      {name}
                                     </option>
                                   );
                                 })}
@@ -751,11 +760,11 @@ const AddAlbum = () => {
                                 <option value="" disabled>
                                   Select artist
                                 </option>
-                                {primaryArtists.map((artist) => {
-                                  const { id, artistName, fullName } = artist;
+                                {artists.map((artist) => {
+                                  const { id, name, fullName } = artist;
                                   return (
-                                    <option key={id} value={artistName}>
-                                      {artistName}
+                                    <option key={id} value={name}>
+                                      {name}
                                     </option>
                                   );
                                 })}

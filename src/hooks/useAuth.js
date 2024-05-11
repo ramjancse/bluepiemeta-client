@@ -1,14 +1,14 @@
-// import React, { useState } from "react";
+import React from "react";
+import { useSelector } from "react-redux";
 
-// const useAuth = () => {
-//   const [token, setToken] = useState(false);
+const useAuth = () => {
+  const auth = useSelector((state) => state.auth);
 
-//   useEffect(() => {
-//     const localStorageToke = JSON.parse(localStorage.getItem("token"));
-//     setToken(localStorageToke);
-//   }, []);
+  if (auth?.accessToken && auth?.user) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
-//   return;
-// };
-
-// export default useAuth;
+export default useAuth;

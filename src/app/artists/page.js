@@ -7,6 +7,8 @@ import Link from "next/link";
 import React from "react";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import Button from "@/components/artist/Button";
+import { FaMagnifyingGlass } from "react-icons/fa6";
+import Search from "@/components/artist/Search";
 
 const page = async () => {
   const session = await getServerSession(authOptions);
@@ -16,13 +18,7 @@ const page = async () => {
     <Layout>
       <Header name="All Artists" />
       <main className="px-4 py-3">
-        <div className="top flex items-center justify-between">
-          <h2 className="text-xl mb-3">Artists table</h2>
-
-          <Link href="/artists/add" className="px-10 py-2 rounded bg-gray-200">
-            Add artist
-          </Link>
-        </div>
+        <Search />
 
         <div className="overflow-x-auto mt-5">
           <table className="w-full border-collapse">
@@ -41,7 +37,7 @@ const page = async () => {
                 artists.map((artist) => {
                   const {
                     _id,
-                    artistName,
+                    name,
                     artistImage,
                     artistType,
                     fullName,
@@ -70,7 +66,7 @@ const page = async () => {
                           className="block text-blue-600"
                           href={`/artists/${_id}`}
                         >
-                          {artistName}
+                          {name}
                         </Link>
                       </td>
 
