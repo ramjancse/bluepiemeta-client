@@ -13,17 +13,16 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { axiosPrivateInstance } from "@/config/axios";
 import { useGetAlbumsQuery } from "@/features/albums/albumAPI";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Loader from "../shared/Loader";
 import TableRow from "./TableRow";
 import Search from "./Search";
 
 const Main = () => {
+  const { keyword } = useSelector((state) => state.album);
   const searchParams = useSearchParams();
-  const queryPage = searchParams.get("page");
+  const page = searchParams.get("page");
 
-  // rtk query req
-  const [page, setPage] = useState(queryPage ? Number(queryPage) : 1);
   const {
     data: {
       data: albums = [],
@@ -33,9 +32,9 @@ const Main = () => {
     isSuccess,
     isError,
     error,
-  } = useGetAlbumsQuery(page);
+  } = useGetAlbumsQuery({ page: page ? Number(page) : 1, keyword });
 
-  // decide what to render
+  // decide what to render in UI
   let content = null;
   if (isLoading) {
     content = <Loader />;
@@ -76,11 +75,11 @@ const Main = () => {
           </table>
         </div>
 
-        <Pagination
+        {/* <Pagination
           route="/albums"
           currentPage={currentPage}
           totalPage={totalPages}
-        />
+        /> */}
       </main>
     );
   }
@@ -112,7 +111,11 @@ const Main = () => {
           </table>
         </div>
 
-        <Pagination route="/albums" currentPage={page} totalPage={totalPages} />
+        <Pagination
+          route="/albums"
+          currentPage={page ? Number(page) : 1}
+          totalPage={totalPages}
+        />
       </main>
     );
   }

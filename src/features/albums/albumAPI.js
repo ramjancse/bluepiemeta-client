@@ -3,7 +3,12 @@ import { apiSlice } from "../api/apiSlice";
 export const albumAPI = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAlbums: builder.query({
-      query: () => `/albums`,
+      query: ({ page, keyword }) => {
+        const encoded = encodeURI(keyword);
+        return {
+          url: `/albums?search=${encoded}&page=${page}`,
+        };
+      },
       transformResponse: (response) => {
         const filteredData = response.data.filter(
           (album) => album.albumStatus !== "Deleted"
