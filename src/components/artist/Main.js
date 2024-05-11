@@ -1,8 +1,9 @@
 import Image from "next/image";
 import mainBanner from "@/assets/images/main_banner.jpg";
 import ArtistForm from "./ArtistForm";
+import AddArtistForm from "./AddArtistForm";
 
-const Main = ({ artistData }) => {
+const Main = () => {
   return (
     <main>
       <div className="intro">
@@ -16,12 +17,9 @@ const Main = ({ artistData }) => {
       </div>
 
       <div className="info">
-        <h3 className="py-2 text-center text-xl font-bold">
-          {" "}
-          {artistData ? "Edit" : "Add"} Artist Info
-        </h3>
+        <h3 className="py-2 text-center text-xl font-bold"> Add Artist Info</h3>
 
-        <ArtistForm artistData={artistData} />
+        <AddArtistForm />
       </div>
     </main>
   );

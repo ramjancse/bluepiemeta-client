@@ -38,9 +38,7 @@ const page = async ({ params: { albumId, trackId } }) => {
     isrc,
   } = foundTrack || {};
 
-  // const data = await getAlbumById(albumId);
-
-  const filteredGenre = trackGenre.filter((genre) => genre.status);
+  // const filteredGenre = trackGenre.filter((genre) => genre.status);
 
   return (
     <Layout>
@@ -211,8 +209,8 @@ const page = async ({ params: { albumId, trackId } }) => {
                 <div className="info border-b py-2">
                   <p className="font-semibold">Genre</p>
                   <p className="text-sm space-x-1">
-                    {filteredGenre.length
-                      ? filteredGenre.map((genre, index, array) => (
+                    {trackGenre.length
+                      ? trackGenre.map((genre, index, array) => (
                           <span
                             key={genre._id}
                             className={

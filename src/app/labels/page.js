@@ -64,7 +64,7 @@ const Label = () => {
       <section className="px-4 py-3 border-l border-b">
         <div className="labels">
           <div className="right">
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
               <h1 className="mb-3 text-xl">All Labels</h1>
 
               <Link
@@ -73,9 +73,9 @@ const Label = () => {
               >
                 Add label
               </Link>
-            </div>
+            </div> */}
 
-            <div className="overflow-x-auto mt-5">
+            <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead className="bg-gray-700 text-white">
                   <tr>

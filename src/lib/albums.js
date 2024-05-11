@@ -12,7 +12,7 @@ export const getAllAlbums = async ({ token, page }) => {
     });
 
     if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+      throw new Error(`Something went wrong`);
     }
 
     const data = await res.json();
@@ -38,7 +38,7 @@ export const getAlbumById = async ({ token, albumId }) => {
     return data;
   } catch (error) {
     console.log(error, "error");
-    return new Error("Something went wrong");
+    new Error("Something went wrong");
   }
 };
 
@@ -56,6 +56,24 @@ export const getAllLabel = async ({ token, page }) => {
       }
     );
 
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error, "error");
+    return new Error("Something went wrong");
+  }
+};
+
+export const deleteAlbumById = async ({ token, albumId }) => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/v1/albums/${albumId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
     const data = await res.json();
     return data;
   } catch (error) {

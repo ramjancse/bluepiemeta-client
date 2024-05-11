@@ -37,6 +37,10 @@ const PaginationPage = ({
         </PaginationItem>
 
         {pages.map((page, index, array) => {
+          // console.log(page, "page");
+          // console.log(currentPage, "currentPage");
+          // console.log(page === currentPage);
+
           if (page !== Number(page)) {
             return (
               <PaginationItem key={index}>
@@ -49,7 +53,7 @@ const PaginationPage = ({
             <PaginationItem key={index}>
               <PaginationLink
                 href={`?page=${page}`}
-                isActive={currentPage === page}
+                isActive={Number(currentPage) === Number(page)}
               >
                 {page}
               </PaginationLink>
