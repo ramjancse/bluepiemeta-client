@@ -369,7 +369,6 @@ const EditAlbum = () => {
     }
   }, [isSuccess, artistsIsSUccess, albumData, reset]);
 
-  // console.log(albumData, "albumData");
   const handleEdit = (trackData) => {
     // show edit form
     setShow((prevShow) => !prevShow);
@@ -441,15 +440,14 @@ const EditAlbum = () => {
 
   const onSubmitAddTrack = (data) => {
     // update state data with new add track
-    setTracks((prevTracks) => {
-      const updatedTracks = [
-        ...prevTracks,
-        { _id: prevTracks.length, ...data },
-      ];
-
-      setValue("tracks", updatedTracks);
-      return updatedTracks;
-    });
+    // setTracks((prevTracks) => {
+    //   const updatedTracks = [
+    //     ...prevTracks,
+    //     { _id: prevTracks.length, ...data },
+    //   ];
+    //   setValue("tracks", updatedTracks);
+    //   return updatedTracks;
+    // });
   };
 
   const onSubmit = async (data) => {
@@ -1404,14 +1402,14 @@ const EditAlbum = () => {
                         </>
                       )}
 
-                      <div className="add flex mt-16">
+                      {/* <div className="add flex mt-16">
                         <button
                           className="px-10 py-2 rounded bg-blue-500 uppercase text-white"
                           onClick={handleAddTrack}
                         >
                           + Add Track
                         </button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
 
