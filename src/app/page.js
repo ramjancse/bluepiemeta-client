@@ -15,14 +15,17 @@ import { getAllAlbums } from "@/lib/albums";
 import DashboardIntro from "@/components/dashboard/DashboardIntro";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/authOptions";
+import Header from "@/components/dashboard/Header";
+import Pagination from "@/components/shared/Pagination";
 
-const Dashboard = async () => {
+const Home = async () => {
   const session = await getServerSession(authOptions);
   const { data: albums } = await getAllAlbums({ token: session?.jwt, page: 1 });
 
   return (
     <Layout>
-      <DashboardIntro albums={albums} />
+      {/* <DashboardIntro albums={albums} /> */}
+      <Header name="Home" />
 
       <div className="bottom bg-[#F5F6FA] flex justify-between">
         <div className="recent-list w-1/3 px-5 pt-3 overflow-hidden shadow-md">
@@ -221,8 +224,10 @@ const Dashboard = async () => {
           </div>
         </div>
       </div>
+
+      {/* <Pagination route="/albums" currentPage={1} totalPage={1} /> */}
     </Layout>
   );
 };
 
-export default Dashboard;
+export default Home;

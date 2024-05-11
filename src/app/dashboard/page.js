@@ -15,6 +15,7 @@ import { getAllAlbums } from "@/lib/albums";
 import DashboardIntro from "@/components/dashboard/DashboardIntro";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
+import Header from "@/components/dashboard/Header";
 
 const Dashboard = async () => {
   const session = await getServerSession(authOptions);
@@ -22,7 +23,9 @@ const Dashboard = async () => {
 
   return (
     <Layout>
-      <DashboardIntro albums={albums} />
+      {/* <DashboardIntro albums={albums} /> */}
+
+      <Header />
 
       <div className="bottom bg-[#F5F6FA] flex justify-between">
         <div className="recent-list w-1/3 px-5 py-3 overflow-hidden shadow-md">

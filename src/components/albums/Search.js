@@ -26,7 +26,7 @@ const Search = () => {
   };
 
   return (
-    <div className="top flex items-center justify-end">
+    <div className="top flex items-center">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="relative">
           <span className="absolute left-3 top-4">

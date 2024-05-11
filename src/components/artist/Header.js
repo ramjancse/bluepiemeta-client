@@ -28,10 +28,10 @@ const Header = () => {
             <ul className="font-ralewayMedium flex text-lg text-primary items-center">
               <li className="ml-3 text-center">
                 <Link
-                  href="/artists"
+                  href="/dashboard"
                   className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
                 >
-                  Artists
+                  Dashboard
                 </Link>
               </li>
 
@@ -41,6 +41,33 @@ const Header = () => {
                   className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
                 >
                   Albums
+                </Link>
+              </li>
+
+              <li className="text-center">
+                <Link
+                  href="/artists"
+                  className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
+                >
+                  Artists
+                </Link>
+              </li>
+
+              <li className="text-center">
+                <Link
+                  href="/labels"
+                  className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
+                >
+                  Labels
+                </Link>
+              </li>
+
+              <li className="text-center">
+                <Link
+                  href="/search"
+                  className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
+                >
+                  Search
                 </Link>
               </li>
             </ul>

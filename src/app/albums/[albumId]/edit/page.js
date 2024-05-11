@@ -369,6 +369,7 @@ const EditAlbum = () => {
     }
   }, [isSuccess, artistsIsSUccess, albumData, reset]);
 
+  // console.log(albumData, "albumData");
   const handleEdit = (trackData) => {
     // show edit form
     setShow((prevShow) => !prevShow);
