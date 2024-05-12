@@ -4,9 +4,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
-import { axiosPrivateInstance } from "@/config/axios";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useAddLabelMutation } from "@/features/labels/labelAPI";
 
 const schema = yup
   .object({
@@ -42,36 +41,32 @@ const schema = yup
   .required();
 
 const AddLabel = () => {
-  const session = useSession();
+  const [addLabel, { isLoading, isSuccess, isError, error }] =
+    useAddLabelMutation();
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmit = async (data) => {
-    try {
-      const res = await axiosPrivateInstance(session?.data?.jwt).post(
-        "/labels",
-        data
-      );
+    addLabel(data)
+      .unwrap()
+      .then((res) => {
+        // show success message
+        toast.success("Label added successfully");
 
-      // show success message
-      toast.success("Label added successfully");
-
-      // redirect labels page
-      router.push("/labels");
-    } catch (error) {
-      console.log(error, "error in add label submit");
-
-      // show error message
-      toast.error("Something went wrong");
-    }
+        // redirect labels page
+        router.push("/labels");
+      })
+      .catch((error) => {
+        // show error message
+        toast.error("Something went wrong");
+      });
   };
 
   return (

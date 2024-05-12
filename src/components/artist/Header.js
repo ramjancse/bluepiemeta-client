@@ -28,7 +28,7 @@ const Header = () => {
             <ul className="font-ralewayMedium flex text-lg text-primary items-center">
               <li className="ml-3 text-center">
                 <Link
-                  href="/dashboard"
+                  href="/"
                   className="px-3 py-2 lg:px-4 rounded hover:bg-gray-200 duration-500 hover:text-fill"
                 >
                   Dashboard
