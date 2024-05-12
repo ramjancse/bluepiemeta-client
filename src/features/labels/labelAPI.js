@@ -5,7 +5,14 @@ export const labelAPI = apiSlice.injectEndpoints({
     getLabels: builder.query({
       query: () => `/labels`,
     }),
+    addLabel: builder.mutation({
+      query: (data) => ({
+        url: "/labels",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useGetLabelsQuery } = labelAPI;
+export const { useGetLabelsQuery, useAddLabelMutation } = labelAPI;

@@ -14,7 +14,7 @@ const menus = [
   {
     id: 1,
     name: "Dashboard",
-    link: "/dashboard",
+    link: "/",
     icon: DashboardIcon,
     children: [],
   },
