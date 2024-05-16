@@ -1,15 +1,19 @@
 import { BASE_URL, axiosPublicInstance } from "@/config/axios";
 
-export const getAllAlbums = async ({ token, page }) => {
+export const getAllAlbums = async ({ token, keyword, page, limit }) => {
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/albums?page=${page}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
+    const encoded = encodeURI(keyword);
+    const res = await fetch(
+      `${BASE_URL}/api/v1/albums?search=${encoded}&page=${page}&limit=${limit}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
     if (!res.ok) {
       throw new Error(`Something went wrong`);

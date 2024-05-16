@@ -14,7 +14,7 @@ const Label = async ({ searchParams: { page } }) => {
   const {
     data: labels = [],
     pagination: {
-      totalItems: { totalItems, limit },
+      totalItems: { totalItems = 1, limit = 1 },
     },
   } = await getAllLabel({
     token: session?.jwt,

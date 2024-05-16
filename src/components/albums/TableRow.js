@@ -1,3 +1,5 @@
+"use client";
+
 import { useDeleteAlbumMutation } from "@/features/albums/albumAPI";
 import dateFormatter from "@/utils/dateFormatter";
 import Image from "next/image";

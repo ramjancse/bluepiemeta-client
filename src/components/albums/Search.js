@@ -1,9 +1,10 @@
+"use client";
+
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
-import { searched } from "@/features/albums/albumSlice";
+import { useRouter } from "next/navigation";
 
 const schema = yup
   .object({
@@ -11,7 +12,7 @@ const schema = yup
   })
   .required();
 
-const Search = () => {
+const Search = ({ route }) => {
   const {
     register,
     handleSubmit,
@@ -19,10 +20,11 @@ const Search = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
-  const dispatch = useDispatch();
+  const router = useRouter();
 
   const onSubmit = async (data) => {
-    dispatch(searched(data));
+    const encoded = encodeURI(data.keyword);
+    router.push(`${route}?keyword=${encoded}`);
   };
 
   return (
